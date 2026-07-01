@@ -1,0 +1,25 @@
+const path = require('path')
+const fs = require('fs')
+const Database = require('better-sqlite3')
+
+const dbPath = process.env.DB_PATH || './db/wireguard-wui.db'
+const absolutePath = path.resolve(dbPath)
+
+const dbDir = path.dirname(absolutePath)
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true })
+}
+
+const db = new Database(absolutePath)
+db.pragma('journal_mode = WAL')
+db.pragma('foreign_keys = ON')
+
+function initSchema() {
+  const schemaPath = path.join(__dirname, 'schema.sql')
+  const schema = fs.readFileSync(schemaPath, 'utf8')
+  db.exec(schema)
+}
+
+initSchema()
+
+module.exports = db

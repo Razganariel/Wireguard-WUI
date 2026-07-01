@@ -1,0 +1,167 @@
+<div class="row mb-4">
+  <div class="col">
+    <h1>Interface WireGuard</h1>
+  </div>
+</div>
+
+{{#unless hasInterfaces}}
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Initialiser une interface</h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted">Configurez votre interface WireGuard. Les clés seront générées automatiquement.</p>
+          <form method="POST" action="/interface">
+            <div class="mb-3">
+              <label for="nom" class="form-label">Nom de l'interface</label>
+              <input type="text" class="form-control" id="nom" name="nom" placeholder="wg0" pattern="wg[0-9]+" required>
+              <div class="form-text">Format : wg0, wg1, wg2…</div>
+            </div>
+            <div class="mb-3">
+              <label for="adresse_ip" class="form-label">Adresse IP</label>
+              <input type="text" class="form-control" id="adresse_ip" name="adresse_ip" placeholder="10.0.0.1/24" required>
+            </div>
+            <div class="mb-3">
+              <label for="port" class="form-label">Port d'écoute</label>
+              <input type="number" class="form-control" id="port" name="port" value="51820" min="1" max="65535" required>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">Initialiser l'interface</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{{/unless}}
+
+{{#if hasInterfaces}}
+  <div class="row mb-3">
+    <div class="col">
+      <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#newInterfaceForm">
+        + Nouvelle interface
+      </button>
+    </div>
+  </div>
+
+  <div class="collapse mb-4" id="newInterfaceForm">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Initialiser une interface</h5>
+          </div>
+          <div class="card-body">
+            <form method="POST" action="/interface">
+              <div class="mb-3">
+                <label for="nom" class="form-label">Nom de l'interface</label>
+                <input type="text" class="form-control" id="nom" name="nom" placeholder="wg0" pattern="wg[0-9]+" required>
+              </div>
+              <div class="mb-3">
+                <label for="adresse_ip" class="form-label">Adresse IP</label>
+                <input type="text" class="form-control" id="adresse_ip" name="adresse_ip" placeholder="10.0.0.1/24" required>
+              </div>
+              <div class="mb-3">
+                <label for="port" class="form-label">Port d'écoute</label>
+                <input type="number" class="form-control" id="port" name="port" value="51820" min="1" max="65535" required>
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Initialiser</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    {{#each interfaces}}
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">{{nom}}</h5>
+            {{#if active}}
+              <span class="badge bg-success">Actif</span>
+            {{else}}
+              <span class="badge bg-secondary">Inactif</span>
+            {{/if}}
+          </div>
+          <div class="card-body">
+            <table class="table table-sm">
+              <tbody>
+                <tr>
+                  <th style="width: 40%">Adresse IP</th>
+                  <td>{{adresse_ip}}</td>
+                </tr>
+                <tr>
+                  <th>Port</th>
+                  <td>{{port}}</td>
+                </tr>
+                <tr>
+                  <th>Clé publique</th>
+                  <td><code class="text-break small">{{public_key}}</code></td>
+                </tr>
+                <tr>
+                  <th>Pairs connectés</th>
+                  <td>{{connectedPeers}} / {{peerCount}}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            {{#if status}}
+              {{#if status.peers.length}}
+                <h6 class="mt-3">Pairs actifs</h6>
+                <table class="table table-sm table-striped">
+                  <thead>
+                    <tr>
+                      <th>Clé publique</th>
+                      <th>Endpoint</th>
+                      <th>Handshake</th>
+                      <th>Transfert</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each status.peers}}
+                      <tr>
+                        <td><code class="small">{{publicKey}}</code></td>
+                        <td>{{endpoint}}</td>
+                        <td>
+                          {{#if latestHandshake}}
+                            {{latestHandshake}}
+                          {{else}}
+                            <span class="text-muted">—</span>
+                          {{/if}}
+                        </td>
+                        <td>
+                          <span class="text-success">↓ {{transferRx}}</span>
+                          <span class="text-primary">↑ {{transferTx}}</span>
+                        </td>
+                      </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              {{/if}}
+            {{/if}}
+
+            <div class="d-flex gap-2 mt-3">
+              <form method="POST" action="/interface/{{id}}/toggle" class="d-inline">
+                {{#if active}}
+                  <button type="submit" class="btn btn-sm btn-outline-warning">Arrêter</button>
+                {{else}}
+                  <button type="submit" class="btn btn-sm btn-outline-success">Démarrer</button>
+                {{/if}}
+              </form>
+              <form method="POST" action="/interface/{{id}}/delete" class="d-inline" onsubmit="return confirm('Supprimer l\\'interface {{nom}} ? Cette action est irréversible.')">
+                <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+              </form>
+              <a href="/peers?interface={{id}}" class="btn btn-sm btn-outline-primary ms-auto">Gérer les pairs</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+{{/if}}
