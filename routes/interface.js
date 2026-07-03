@@ -12,8 +12,7 @@ router.get('/', async (req, res) => {
   let statuses = {}
   if (interfaces.length > 0) {
     try {
-      const { getAllStatus } = require('../controllers/interface')
-      statuses = await getAllStatus()
+      statuses = await interfaceController.getAllStatus()
     } catch (err) {
       statuses = {}
     }
@@ -31,10 +30,26 @@ router.get('/', async (req, res) => {
     }
   })
 
+  let systemInterfaces = []
+  let sudoNotSet = false
+  if (req.session.sudoPassword) {
+    try {
+      const names = await interfaceController.getSystemInterfaceNames()
+      const dbNames = interfaces.map((i) => i.nom)
+      systemInterfaces = names.filter((n) => !dbNames.includes(n))
+    } catch (err) {
+      systemInterfaces = []
+    }
+  } else {
+    sudoNotSet = true
+  }
+
   res.render('interface/index', {
     title: 'Interface WireGuard',
     interfaces: enrichedInterfaces,
-    hasInterfaces: interfaces.length > 0
+    hasInterfaces: interfaces.length > 0,
+    systemInterfaces,
+    sudoNotSet
   })
 })
 
@@ -53,5 +68,15 @@ router.post('/select', (req, res) => {
 router.post('/:id/toggle', requireSudoPassword, interfaceController.toggleInterface)
 
 router.post('/:id/delete', requireSudoPassword, interfaceController.deleteInterface)
+
+router.post('/import/:name', requireSudoPassword, async (req, res) => {
+  try {
+    await interfaceController.importInterface(req.params.name)
+    req.session.flash = { success: `Interface "${req.params.name}" importée avec succès.` }
+  } catch (err) {
+    req.session.flash = { error: `Import impossible : ${err.message}` }
+  }
+  res.redirect('/interface')
+})
 
 module.exports = router

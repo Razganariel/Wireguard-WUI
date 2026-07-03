@@ -267,10 +267,90 @@ async function deleteInterface(req, res) {
   return res.redirect('/interface')
 }
 
+async function getSystemInterfaceNames() {
+  try {
+    if (!sudo.hasPassword()) return []
+    const { stdout } = await sudo.exec('find /etc/wireguard -maxdepth 1 -name "*.conf" -exec basename {} .conf \\; 2>/dev/null; exit 0')
+    return stdout.trim().split('\n').filter(Boolean)
+  } catch (err) {
+    return []
+  }
+}
+
+async function importInterface(nom) {
+  const { stdout } = await sudo.exec(`cat /etc/wireguard/${nom}.conf`)
+  const lines = stdout.split('\n')
+
+  let privateKey = ''
+  let adresse_ip = ''
+  let port = 51820
+
+  let section = ''
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (trimmed.startsWith('[')) {
+      section = trimmed.toLowerCase()
+      continue
+    }
+    if (section === '[interface]') {
+      const [key, ...vals] = trimmed.split('=')
+      const val = vals.join('=').trim()
+      switch (key.trim().toLowerCase()) {
+        case 'privatekey':
+          privateKey = val
+          break
+        case 'address':
+          adresse_ip = val.split(',')[0].trim()
+          break
+        case 'listenport':
+          port = parseInt(val, 10) || 51820
+          break
+      }
+    }
+  }
+
+  if (!privateKey || !adresse_ip) {
+    throw new Error(`Impossible de parser la configuration de ${nom} : PrivateKey ou Address manquant.`)
+  }
+
+  let publicKey = 'IMPORT_FAILED'
+  const tmpFile = path.join(os.tmpdir(), `wgimport_${nom}_${Date.now()}`)
+  fs.writeFileSync(tmpFile, privateKey)
+  try {
+    const { stdout: pubout } = await execAsync(`wg pubkey < ${tmpFile}`)
+    publicKey = pubout.trim()
+  } finally {
+    if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile)
+  }
+
+  const existing = interfaceModel.findAll().find((i) => i.nom === nom)
+  if (existing) {
+    throw new Error(`L'interface "${nom}" existe déjà dans la base.`)
+  }
+
+  const id = interfaceModel.create({
+    nom,
+    private_key: privateKey,
+    public_key: publicKey,
+    adresse_ip,
+    port
+  })
+
+  const iface = interfaceModel.findById(id)
+  const isActive = await getStatus(nom)
+  if (isActive) {
+    interfaceModel.updateActive(id, true)
+  }
+
+  return iface
+}
+
 module.exports = {
   initInterface,
   toggleInterface,
   deleteInterface,
   getStatus,
-  getAllStatus
+  getAllStatus,
+  getSystemInterfaceNames,
+  importInterface
 }
