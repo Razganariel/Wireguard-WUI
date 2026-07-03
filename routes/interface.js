@@ -31,19 +31,25 @@ router.get('/', async (req, res) => {
   })
 
   let systemInterfaces = []
-  try {
-    const names = await interfaceController.getSystemInterfaceNames()
-    const dbNames = interfaces.map((i) => i.nom)
-    systemInterfaces = names.filter((n) => !dbNames.includes(n))
-  } catch (err) {
-    systemInterfaces = []
+  let sudoNotSet = false
+  if (req.session.sudoPassword) {
+    try {
+      const names = await interfaceController.getSystemInterfaceNames()
+      const dbNames = interfaces.map((i) => i.nom)
+      systemInterfaces = names.filter((n) => !dbNames.includes(n))
+    } catch (err) {
+      systemInterfaces = []
+    }
+  } else {
+    sudoNotSet = true
   }
 
   res.render('interface/index', {
     title: 'Interface WireGuard',
     interfaces: enrichedInterfaces,
     hasInterfaces: interfaces.length > 0,
-    systemInterfaces
+    systemInterfaces,
+    sudoNotSet
   })
 })
 

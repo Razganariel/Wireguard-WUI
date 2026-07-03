@@ -269,8 +269,9 @@ async function deleteInterface(req, res) {
 
 async function getSystemInterfaceNames() {
   try {
-    const { stdout } = await sudo.exec('ls /etc/wireguard/*.conf 2>/dev/null')
-    return stdout.trim().split('\n').filter(Boolean).map((f) => path.basename(f, '.conf'))
+    if (!sudo.hasPassword()) return []
+    const { stdout } = await sudo.exec('find /etc/wireguard -maxdepth 1 -name "*.conf" -exec basename {} .conf \\; 2>/dev/null; exit 0')
+    return stdout.trim().split('\n').filter(Boolean)
   } catch (err) {
     return []
   }

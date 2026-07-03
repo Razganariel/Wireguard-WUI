@@ -4,6 +4,40 @@
   </div>
 </div>
 
+{{#if systemInterfaces.length}}
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-warning">
+        <div class="card-header bg-warning bg-opacity-10">
+          <h5 class="mb-0">Interfaces système détectées</h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted small mb-3">
+            Les interfaces suivantes existent dans /etc/wireguard/ mais ne sont pas encore dans la base.
+            Importez-les pour les gérer depuis l'interface web.
+          </p>
+          <div class="d-flex flex-wrap gap-2">
+            {{#each systemInterfaces}}
+              <form method="POST" action="/interface/import/{{this}}" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-outline-warning">Importer {{this}}</button>
+              </form>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{{else if sudoNotSet}}
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="alert alert-info">
+        <a href="/auth/sudo-password" class="alert-link">Définissez le mot de passe sudo</a>
+        pour détecter les interfaces WireGuard existantes sur le système.
+      </div>
+    </div>
+  </div>
+{{/if}}
+
 {{#unless hasInterfaces}}
   <div class="row justify-content-center">
     <div class="col-md-6">
@@ -36,31 +70,6 @@
     </div>
   </div>
 {{/unless}}
-
-{{#if systemInterfaces.length}}
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="card border-warning">
-        <div class="card-header bg-warning bg-opacity-10">
-          <h5 class="mb-0">Interfaces système détectées</h5>
-        </div>
-        <div class="card-body">
-          <p class="text-muted small mb-3">
-            Les interfaces suivantes existent dans /etc/wireguard/ mais ne sont pas encore dans la base.
-            Importez-les pour les gérer depuis l'interface web.
-          </p>
-          <div class="d-flex flex-wrap gap-2">
-            {{#each systemInterfaces}}
-              <form method="POST" action="/interface/import/{{this}}" class="d-inline">
-                <button type="submit" class="btn btn-sm btn-outline-warning">Importer {{this}}</button>
-              </form>
-            {{/each}}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-{{/if}}
 
 {{#if hasInterfaces}}
   <div class="row mb-3">
