@@ -277,22 +277,37 @@ async function getSystemInterfaceNames() {
   }
 }
 
-async function importInterface(nom) {
-  const { stdout } = await sudo.exec(`cat /etc/wireguard/${nom}.conf`)
-  const lines = stdout.split('\n')
-
+function parseConfig(configContent) {
+  const lines = configContent.split('\n')
   let privateKey = ''
   let adresse_ip = ''
   let port = 51820
+  const peerEntries = []
+  let currentPeer = null
+  let pendingComment = ''
+  let currentComment = ''
 
-  let section = ''
-  for (const line of lines) {
-    const trimmed = line.trim()
-    if (trimmed.startsWith('[')) {
-      section = trimmed.toLowerCase()
+  for (const raw of lines) {
+    const trimmed = raw.trim()
+    if (trimmed.startsWith('#')) {
+      pendingComment = trimmed.slice(1).trim()
       continue
     }
-    if (section === '[interface]') {
+    if (trimmed.startsWith('[')) {
+      const section = trimmed.toLowerCase()
+      if (section === '[peer]') {
+        if (currentPeer) {
+          peerEntries.push({ ...currentPeer, comment: currentComment })
+        }
+        currentPeer = {}
+        currentComment = pendingComment
+        pendingComment = ''
+      } else if (section === '[interface]') {
+        currentPeer = null
+      }
+      continue
+    }
+    if (!currentPeer) {
       const [key, ...vals] = trimmed.split('=')
       const val = vals.join('=').trim()
       switch (key.trim().toLowerCase()) {
@@ -306,8 +321,58 @@ async function importInterface(nom) {
           port = parseInt(val, 10) || 51820
           break
       }
+    } else {
+      const [key, ...vals] = trimmed.split('=')
+      const val = vals.join('=').trim()
+      switch (key.trim().toLowerCase()) {
+        case 'publickey':
+          currentPeer.public_key = val
+          break
+        case 'presharedkey':
+          currentPeer.preshared_key = val
+          break
+        case 'allowedips':
+          currentPeer.allowed_ips = val
+          break
+        case 'persistentkeepalive':
+          currentPeer.persistent_keepalive = parseInt(val, 10) || 25
+          break
+      }
     }
   }
+  if (currentPeer && Object.keys(currentPeer).length > 0) {
+    peerEntries.push({ ...currentPeer, comment: currentComment })
+  }
+
+  return { privateKey, adresse_ip, port, peerEntries }
+}
+
+function persistPeers(interfaceId, peerEntries) {
+  const existingKeys = peerModel.findByInterfaceId(interfaceId).map((p) => p.public_key)
+  let count = 0
+  for (const entry of peerEntries) {
+    if (!entry.public_key) continue
+    if (existingKeys.includes(entry.public_key)) continue
+    const ipFromAllowed = (entry.allowed_ips || '').split(',')[0].trim().split('/')[0]
+    peerModel.create({
+      interface_id: interfaceId,
+      nom: entry.comment || `peer-${entry.public_key.slice(0, 8)}`,
+      adresse_ip: ipFromAllowed || '0.0.0.0',
+      public_key: entry.public_key,
+      private_key: 'IMPORTED_FROM_SYSTEM',
+      preshared_key: entry.preshared_key || null,
+      allowed_ips: entry.allowed_ips || '0.0.0.0/0',
+      dns: null,
+      persistent_keepalive: entry.persistent_keepalive || 25
+    })
+    count++
+  }
+  return count
+}
+
+async function importInterface(nom) {
+  const { stdout } = await sudo.exec(`cat /etc/wireguard/${nom}.conf`)
+  const { privateKey, adresse_ip, port, peerEntries } = parseConfig(stdout)
 
   if (!privateKey || !adresse_ip) {
     throw new Error(`Impossible de parser la configuration de ${nom} : PrivateKey ou Address manquant.`)
@@ -323,26 +388,78 @@ async function importInterface(nom) {
     if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile)
   }
 
-  const existing = interfaceModel.findAll().find((i) => i.nom === nom)
-  if (existing) {
-    throw new Error(`L'interface "${nom}" existe déjà dans la base.`)
+  let iface = interfaceModel.findAll().find((i) => i.nom === nom)
+  let isNewInterface = false
+  if (!iface) {
+    const id = interfaceModel.create({
+      nom,
+      private_key: privateKey,
+      public_key: publicKey,
+      adresse_ip,
+      port
+    })
+    iface = interfaceModel.findById(id)
+    isNewInterface = true
   }
 
-  const id = interfaceModel.create({
-    nom,
-    private_key: privateKey,
-    public_key: publicKey,
-    adresse_ip,
-    port
-  })
-
-  const iface = interfaceModel.findById(id)
   const isActive = await getStatus(nom)
-  if (isActive) {
-    interfaceModel.updateActive(id, true)
+  if (isActive) interfaceModel.updateActive(iface.id, true)
+
+  const importedPeerCount = persistPeers(iface.id, peerEntries)
+  iface._importedPeerCount = importedPeerCount
+  iface._isNewInterface = isNewInterface
+  return iface
+}
+
+async function detectAndImportAll() {
+  const names = await getSystemInterfaceNames()
+  let importedIfaces = 0
+  let importedPeers = 0
+  for (const nom of names) {
+    const existing = interfaceModel.findAll().find((i) => i.nom === nom)
+    if (existing) continue
+    const iface = await importInterface(nom)
+    importedIfaces++
+    importedPeers += iface._importedPeerCount
+  }
+  return { importedIfaces, importedPeers }
+}
+
+async function importPeersFromInterface(nom) {
+  const iface = interfaceModel.findAll().find((i) => i.nom === nom)
+  if (!iface) throw new Error(`Interface "${nom}" introuvable dans la base.`)
+
+  const allPeers = []
+
+  try {
+    const { stdout } = await sudo.exec(`cat /etc/wireguard/${nom}.conf`)
+    const { peerEntries } = parseConfig(stdout)
+    allPeers.push(...peerEntries)
+  } catch (err) {
+    // config file might not exist or have no peers — fallback to runtime dump
   }
 
-  return iface
+  try {
+    const dump = await getStatus(nom)
+    if (dump && dump.peers) {
+      for (const p of dump.peers) {
+        const already = allPeers.find((e) => e.public_key === p.publicKey)
+        if (!already) {
+          allPeers.push({
+            public_key: p.publicKey,
+            preshared_key: p.presharedKey || null,
+            allowed_ips: p.allowedIps || '0.0.0.0/0',
+            persistent_keepalive: p.persistentKeepalive || 25,
+            comment: ''
+          })
+        }
+      }
+    }
+  } catch (err) {
+    // runtime dump unavailable
+  }
+
+  return persistPeers(iface.id, allPeers)
 }
 
 module.exports = {
@@ -352,5 +469,8 @@ module.exports = {
   getStatus,
   getAllStatus,
   getSystemInterfaceNames,
-  importInterface
+  importInterface,
+  detectAndImportAll,
+  importPeersFromInterface,
+  writeConfigFile
 }
