@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const peerController = require('../controllers/peers')
+const interfaceController = require('../controllers/interface')
 const peerModel = require('../models/peer')
 const interfaceModel = require('../models/interface')
 const { isAuthenticated, requireSudoPassword } = require('../middlewares/auth')
@@ -100,6 +101,30 @@ router.get('/', async (req, res) => {
     selectedInterfaceName: selectedIface.nom,
     hasInterfaces: true
   })
+})
+
+router.post('/detect', requireSudoPassword, async (req, res) => {
+  const ifaceId = req.session.selectedInterfaceId
+  if (!ifaceId) {
+    req.session.flash = { error: 'Aucune interface sélectionnée.' }
+    return res.redirect('/peers')
+  }
+  const iface = interfaceModel.findById(ifaceId)
+  if (!iface) {
+    req.session.flash = { error: 'Interface introuvable.' }
+    return res.redirect('/peers')
+  }
+  try {
+    const count = await interfaceController.importPeersFromInterface(iface.nom)
+    if (count > 0) {
+      req.session.flash = { success: `${count} pair${count > 1 ? 's' : ''} importé${count > 1 ? 's' : ''} depuis "${iface.nom}".` }
+    } else {
+      req.session.flash = { success: 'Aucun nouveau pair détecté.' }
+    }
+  } catch (err) {
+    req.session.flash = { error: `Erreur : ${err.message}` }
+  }
+  res.redirect('/peers')
 })
 
 router.post('/', requireSudoPassword, peerController.createPeer)

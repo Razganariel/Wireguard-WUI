@@ -8,6 +8,7 @@ const sudo = require('../helpers/sudo')
 
 const peerModel = require('../models/peer')
 const interfaceModel = require('../models/interface')
+const interfaceController = require('./interface')
 
 async function generateKeys() {
   const { stdout: privkey } = await execAsync('wg genkey')
@@ -43,7 +44,7 @@ async function addPeerToInterface(iface, peer) {
   }
   try {
     await sudo.exec(cmd)
-    await sudo.exec(`wg-quick save ${iface.nom}`)
+    await interfaceController.writeConfigFile(iface)
   } finally {
     if (tmpFile && fs.existsSync(tmpFile)) {
       fs.unlinkSync(tmpFile)
@@ -53,7 +54,7 @@ async function addPeerToInterface(iface, peer) {
 
 async function removePeerFromInterface(iface, publicKey) {
   await sudo.exec(`wg set ${iface.nom} peer ${publicKey} remove`)
-  await sudo.exec(`wg-quick save ${iface.nom}`)
+  await interfaceController.writeConfigFile(iface)
 }
 
 async function createPeer(req, res) {

@@ -71,10 +71,33 @@ router.post('/:id/delete', requireSudoPassword, interfaceController.deleteInterf
 
 router.post('/import/:name', requireSudoPassword, async (req, res) => {
   try {
-    await interfaceController.importInterface(req.params.name)
-    req.session.flash = { success: `Interface "${req.params.name}" importée avec succès.` }
+    const iface = await interfaceController.importInterface(req.params.name)
+    const peerMsg = iface._importedPeerCount > 0
+      ? ` (${iface._importedPeerCount} pair${iface._importedPeerCount > 1 ? 's' : ''} importé${iface._importedPeerCount > 1 ? 's' : ''})`
+      : ''
+    const msg = iface._isNewInterface
+      ? `Interface "${req.params.name}" importée avec succès${peerMsg}.`
+      : `${iface._importedPeerCount} pair${iface._importedPeerCount > 1 ? 's' : ''} importé${iface._importedPeerCount > 1 ? 's' : ''} depuis "${req.params.name}".`
+    req.session.flash = { success: msg }
   } catch (err) {
     req.session.flash = { error: `Import impossible : ${err.message}` }
+  }
+  res.redirect('/interface')
+})
+
+router.post('/detect', requireSudoPassword, async (req, res) => {
+  try {
+    const { importedIfaces, importedPeers } = await interfaceController.detectAndImportAll()
+    if (importedIfaces === 0 && importedPeers === 0) {
+      req.session.flash = { success: 'Aucune nouvelle interface ou pair détecté.' }
+    } else {
+      const parts = []
+      if (importedIfaces > 0) parts.push(`${importedIfaces} interface${importedIfaces > 1 ? 's' : ''}`)
+      if (importedPeers > 0) parts.push(`${importedPeers} pair${importedPeers > 1 ? 's' : ''}`)
+      req.session.flash = { success: `Détection terminée : ${parts.join(' et ')} importé${parts.length > 1 ? 's' : ''}.` }
+    }
+  } catch (err) {
+    req.session.flash = { error: `Erreur lors de la détection : ${err.message}` }
   }
   res.redirect('/interface')
 })
