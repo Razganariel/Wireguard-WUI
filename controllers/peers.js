@@ -4,6 +4,7 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const execAsync = util.promisify(exec)
+const sudo = require('../helpers/sudo')
 
 const peerModel = require('../models/peer')
 const interfaceModel = require('../models/interface')
@@ -33,7 +34,7 @@ async function generatePresharedKey() {
 }
 
 async function addPeerToInterface(iface, peer) {
-  let cmd = `sudo wg set ${iface.nom} peer ${peer.public_key} allowed-ips ${peer.adresse_ip}/32`
+  let cmd = `wg set ${iface.nom} peer ${peer.public_key} allowed-ips ${peer.adresse_ip}/32`
   let tmpFile = null
   if (peer.preshared_key) {
     tmpFile = path.join(os.tmpdir(), `wgpsk_${Date.now()}`)
@@ -41,8 +42,8 @@ async function addPeerToInterface(iface, peer) {
     cmd += ` preshared-key ${tmpFile}`
   }
   try {
-    await execAsync(cmd)
-    await execAsync(`sudo wg-quick save ${iface.nom}`)
+    await sudo.exec(cmd)
+    await sudo.exec(`wg-quick save ${iface.nom}`)
   } finally {
     if (tmpFile && fs.existsSync(tmpFile)) {
       fs.unlinkSync(tmpFile)
@@ -51,8 +52,8 @@ async function addPeerToInterface(iface, peer) {
 }
 
 async function removePeerFromInterface(iface, publicKey) {
-  await execAsync(`sudo wg set ${iface.nom} peer ${publicKey} remove`)
-  await execAsync(`sudo wg-quick save ${iface.nom}`)
+  await sudo.exec(`wg set ${iface.nom} peer ${publicKey} remove`)
+  await sudo.exec(`wg-quick save ${iface.nom}`)
 }
 
 async function createPeer(req, res) {

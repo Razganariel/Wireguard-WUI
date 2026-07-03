@@ -4,6 +4,7 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const execAsync = util.promisify(exec)
+const sudo = require('../helpers/sudo')
 
 const interfaceModel = require('../models/interface')
 const peerModel = require('../models/peer')
@@ -51,8 +52,8 @@ async function writeConfigFile(iface) {
   const tmpFile = path.join(os.tmpdir(), `wgconf_${iface.nom}_${Date.now()}.conf`)
   fs.writeFileSync(tmpFile, configContent)
   try {
-    await execAsync(`sudo cp ${tmpFile} ${configPath}`)
-    await execAsync(`sudo chmod 600 ${configPath}`)
+    await sudo.exec(`cp ${tmpFile} ${configPath}`)
+    await sudo.exec(`chmod 600 ${configPath}`)
   } finally {
     if (fs.existsSync(tmpFile)) {
       fs.unlinkSync(tmpFile)
@@ -62,16 +63,16 @@ async function writeConfigFile(iface) {
 }
 
 async function bringUp(nom) {
-  await execAsync(`sudo wg-quick up ${nom}`)
+  await sudo.exec(`wg-quick up ${nom}`)
 }
 
 async function bringDown(nom) {
-  await execAsync(`sudo wg-quick down ${nom}`)
+  await sudo.exec(`wg-quick down ${nom}`)
 }
 
 async function getStatus(nom) {
   try {
-    const { stdout } = await execAsync(`sudo wg show ${nom} dump`)
+    const { stdout } = await sudo.exec(`wg show ${nom} dump`)
     return parseDump(stdout)
   } catch (err) {
     return null
@@ -80,7 +81,7 @@ async function getStatus(nom) {
 
 async function getAllStatus() {
   try {
-    const { stdout } = await execAsync('sudo wg show all dump')
+    const { stdout } = await sudo.exec('wg show all dump')
     return parseAllDump(stdout)
   } catch (err) {
     return {}
@@ -256,7 +257,7 @@ async function deleteInterface(req, res) {
     if (iface.active) {
       await bringDown(iface.nom)
     }
-    await execAsync(`sudo rm -f /etc/wireguard/${iface.nom}.conf`)
+    await sudo.exec(`rm -f /etc/wireguard/${iface.nom}.conf`)
   } catch (err) {
     // best effort — continue with DB cleanup
   }

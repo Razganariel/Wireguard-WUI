@@ -132,6 +132,11 @@ dist
 # DevWorkflow context (not part of the project)
 dev/
 
+# SQLite database files (local data, not part of the project)
+db/*.db
+db/*.db-shm
+db/*.db-wal
+
 # yarn v2
 .yarn/cache
 .yarn/unplugged
