@@ -66,6 +66,12 @@ router.get('/', async (req, res) => {
   let selectedIface = null
   if (interfaceId) {
     selectedIface = interfaceModel.findById(interfaceId)
+    if (selectedIface) {
+      req.session.selectedInterfaceId = selectedIface.id
+    }
+  }
+  if (!selectedIface && req.session.selectedInterfaceId) {
+    selectedIface = interfaceModel.findById(req.session.selectedInterfaceId)
   }
   if (!selectedIface) {
     selectedIface = interfaces[0]

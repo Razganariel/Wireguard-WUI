@@ -1,6 +1,6 @@
 <div class="row mb-4">
   <div class="col">
-    <h1>Pairs</h1>
+    <h1>Pairs <small class="text-muted fs-5">{{selectedInterfaceName}}</small></h1>
   </div>
 </div>
 
@@ -11,21 +11,6 @@
 {{/unless}}
 
 {{#if hasInterfaces}}
-  {{#if interfaces.length}}
-    <div class="row mb-3">
-      <div class="col-md-4">
-        <form method="GET" action="/peers" class="d-flex align-items-center" id="ifaceSelector">
-          <label class="form-label me-2 mb-0">Interface :</label>
-          <select name="interface" class="form-select form-select-sm" onchange="this.form.submit()">
-            {{#each interfaces}}
-              <option value="{{id}}" {{#if (eq ../selectedInterface id)}}selected{{/if}}>{{nom}}</option>
-            {{/each}}
-          </select>
-        </form>
-      </div>
-    </div>
-  {{/if}}
-
   <div class="row mb-4">
     <div class="col">
       <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#addPeerForm">
@@ -40,7 +25,7 @@
         <h5 class="mb-0">Ajouter un pair</h5>
       </div>
       <div class="card-body">
-        <form method="POST" action="/peers">
+        <form method="POST" action="/peers" data-validate>
           <input type="hidden" name="interface_id" value="{{selectedInterface}}">
           <div class="row g-3">
             <div class="col-md-4">

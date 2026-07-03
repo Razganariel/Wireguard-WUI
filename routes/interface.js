@@ -40,6 +40,16 @@ router.get('/', async (req, res) => {
 
 router.post('/', interfaceController.initInterface)
 
+router.post('/select', (req, res) => {
+  const id = parseInt(req.body.interface_id, 10)
+  const iface = interfaceModel.findById(id)
+  if (iface) {
+    req.session.selectedInterfaceId = id
+  }
+  const redirectUrl = req.body.redirect || '/peers'
+  res.redirect(redirectUrl)
+})
+
 router.post('/:id/toggle', interfaceController.toggleInterface)
 
 router.post('/:id/delete', interfaceController.deleteInterface)
