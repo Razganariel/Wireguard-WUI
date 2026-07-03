@@ -244,6 +244,95 @@ async function toggleInterface(req, res) {
   return res.redirect('/interface')
 }
 
+function buildWireGuardConfig(iface) {
+  const lines = [
+    '[Interface]',
+    `PrivateKey = ${iface.private_key}`,
+    `ListenPort = ${iface.port}`,
+    ''
+  ]
+  const peers = peerModel.findByInterfaceId(iface.id)
+  for (const peer of peers) {
+    lines.push(`# ${peer.nom}`)
+    lines.push('[Peer]')
+    lines.push(`PublicKey = ${peer.public_key}`)
+    lines.push(`AllowedIPs = ${peer.allowed_ips}`)
+    if (peer.preshared_key) {
+      lines.push(`PresharedKey = ${peer.preshared_key}`)
+    }
+    if (peer.persistent_keepalive) {
+      lines.push(`PersistentKeepalive = ${peer.persistent_keepalive}`)
+    }
+    lines.push('')
+  }
+  return lines.join('\n')
+}
+
+async function syncConfig(nom) {
+  const iface = interfaceModel.findAll().find((i) => i.nom === nom)
+  if (!iface) throw new Error(`Interface "${nom}" introuvable.`)
+  const wgConfig = buildWireGuardConfig(iface)
+  const tmpFile = path.join(os.tmpdir(), `wgsync_${nom}_${Date.now()}.conf`)
+  fs.writeFileSync(tmpFile, wgConfig)
+  try {
+    await sudo.exec(`wg syncconf ${nom} ${tmpFile}`)
+  } finally {
+    if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile)
+  }
+}
+
+async function editInterface(req, res) {
+  const id = req.params.id
+  const iface = interfaceModel.findById(id)
+
+  if (!iface) {
+    req.session.flash = { error: 'Interface introuvable.' }
+    return res.redirect('/interface')
+  }
+
+  const { adresse_ip, port } = req.body
+
+  if (!adresse_ip || !/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/.test(adresse_ip)) {
+    req.session.flash = { error: 'L\'adresse IP doit être au format CIDR (ex: 10.0.0.1/24).' }
+    return res.redirect('/interface')
+  }
+
+  const portNum = parseInt(port, 10)
+  if (!port || isNaN(portNum) || portNum < 1 || portNum > 65535) {
+    req.session.flash = { error: 'Le port doit être un nombre entre 1 et 65535.' }
+    return res.redirect('/interface')
+  }
+
+  const oldConfig = { adresse_ip: iface.adresse_ip, port: iface.port }
+
+  try {
+    iface.adresse_ip = adresse_ip
+    iface.port = portNum
+    await writeConfigFile(iface)
+
+    if (iface.active) {
+      try {
+        await syncConfig(iface.nom)
+      } catch (syncErr) {
+        iface.adresse_ip = oldConfig.adresse_ip
+        iface.port = oldConfig.port
+        await writeConfigFile(iface)
+        req.session.flash = { error: `Erreur lors de l'application de la configuration : ${syncErr.message}. Les modifications ont été annulées.` }
+        return res.redirect('/interface')
+      }
+    }
+
+    const db = require('../db')
+    db.prepare('UPDATE interfaces SET adresse_ip = ?, port = ? WHERE id = ?').run(adresse_ip, portNum, id)
+
+    req.session.flash = { success: `Interface "${iface.nom}" mise à jour.` }
+  } catch (err) {
+    req.session.flash = { error: `Erreur : ${err.message}` }
+  }
+
+  return res.redirect('/interface')
+}
+
 async function deleteInterface(req, res) {
   const id = req.params.id
   const iface = interfaceModel.findById(id)
@@ -465,6 +554,7 @@ async function importPeersFromInterface(nom) {
 module.exports = {
   initInterface,
   toggleInterface,
+  editInterface,
   deleteInterface,
   getStatus,
   getAllStatus,

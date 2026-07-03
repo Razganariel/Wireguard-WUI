@@ -140,6 +140,82 @@ async function createPeer(req, res) {
   return res.redirect(`/peers?interface=${interface_id}`)
 }
 
+async function editPeer(req, res) {
+  const id = req.params.id
+  const peer = peerModel.findById(id)
+  if (!peer) {
+    req.session.flash = { error: 'Pair introuvable.' }
+    return res.redirect('/peers')
+  }
+
+  const { nom, adresse_ip, allowed_ips, dns, persistent_keepalive } = req.body
+
+  if (!nom || !adresse_ip) {
+    req.session.flash = { error: 'Nom et adresse IP sont obligatoires.' }
+    return res.redirect(`/peers?interface=${peer.interface_id}`)
+  }
+
+  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(adresse_ip)) {
+    req.session.flash = { error: 'L\'adresse IP doit être au format IPv4 (ex: 10.0.0.2).' }
+    return res.redirect(`/peers?interface=${peer.interface_id}`)
+  }
+
+  if (allowed_ips && !/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}(,\s*(\d{1,3}\.){3}\d{1,3}\/\d{1,2})*$/.test(allowed_ips)) {
+    req.session.flash = { error: 'Allowed IPs doit être au format CIDR (ex: 0.0.0.0/0).' }
+    return res.redirect(`/peers?interface=${peer.interface_id}`)
+  }
+
+  if (dns && !/^(\d{1,3}\.){3}\d{1,3}$/.test(dns)) {
+    req.session.flash = { error: 'Le DNS doit être une adresse IPv4 valide.' }
+    return res.redirect(`/peers?interface=${peer.interface_id}`)
+  }
+
+  if (adresse_ip !== peer.adresse_ip) {
+    const ifacePeers = peerModel.findByInterfaceId(peer.interface_id)
+    if (ifacePeers.some((p) => p.id !== parseInt(id, 10) && p.adresse_ip === adresse_ip)) {
+      req.session.flash = { error: `L'adresse IP ${adresse_ip} est déjà utilisée sur cette interface.` }
+      return res.redirect(`/peers?interface=${peer.interface_id}`)
+    }
+  }
+
+  const oldPeer = { ...peer }
+  const iface = interfaceModel.findById(peer.interface_id)
+
+  try {
+    peerModel.update(id, {
+      nom,
+      adresse_ip,
+      allowed_ips: allowed_ips || '0.0.0.0/0',
+      dns: dns || null,
+      persistent_keepalive: parseInt(persistent_keepalive, 10) || 25
+    })
+
+    if (iface && iface.active) {
+      await interfaceController.writeConfigFile(iface)
+      try {
+        await sudo.exec(`wg syncconf ${iface.nom} /etc/wireguard/${iface.nom}.conf`)
+      } catch (syncErr) {
+        peerModel.update(id, {
+          nom: oldPeer.nom,
+          adresse_ip: oldPeer.adresse_ip,
+          allowed_ips: oldPeer.allowed_ips,
+          dns: oldPeer.dns,
+          persistent_keepalive: oldPeer.persistent_keepalive
+        })
+        await interfaceController.writeConfigFile(iface)
+        req.session.flash = { error: `Erreur lors de l'application : ${syncErr.message}. Modifications annulées.` }
+        return res.redirect(`/peers?interface=${peer.interface_id}`)
+      }
+    }
+
+    req.session.flash = { success: `Pair "${nom}" mis à jour.` }
+  } catch (err) {
+    req.session.flash = { error: `Erreur : ${err.message}` }
+  }
+
+  return res.redirect(`/peers?interface=${peer.interface_id}`)
+}
+
 async function deletePeer(req, res) {
   const id = req.params.id
   const peer = peerModel.findById(id)
@@ -203,6 +279,7 @@ async function downloadConfig(req, res) {
 
 module.exports = {
   createPeer,
+  editPeer,
   deletePeer,
   downloadConfig,
   buildClientConfig

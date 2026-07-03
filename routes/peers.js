@@ -132,6 +132,8 @@ router.post('/detect', requireSudoPassword, async (req, res) => {
 
 router.post('/', requireSudoPassword, peerController.createPeer)
 
+router.post('/:id/edit', requireSudoPassword, peerController.editPeer)
+
 router.post('/:id/delete', requireSudoPassword, peerController.deletePeer)
 
 router.get('/:id/config', peerController.downloadConfig)
