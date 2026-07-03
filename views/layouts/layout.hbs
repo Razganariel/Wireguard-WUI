@@ -43,8 +43,17 @@
             </form>
           {{/if}}
         {{/if}}
-        <ul class="navbar-nav ms-2">
+        <ul class="navbar-nav ms-2 align-items-center">
           {{#if user}}
+            <li class="nav-item me-2">
+              <a href="/auth/sudo-password" class="text-decoration-none">
+                {{#if hasSudoPassword}}
+                  <span class="badge bg-success">Sudo</span>
+                {{else}}
+                  <span class="badge bg-warning text-dark">Sudo</span>
+                {{/if}}
+              </a>
+            </li>
             <li class="nav-item">
               <span class="navbar-text text-light me-3">{{userName}}</span>
             </li>

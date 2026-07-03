@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const interfaceController = require('../controllers/interface')
 const interfaceModel = require('../models/interface')
-const { isAuthenticated } = require('../middlewares/auth')
+const { isAuthenticated, requireSudoPassword } = require('../middlewares/auth')
 
 router.use(isAuthenticated)
 
@@ -38,7 +38,7 @@ router.get('/', async (req, res) => {
   })
 })
 
-router.post('/', interfaceController.initInterface)
+router.post('/', requireSudoPassword, interfaceController.initInterface)
 
 router.post('/select', (req, res) => {
   const id = parseInt(req.body.interface_id, 10)
@@ -50,8 +50,8 @@ router.post('/select', (req, res) => {
   res.redirect(redirectUrl)
 })
 
-router.post('/:id/toggle', interfaceController.toggleInterface)
+router.post('/:id/toggle', requireSudoPassword, interfaceController.toggleInterface)
 
-router.post('/:id/delete', interfaceController.deleteInterface)
+router.post('/:id/delete', requireSudoPassword, interfaceController.deleteInterface)
 
 module.exports = router

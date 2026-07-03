@@ -7,6 +7,7 @@ require('dotenv').config()
 const db = require('./db')
 const userModel = require('./models/user')
 const interfaceModel = require('./models/interface')
+const sudo = require('./helpers/sudo')
 const authRoutes = require('./routes/auth')
 const interfaceRoutes = require('./routes/interface')
 const peersRoutes = require('./routes/peers')
@@ -38,6 +39,13 @@ app.use((req, res, next) => {
     req.session.flash = null
     res.locals.user = req.session.userId || null
     res.locals.userName = req.session.userName || null
+
+    if (req.session.sudoPassword) {
+      sudo.setPassword(req.session.sudoPassword)
+    } else {
+      sudo.clearPassword()
+    }
+    res.locals.hasSudoPassword = sudo.hasPassword()
 
     if (req.session.userId) {
       const interfaces = interfaceModel.findAll()
