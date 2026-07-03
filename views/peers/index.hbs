@@ -101,6 +101,9 @@
               </td>
               <td class="text-end">
                 <a href="/peers/{{id}}/config" class="btn btn-sm btn-outline-secondary">.conf</a>
+                {{#if ../qrcodeAvailable}}
+                  <a href="/peers/{{id}}/qrcode" class="btn btn-sm btn-outline-info">QR</a>
+                {{/if}}
                 <form method="POST" action="/peers/{{id}}/delete" class="d-inline" onsubmit="return confirm('Supprimer le pair {{nom}} ?')">
                   <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
                 </form>
