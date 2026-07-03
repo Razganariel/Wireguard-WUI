@@ -1,0 +1,115 @@
+<div class="row mb-4">
+  <div class="col">
+    <h1>Pairs <small class="text-muted fs-5">{{selectedInterfaceName}}</small></h1>
+  </div>
+</div>
+
+{{#unless hasInterfaces}}
+  <div class="alert alert-info">
+    Aucune interface WireGuard n'est configurée. <a href="/interface">Créer une interface</a> d'abord.
+  </div>
+{{/unless}}
+
+{{#if hasInterfaces}}
+  <div class="row mb-4">
+    <div class="col">
+      <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#addPeerForm">
+        + Ajouter un pair
+      </button>
+    </div>
+  </div>
+
+  <div class="collapse mb-4" id="addPeerForm">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Ajouter un pair</h5>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="/peers" data-validate>
+          <input type="hidden" name="interface_id" value="{{selectedInterface}}">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="nom" class="form-label">Nom</label>
+              <input type="text" class="form-control" id="nom" name="nom" placeholder="Téléphone de Alice" required>
+            </div>
+            <div class="col-md-4">
+              <label for="adresse_ip" class="form-label">Adresse IP</label>
+              <input type="text" class="form-control" id="adresse_ip" name="adresse_ip" placeholder="10.0.0.2" required>
+              <div class="form-text">Sans le /32 (ajouté automatiquement)</div>
+            </div>
+            <div class="col-md-4">
+              <label for="allowed_ips" class="form-label">Allowed IPs</label>
+              <input type="text" class="form-control" id="allowed_ips" name="allowed_ips" value="0.0.0.0/0">
+            </div>
+            <div class="col-md-4">
+              <label for="dns" class="form-label">DNS</label>
+              <input type="text" class="form-control" id="dns" name="dns" placeholder="1.1.1.1">
+            </div>
+            <div class="col-md-4">
+              <label for="persistent_keepalive" class="form-label">Persistent Keepalive</label>
+              <input type="number" class="form-control" id="persistent_keepalive" name="persistent_keepalive" value="25">
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary">Créer le pair</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {{#if peers.length}}
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Adresse IP</th>
+            <th>Allowed IPs</th>
+            <th>Handshake</th>
+            <th>Transfert</th>
+            <th>Statut</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each peers}}
+            <tr class="{{#unless isConnected}}table-danger{{/unless}}">
+              <td>{{nom}}</td>
+              <td>{{adresse_ip}}</td>
+              <td><code class="small">{{allowed_ips}}</code></td>
+              <td>
+                {{#if handshake}}
+                  {{handshake}}
+                {{else}}
+                  <span class="text-muted">jamais</span>
+                {{/if}}
+              </td>
+              <td>
+                <span class="text-success">↓ {{transferRx}}</span>
+                <span class="text-primary">↑ {{transferTx}}</span>
+              </td>
+              <td>
+                {{#if isConnected}}
+                  <span class="badge bg-success">Connecté</span>
+                {{else}}
+                  <span class="badge bg-danger">Inactif</span>
+                {{/if}}
+              </td>
+              <td class="text-end">
+                <a href="/peers/{{id}}/config" class="btn btn-sm btn-outline-secondary">.conf</a>
+                <form method="POST" action="/peers/{{id}}/delete" class="d-inline" onsubmit="return confirm('Supprimer le pair {{nom}} ?')">
+                  <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+                </form>
+              </td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  {{else}}
+    <div class="alert alert-info">
+      Aucun pair sur l'interface <strong>{{selectedInterfaceName}}</strong>. Ajoutez-en un avec le bouton ci-dessus.
+    </div>
+  {{/if}}
+{{/if}}
