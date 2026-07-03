@@ -184,6 +184,7 @@
             {{/if}}
 
             <div class="d-flex gap-2 mt-3">
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editIface{{id}}">Éditer</button>
               <form method="POST" action="/interface/{{id}}/toggle" class="d-inline">
                 {{#if active}}
                   <button type="submit" class="btn btn-sm btn-outline-warning">Arrêter</button>
@@ -195,6 +196,33 @@
                 <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
               </form>
               <a href="/peers?interface={{id}}" class="btn btn-sm btn-outline-primary ms-auto">Gérer les pairs</a>
+            </div>
+
+            <div class="modal fade" id="editIface{{id}}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <form method="POST" action="/interface/{{id}}/edit">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Éditer {{nom}}</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="mb-3">
+                        <label for="adresse_ip{{id}}" class="form-label">Adresse IP</label>
+                        <input type="text" class="form-control" id="adresse_ip{{id}}" name="adresse_ip" value="{{adresse_ip}}" pattern="^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="port{{id}}" class="form-label">Port d'écoute</label>
+                        <input type="number" class="form-control" id="port{{id}}" name="port" value="{{port}}" min="1" max="65535" required>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                      <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
             </div>
           </div>
         </div>
