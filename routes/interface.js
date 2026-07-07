@@ -44,9 +44,22 @@ router.get('/', async (req, res) => {
     sudoNotSet = true
   }
 
+  const enrichedInterfaces2 = []
+  for (const iface of enrichedInterfaces) {
+    let routing = null
+    if (req.session.sudoPassword && iface.active) {
+      try {
+        routing = await interfaceController.getRoutingInfo(iface.nom, iface.adresse_ip)
+      } catch (err) {
+        routing = null
+      }
+    }
+    enrichedInterfaces2.push({ ...iface, routing })
+  }
+
   res.render('interface/index', {
     title: 'Interface WireGuard',
-    interfaces: enrichedInterfaces,
+    interfaces: enrichedInterfaces2,
     hasInterfaces: interfaces.length > 0,
     systemInterfaces,
     sudoNotSet
