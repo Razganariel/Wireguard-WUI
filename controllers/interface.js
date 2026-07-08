@@ -198,11 +198,11 @@ async function removeRoutingRules(nom, adresse_ip) {
 }
 
 async function bringUp(nom) {
-  await sudo.exec(`wg-quick up ${nom}`)
   const iface = interfaceModel.findAll().find((i) => i.nom === nom)
-  if (iface) {
-    try { await addRoutingRules(nom, iface.adresse_ip) } catch (e) {}
-  }
+  if (!iface) throw new Error(`Interface "${nom}" introuvable dans la base.`)
+  await writeConfigFile(iface)
+  await sudo.exec(`wg-quick up ${nom}`)
+  try { await addRoutingRules(nom, iface.adresse_ip) } catch (e) {}
 }
 
 async function bringDown(nom) {
@@ -210,7 +210,11 @@ async function bringDown(nom) {
   if (iface) {
     try { await removeRoutingRules(nom, iface.adresse_ip) } catch (e) {}
   }
-  await sudo.exec(`wg-quick down ${nom}`)
+  try {
+    await sudo.exec(`wg-quick down ${nom}`)
+  } catch (e) {
+    try { await sudo.exec(`wg show ${nom} >/dev/null 2>&1 && ip link delete ${nom}`) } catch (e2) {}
+  }
 }
 
 async function getStatus(nom) {
@@ -495,25 +499,29 @@ async function deleteInterface(req, res) {
     return res.redirect('/interface')
   }
 
+  const peers = peerModel.findByInterfaceId(id)
+  if (peers.length > 0) {
+    req.session.flash = { error: `Impossible de supprimer l'interface "${iface.nom}" : des pairs lui sont encore associés. Supprimez d'abord tous les pairs de cette interface.` }
+    return res.redirect('/interface')
+  }
+
+  try {
+    interfaceModel.remove(id)
+  } catch (err) {
+    req.session.flash = { error: `Erreur lors de la suppression : ${err.message}` }
+    return res.redirect('/interface')
+  }
+
   try {
     if (iface.active) {
       await bringDown(iface.nom)
     }
     await sudo.exec(`rm -f /etc/wireguard/${iface.nom}.conf`)
   } catch (err) {
-    // best effort — continue with DB cleanup
+    // best effort — cleanup done
   }
 
-  try {
-    interfaceModel.remove(id)
-    req.session.flash = { success: `Interface "${iface.nom}" supprimée.` }
-  } catch (err) {
-    if (err.code === 'SQLITE_CONSTRAINT_FOREIGNKEY') {
-      req.session.flash = { error: `Impossible de supprimer l'interface "${iface.nom}" : des pairs lui sont encore associés. Supprimez d'abord tous les pairs de cette interface.` }
-    } else {
-      req.session.flash = { error: `Erreur lors de la suppression : ${err.message}` }
-    }
-  }
+  req.session.flash = { success: `Interface "${iface.nom}" supprimée.` }
   return res.redirect('/interface')
 }
 
@@ -727,5 +735,6 @@ module.exports = {
   detectAndImportAll,
   importPeersFromInterface,
   writeConfigFile,
-  getRoutingInfo
+  getRoutingInfo,
+  syncConfig
 }

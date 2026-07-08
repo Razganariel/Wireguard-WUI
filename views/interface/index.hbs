@@ -60,6 +60,7 @@
             <div class="mb-3">
               <label for="port" class="form-label">Port d'écoute</label>
               <input type="number" class="form-control" id="port" name="port" value="51820" min="1" max="65535" required>
+              <div class="form-text">N'oubliez pas d'ouvrir ce port sur votre routeur (redirection de port) pour les connexions distantes.</div>
             </div>
             <div class="d-grid">
               <button type="submit" class="btn btn-primary">Initialiser l'interface</button>
@@ -103,6 +104,7 @@
               <div class="mb-3">
                 <label for="port" class="form-label">Port d'écoute</label>
                 <input type="number" class="form-control" id="port" name="port" value="51820" min="1" max="65535" required>
+                <div class="form-text">N'oubliez pas d'ouvrir ce port sur votre routeur (redirection de port) pour les connexions distantes.</div>
               </div>
               <div class="d-grid">
                 <button type="submit" class="btn btn-primary">Initialiser</button>
@@ -211,6 +213,7 @@
                       <div class="mb-3">
                         <label for="port{{id}}" class="form-label">Port d'écoute</label>
                         <input type="number" class="form-control" id="port{{id}}" name="port" value="{{port}}" min="1" max="65535" required>
+                        <div class="form-text">N'oubliez pas d'ouvrir ce port sur votre routeur (redirection de port) pour les connexions distantes.</div>
                       </div>
                     </div>
                     <div class="modal-footer">

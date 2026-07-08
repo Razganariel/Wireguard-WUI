@@ -193,7 +193,7 @@ async function editPeer(req, res) {
     if (iface && iface.active) {
       await interfaceController.writeConfigFile(iface)
       try {
-        await sudo.exec(`wg syncconf ${iface.nom} /etc/wireguard/${iface.nom}.conf`)
+        await interfaceController.syncConfig(iface.nom)
       } catch (syncErr) {
         peerModel.update(id, {
           nom: oldPeer.nom,

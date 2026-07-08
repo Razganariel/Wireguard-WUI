@@ -31,6 +31,9 @@ async function execSudo(command) {
     if (err.stderr && (err.stderr.includes('Sorry') || err.stderr.includes('incorrect password'))) {
       throw new Error('Mot de passe sudo incorrect. Rendez-vous sur /auth/sudo-password pour le corriger.')
     }
+    const sanitize = (s) => s.replace(/echo '[^']*' \| sudo /g, 'sudo ')
+    if (err.message) err.message = sanitize(err.message)
+    if (err.cmd) err.cmd = sanitize(err.cmd)
     throw err
   }
 }
