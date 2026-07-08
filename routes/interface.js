@@ -18,15 +18,31 @@ router.get('/', async (req, res) => {
     }
   }
 
+  function formatBytes(bytes) {
+    if (!bytes || bytes === 0) return '0 B'
+    const units = ['B', 'KB', 'MB', 'GB', 'TB']
+    const i = Math.floor(Math.log(bytes) / Math.log(1024))
+    return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
+  }
+
   const enrichedInterfaces = interfaces.map((iface) => {
     const status = statuses[iface.nom]
+    let totalRx = 0, totalTx = 0
+    if (status && status.peers) {
+      for (const p of status.peers) {
+        totalRx += p.transferRx || 0
+        totalTx += p.transferTx || 0
+      }
+    }
     return {
       ...iface,
       status: status || null,
       peerCount: status ? status.peers.length : 0,
       connectedPeers: status
         ? status.peers.filter((p) => p.latestHandshake > 0).length
-        : 0
+        : 0,
+      totalRx: formatBytes(totalRx),
+      totalTx: formatBytes(totalTx)
     }
   })
 
