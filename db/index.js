@@ -18,6 +18,8 @@ function initSchema() {
   const schemaPath = path.join(__dirname, 'schema.sql')
   const schema = fs.readFileSync(schemaPath, 'utf8')
   db.exec(schema)
+
+  try { db.exec('ALTER TABLE interfaces ADD COLUMN endpoint TEXT') } catch (e) {}
 }
 
 initSchema()

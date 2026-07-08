@@ -60,6 +60,12 @@
             <div class="mb-3">
               <label for="port" class="form-label">Port d'écoute</label>
               <input type="number" class="form-control" id="port" name="port" value="51820" min="1" max="65535" required>
+              <div class="form-text">N'oubliez pas d'ouvrir ce port sur votre routeur (redirection de port) pour les connexions distantes.</div>
+            </div>
+            <div class="mb-3">
+              <label for="endpoint" class="form-label">Point de terminaison (optionnel)</label>
+              <input type="text" class="form-control" id="endpoint" name="endpoint" placeholder="votre-domaine.com">
+              <div class="form-text">Adresse publique (IP ou domaine) pour l'accès depuis l'extérieur. Le port est automatiquement ajouté. Si vide, l'IP du tunnel est utilisée.</div>
             </div>
             <div class="d-grid">
               <button type="submit" class="btn btn-primary">Initialiser l'interface</button>
@@ -103,6 +109,12 @@
               <div class="mb-3">
                 <label for="port" class="form-label">Port d'écoute</label>
                 <input type="number" class="form-control" id="port" name="port" value="51820" min="1" max="65535" required>
+                <div class="form-text">N'oubliez pas d'ouvrir ce port sur votre routeur (redirection de port) pour les connexions distantes.</div>
+              </div>
+              <div class="mb-3">
+                <label for="endpoint" class="form-label">Point de terminaison (optionnel)</label>
+                <input type="text" class="form-control" id="endpoint" name="endpoint" placeholder="votre-domaine.com">
+                <div class="form-text">Adresse publique (IP ou domaine) pour l'accès depuis l'extérieur. Le port est automatiquement ajouté.</div>
               </div>
               <div class="d-grid">
                 <button type="submit" class="btn btn-primary">Initialiser</button>
@@ -137,6 +149,12 @@
                   <th>Port</th>
                   <td>{{port}}</td>
                 </tr>
+                {{#if endpoint}}
+                <tr>
+                  <th>Point de terminaison</th>
+                  <td><code class="text-break small">{{endpoint}}</code></td>
+                </tr>
+                {{/if}}
                 <tr>
                   <th>Clé publique</th>
                   <td><code class="text-break small">{{public_key}}</code></td>
@@ -148,39 +166,36 @@
               </tbody>
             </table>
 
-            {{#if status}}
-              {{#if status.peers.length}}
-                <h6 class="mt-3">Pairs actifs</h6>
-                <table class="table table-sm table-striped">
-                  <thead>
-                    <tr>
-                      <th>Clé publique</th>
-                      <th>Endpoint</th>
-                      <th>Handshake</th>
-                      <th>Transfert</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {{#each status.peers}}
-                      <tr>
-                        <td><code class="small">{{publicKey}}</code></td>
-                        <td>{{endpoint}}</td>
-                        <td>
-                          {{#if latestHandshake}}
-                            {{latestHandshake}}
-                          {{else}}
-                            <span class="text-muted">—</span>
-                          {{/if}}
-                        </td>
-                        <td>
-                          <span class="text-success">↓ {{transferRx}}</span>
-                          <span class="text-primary">↑ {{transferTx}}</span>
-                        </td>
-                      </tr>
-                    {{/each}}
-                  </tbody>
-                </table>
-              {{/if}}
+            {{#if routing}}
+              {{#unless routing.allOk}}
+                <div class="alert alert-warning small py-2 my-3">
+                  <strong>Routage non configuré.</strong>
+                  Les pairs connectés ne pourront pas accéder au réseau.
+                  <button class="btn btn-sm btn-outline-warning mt-1" type="button" data-bs-toggle="collapse" data-bs-target="#routingCmds{{id}}">
+                    Voir les commandes
+                  </button>
+                  <div class="collapse mt-2" id="routingCmds{{id}}">
+                    <code class="d-block text-bg-dark p-2 rounded small" style="white-space: pre-wrap;">
+{{routing.phy}} — {{routing.subnet}}
+{{#if routing.masquerade}}✅ MASQUERADE{{else}}❌ MASQUERADE{{/if}}
+{{#if routing.forwardIn}}✅ FORWARD IN{{else}}❌ FORWARD IN{{/if}}
+{{#if routing.forwardOut}}✅ FORWARD OUT{{else}}❌ FORWARD OUT{{/if}}
+                    </code>
+                    <div class="mt-2">
+                      <strong>Commandes iptables :</strong>
+                      <code class="d-block text-bg-dark p-2 rounded small mt-1" style="white-space: pre-wrap;">
+{{#each routing.iptablesCmds}}{{this}}
+{{/each}}</code>
+                      {{#if routing.firewallCmds.length}}
+                        <strong>Ou avec {{routing.firewallType}} (alternative) :</strong>
+                        <code class="d-block text-bg-dark p-2 rounded small mt-1" style="white-space: pre-wrap;">
+{{#each routing.firewallCmds}}{{this}}
+{{/each}}</code>
+                      {{/if}}
+                    </div>
+                  </div>
+                </div>
+              {{/unless}}
             {{/if}}
 
             <div class="d-flex gap-2 mt-3">
@@ -214,6 +229,12 @@
                       <div class="mb-3">
                         <label for="port{{id}}" class="form-label">Port d'écoute</label>
                         <input type="number" class="form-control" id="port{{id}}" name="port" value="{{port}}" min="1" max="65535" required>
+                        <div class="form-text">N'oubliez pas d'ouvrir ce port sur votre routeur (redirection de port) pour les connexions distantes.</div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="endpoint{{id}}" class="form-label">Point de terminaison (optionnel)</label>
+                        <input type="text" class="form-control" id="endpoint{{id}}" name="endpoint" value="{{endpoint}}" placeholder="votre-domaine.com">
+                        <div class="form-text">Adresse publique (IP ou domaine) pour l'accès depuis l'extérieur. Le port est automatiquement ajouté.</div>
                       </div>
                     </div>
                     <div class="modal-footer">

@@ -95,6 +95,21 @@ router.get('/', async (req, res) => {
     }
   })
 
+  const ifaceIp = selectedIface.adresse_ip || ''
+  const ifaceMatch = ifaceIp.match(/^(\d+)\.(\d+)\.(\d+)\.\d+\/(\d+)$/)
+  let suggestedPeerIp = ''
+  if (ifaceMatch) {
+    const base = `${ifaceMatch[1]}.${ifaceMatch[2]}.${ifaceMatch[3]}`
+    const usedIps = new Set(peers.map((p) => p.adresse_ip))
+    for (let i = 2; i < 255; i++) {
+      const candidate = `${base}.${i}`
+      if (!usedIps.has(candidate)) {
+        suggestedPeerIp = candidate
+        break
+      }
+    }
+  }
+
   res.render('peers/index', {
     title: 'Pairs',
     peers,
@@ -102,7 +117,8 @@ router.get('/', async (req, res) => {
     selectedInterface: selectedIface.id,
     selectedInterfaceName: selectedIface.nom,
     hasInterfaces: true,
-    qrcodeAvailable: qrcode.isAvailable()
+    qrcodeAvailable: qrcode.isAvailable(),
+    suggestedPeerIp
   })
 })
 

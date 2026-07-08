@@ -22,10 +22,20 @@ async function execSudo(command) {
   }
   const escapedPwd = _password.replace(/'/g, "'\\''")
   const fullCommand = `echo '${escapedPwd}' | sudo -S ${command}`
-  const { stdout, stderr } = await execPromise(fullCommand, {
-    maxBuffer: 1024 * 1024
-  })
-  return { stdout, stderr }
+  try {
+    const { stdout, stderr } = await execPromise(fullCommand, {
+      maxBuffer: 1024 * 1024
+    })
+    return { stdout, stderr }
+  } catch (err) {
+    if (err.stderr && (err.stderr.includes('Sorry') || err.stderr.includes('incorrect password'))) {
+      throw new Error('Mot de passe sudo incorrect. Rendez-vous sur /auth/sudo-password pour le corriger.')
+    }
+    const sanitize = (s) => s.replace(/echo '[^']*' \| sudo /g, 'sudo ')
+    if (err.message) err.message = sanitize(err.message)
+    if (err.cmd) err.cmd = sanitize(err.cmd)
+    throw err
+  }
 }
 
 module.exports = {

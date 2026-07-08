@@ -62,12 +62,159 @@ async function writeConfigFile(iface) {
   return configPath
 }
 
+async function getFirewallType() {
+  try {
+    const { stdout } = await execAsync('which ufw 2>/dev/null')
+    if (stdout.trim()) return 'ufw'
+  } catch (e) {}
+  try {
+    const { stdout } = await execAsync('which firewall-cmd 2>/dev/null')
+    if (stdout.trim()) return 'firewalld'
+  } catch (e) {}
+  return 'iptables'
+}
+
+async function checkRuleExists(args) {
+  try {
+    await sudo.exec(`iptables ${args} 2>/dev/null`)
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
+async function getRoutingInfo(nom, adresse_ip) {
+  const phy = await getPhyInterface()
+  const subnet = netmaskFromCIDR(adresse_ip)
+  const fwType = await getFirewallType()
+
+  let masqOk = false
+  let fwdOk = false
+  let fwdOutOk = false
+
+  if (fwType === 'firewalld') {
+    try {
+      const { stdout } = await sudo.exec(`firewall-cmd --query-rich-rule='rule family="ipv4" source address="${subnet}" masquerade'`)
+      masqOk = stdout.trim() === 'yes'
+    } catch (e) { masqOk = false }
+    try {
+      const { stdout } = await sudo.exec(`firewall-cmd --direct --query-rule ipv4 filter FORWARD -i ${nom} -o ${phy} -j ACCEPT`)
+      fwdOk = stdout.trim() === 'yes'
+    } catch (e) { fwdOk = false }
+    try {
+      const { stdout } = await sudo.exec(`firewall-cmd --direct --query-rule ipv4 filter FORWARD -i ${phy} -o ${nom} -m state --state RELATED,ESTABLISHED -j ACCEPT`)
+      fwdOutOk = stdout.trim() === 'yes'
+    } catch (e) { fwdOutOk = false }
+  } else {
+    masqOk = await checkRuleExists(`-t nat -C POSTROUTING -s ${subnet} -o ${phy} -j MASQUERADE`)
+    fwdOk = await checkRuleExists(`-C FORWARD -i ${nom} -o ${phy} -j ACCEPT`)
+    fwdOutOk = await checkRuleExists(`-C FORWARD -i ${phy} -o ${nom} -m state --state RELATED,ESTABLISHED -j ACCEPT`)
+  }
+
+  let firewallCmds = []
+  if (fwType === 'firewalld') {
+    firewallCmds = [
+      `sudo firewall-cmd --permanent --add-rich-rule='rule family="ipv4" source address="${subnet}" masquerade'`,
+      `sudo firewall-cmd --permanent --direct --add-rule ipv4 filter FORWARD 0 -i ${nom} -o ${phy} -j ACCEPT`,
+      `sudo firewall-cmd --permanent --direct --add-rule ipv4 filter FORWARD 0 -i ${phy} -o ${nom} -m state --state RELATED,ESTABLISHED -j ACCEPT`,
+      `sudo firewall-cmd --reload`
+    ]
+  }
+
+  return {
+    nom,
+    subnet,
+    phy,
+    masquerade: masqOk,
+    forwardIn: fwdOk,
+    forwardOut: fwdOutOk,
+    allOk: masqOk && fwdOk && fwdOutOk,
+    firewallType: fwType,
+    firewallCmds,
+    iptablesCmds: [
+      `sudo iptables -t nat -A POSTROUTING -s ${subnet} -o ${phy} -j MASQUERADE`,
+      `sudo iptables -A FORWARD -i ${nom} -o ${phy} -j ACCEPT`,
+      `sudo iptables -A FORWARD -i ${phy} -o ${nom} -m state --state RELATED,ESTABLISHED -j ACCEPT`
+    ]
+  }
+}
+
+async function getPhyInterface() {
+  const { stdout } = await execAsync('ip -4 route show default')
+  const parts = stdout.trim().split(/\s+/)
+  return parts[4] || 'eth0'
+}
+
+function netmaskFromCIDR(cidr) {
+  const m = parseInt(cidr.split('/')[1], 10)
+  let mask = 0xffffffff << (32 - m)
+  const ip = cidr.split('/')[0].split('.').map(Number)
+  const net = [(ip[0] << 24 | ip[1] << 16 | ip[2] << 8 | ip[3]) & mask]
+  const a = (net[0] >>> 24) & 0xff
+  const b = (net[0] >>> 16) & 0xff
+  const c = (net[0] >>> 8) & 0xff
+  const d = net[0] & 0xff
+  return `${a}.${b}.${c}.${d}/${m}`
+}
+
+async function addRoutingRules(nom, adresse_ip) {
+  const phy = await getPhyInterface()
+  const subnet = netmaskFromCIDR(adresse_ip)
+  const fwType = await getFirewallType()
+
+  if (fwType === 'firewalld') {
+    try { await sudo.exec(`firewall-cmd --permanent --remove-rich-rule='rule family="ipv4" source address="${subnet}" masquerade'`) } catch (e) {}
+    try { await sudo.exec(`firewall-cmd --permanent --direct --remove-rule ipv4 filter FORWARD 0 -i ${nom} -o ${phy} -j ACCEPT`) } catch (e) {}
+    try { await sudo.exec(`firewall-cmd --permanent --direct --remove-rule ipv4 filter FORWARD 0 -i ${phy} -o ${nom} -m state --state RELATED,ESTABLISHED -j ACCEPT`) } catch (e) {}
+    await sudo.exec(`firewall-cmd --permanent --add-rich-rule='rule family="ipv4" source address="${subnet}" masquerade'`)
+    await sudo.exec(`firewall-cmd --permanent --direct --add-rule ipv4 filter FORWARD 0 -i ${nom} -o ${phy} -j ACCEPT`)
+    await sudo.exec(`firewall-cmd --permanent --direct --add-rule ipv4 filter FORWARD 0 -i ${phy} -o ${nom} -m state --state RELATED,ESTABLISHED -j ACCEPT`)
+    await sudo.exec('firewall-cmd --reload')
+  } else {
+    try { await sudo.exec(`iptables -t nat -D POSTROUTING -s ${subnet} -o ${phy} -j MASQUERADE 2>/dev/null`) } catch (e) {}
+    try { await sudo.exec(`iptables -D FORWARD -i ${nom} -o ${phy} -j ACCEPT 2>/dev/null`) } catch (e) {}
+    try { await sudo.exec(`iptables -D FORWARD -i ${phy} -o ${nom} -m state --state RELATED,ESTABLISHED -j ACCEPT 2>/dev/null`) } catch (e) {}
+    await sudo.exec(`iptables -t nat -A POSTROUTING -s ${subnet} -o ${phy} -j MASQUERADE`)
+    await sudo.exec(`iptables -A FORWARD -i ${nom} -o ${phy} -j ACCEPT`)
+    await sudo.exec(`iptables -A FORWARD -i ${phy} -o ${nom} -m state --state RELATED,ESTABLISHED -j ACCEPT`)
+  }
+}
+
+async function removeRoutingRules(nom, adresse_ip) {
+  const phy = await getPhyInterface()
+  const subnet = netmaskFromCIDR(adresse_ip)
+  const fwType = await getFirewallType()
+
+  if (fwType === 'firewalld') {
+    try { await sudo.exec(`firewall-cmd --permanent --remove-rich-rule='rule family="ipv4" source address="${subnet}" masquerade'`) } catch (e) {}
+    try { await sudo.exec(`firewall-cmd --permanent --direct --remove-rule ipv4 filter FORWARD 0 -i ${nom} -o ${phy} -j ACCEPT`) } catch (e) {}
+    try { await sudo.exec(`firewall-cmd --permanent --direct --remove-rule ipv4 filter FORWARD 0 -i ${phy} -o ${nom} -m state --state RELATED,ESTABLISHED -j ACCEPT`) } catch (e) {}
+    await sudo.exec('firewall-cmd --reload')
+  } else {
+    try { await sudo.exec(`iptables -t nat -D POSTROUTING -s ${subnet} -o ${phy} -j MASQUERADE`) } catch (e) {}
+    try { await sudo.exec(`iptables -D FORWARD -i ${nom} -o ${phy} -j ACCEPT`) } catch (e) {}
+    try { await sudo.exec(`iptables -D FORWARD -i ${phy} -o ${nom} -m state --state RELATED,ESTABLISHED -j ACCEPT`) } catch (e) {}
+  }
+}
+
 async function bringUp(nom) {
+  const iface = interfaceModel.findAll().find((i) => i.nom === nom)
+  if (!iface) throw new Error(`Interface "${nom}" introuvable dans la base.`)
+  await writeConfigFile(iface)
   await sudo.exec(`wg-quick up ${nom}`)
+  try { await addRoutingRules(nom, iface.adresse_ip) } catch (e) {}
 }
 
 async function bringDown(nom) {
-  await sudo.exec(`wg-quick down ${nom}`)
+  const iface = interfaceModel.findAll().find((i) => i.nom === nom)
+  if (iface) {
+    try { await removeRoutingRules(nom, iface.adresse_ip) } catch (e) {}
+  }
+  try {
+    await sudo.exec(`wg-quick down ${nom}`)
+  } catch (e) {
+    try { await sudo.exec(`wg show ${nom} >/dev/null 2>&1 && ip link delete ${nom}`) } catch (e2) {}
+  }
 }
 
 async function getStatus(nom) {
@@ -148,7 +295,7 @@ function parseAllDump(stdout) {
 }
 
 async function initInterface(req, res) {
-  const { nom, adresse_ip, port } = req.body
+  const { nom, adresse_ip, port, endpoint } = req.body
 
   if (!nom || !adresse_ip || !port) {
     req.session.flash = { error: 'Tous les champs sont obligatoires.' }
@@ -193,7 +340,8 @@ async function initInterface(req, res) {
     private_key: privateKey,
     public_key: publicKey,
     adresse_ip,
-    port: parseInt(port, 10)
+    port: parseInt(port, 10),
+    endpoint: endpoint?.trim() || null
   })
 
   if (!keygenOk) {
@@ -290,7 +438,7 @@ async function editInterface(req, res) {
     return res.redirect('/interface')
   }
 
-  const { adresse_ip, port } = req.body
+  const { adresse_ip, port, endpoint } = req.body
 
   if (!adresse_ip || !/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/.test(adresse_ip)) {
     req.session.flash = { error: 'L\'adresse IP doit être au format CIDR (ex: 10.0.0.1/24).' }
@@ -303,27 +451,39 @@ async function editInterface(req, res) {
     return res.redirect('/interface')
   }
 
-  const oldConfig = { adresse_ip: iface.adresse_ip, port: iface.port }
+  const oldConfig = { adresse_ip: iface.adresse_ip, port: iface.port, endpoint: iface.endpoint }
 
   try {
     iface.adresse_ip = adresse_ip
     iface.port = portNum
+    iface.endpoint = endpoint?.trim() || null
     await writeConfigFile(iface)
 
     if (iface.active) {
+      const subnetChanged = adresse_ip !== oldConfig.adresse_ip
+      if (subnetChanged) {
+        try { await removeRoutingRules(iface.nom, oldConfig.adresse_ip) } catch (e) {}
+      }
       try {
         await syncConfig(iface.nom)
+        if (subnetChanged) {
+          try { await addRoutingRules(iface.nom, adresse_ip) } catch (e) {}
+        }
       } catch (syncErr) {
         iface.adresse_ip = oldConfig.adresse_ip
         iface.port = oldConfig.port
+        iface.endpoint = oldConfig.endpoint
         await writeConfigFile(iface)
+        if (subnetChanged) {
+          try { await addRoutingRules(iface.nom, oldConfig.adresse_ip) } catch (e) {}
+        }
         req.session.flash = { error: `Erreur lors de l'application de la configuration : ${syncErr.message}. Les modifications ont été annulées.` }
         return res.redirect('/interface')
       }
     }
 
     const db = require('../db')
-    db.prepare('UPDATE interfaces SET adresse_ip = ?, port = ? WHERE id = ?').run(adresse_ip, portNum, id)
+    db.prepare('UPDATE interfaces SET adresse_ip = ?, port = ?, endpoint = ? WHERE id = ?').run(adresse_ip, portNum, iface.endpoint, id)
 
     req.session.flash = { success: `Interface "${iface.nom}" mise à jour.` }
   } catch (err) {
@@ -342,16 +502,28 @@ async function deleteInterface(req, res) {
     return res.redirect('/interface')
   }
 
+  const peers = peerModel.findByInterfaceId(id)
+  if (peers.length > 0) {
+    req.session.flash = { error: `Impossible de supprimer l'interface "${iface.nom}" : des pairs lui sont encore associés. Supprimez d'abord tous les pairs de cette interface.` }
+    return res.redirect('/interface')
+  }
+
+  try {
+    interfaceModel.remove(id)
+  } catch (err) {
+    req.session.flash = { error: `Erreur lors de la suppression : ${err.message}` }
+    return res.redirect('/interface')
+  }
+
   try {
     if (iface.active) {
       await bringDown(iface.nom)
     }
     await sudo.exec(`rm -f /etc/wireguard/${iface.nom}.conf`)
   } catch (err) {
-    // best effort — continue with DB cleanup
+    // best effort — cleanup done
   }
 
-  interfaceModel.remove(id)
   req.session.flash = { success: `Interface "${iface.nom}" supprimée.` }
   return res.redirect('/interface')
 }
@@ -492,7 +664,10 @@ async function importInterface(nom) {
   }
 
   const isActive = await getStatus(nom)
-  if (isActive) interfaceModel.updateActive(iface.id, true)
+  if (isActive) {
+    interfaceModel.updateActive(iface.id, true)
+    try { await addRoutingRules(nom, adresse_ip) } catch (e) {}
+  }
 
   const importedPeerCount = persistPeers(iface.id, peerEntries)
   iface._importedPeerCount = importedPeerCount
@@ -562,5 +737,7 @@ module.exports = {
   importInterface,
   detectAndImportAll,
   importPeersFromInterface,
-  writeConfigFile
+  writeConfigFile,
+  getRoutingInfo,
+  syncConfig
 }
