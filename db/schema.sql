@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS interfaces (
   adresse_ip      TEXT NOT NULL,
   port            INTEGER NOT NULL DEFAULT 51820,
   active          BOOLEAN NOT NULL DEFAULT FALSE,
+  endpoint        TEXT,
   created_at      DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

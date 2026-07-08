@@ -17,10 +17,10 @@ function count() {
 }
 
 function create(data) {
-  const { nom, private_key, public_key, adresse_ip, port = 51820 } = data
+  const { nom, private_key, public_key, adresse_ip, port = 51820, endpoint = null } = data
   const info = db.prepare(
-    'INSERT INTO interfaces (nom, private_key, public_key, adresse_ip, port, active) VALUES (?, ?, ?, ?, ?, ?)'
-  ).run(nom, private_key, public_key, adresse_ip, port, 0)
+    'INSERT INTO interfaces (nom, private_key, public_key, adresse_ip, port, active, endpoint) VALUES (?, ?, ?, ?, ?, ?, ?)'
+  ).run(nom, private_key, public_key, adresse_ip, port, 0, endpoint)
   return info.lastInsertRowid
 }
 

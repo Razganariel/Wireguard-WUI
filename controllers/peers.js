@@ -249,7 +249,7 @@ function buildClientConfig(peer, iface) {
     '',
     '[Peer]',
     `PublicKey = ${iface.public_key}`,
-    `Endpoint = ${iface.adresse_ip.split('/')[0]}:${iface.port}`,
+      `Endpoint = ${iface.endpoint ? `${iface.endpoint}:${iface.port}` : `${iface.adresse_ip.split('/')[0]}:${iface.port}`}`,
     `AllowedIPs = ${peer.allowed_ips}`,
     `PersistentKeepalive = ${peer.persistent_keepalive}`
   ]
