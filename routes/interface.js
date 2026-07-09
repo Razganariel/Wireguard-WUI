@@ -3,6 +3,7 @@ const router = express.Router()
 const interfaceController = require('../controllers/interface')
 const interfaceModel = require('../models/interface')
 const { isAuthenticated, requireSudoPassword } = require('../middlewares/auth')
+const { sanitizeInt, sanitizeInterfaceName } = require('../helpers/sanitize')
 
 router.use(isAuthenticated)
 
@@ -80,12 +81,13 @@ router.get('/', async (req, res) => {
 router.post('/', requireSudoPassword, interfaceController.initInterface)
 
 router.post('/select', (req, res) => {
-  const id = parseInt(req.body.interface_id, 10)
+  const id = sanitizeInt(req.body.interface_id)
   const iface = interfaceModel.findById(id)
   if (iface) {
     req.session.selectedInterfaceId = id
   }
-  const redirectUrl = req.body.redirect || '/peers'
+  const allowedRedirects = ['/peers', '/interface']
+  const redirectUrl = allowedRedirects.includes(req.body.redirect) ? req.body.redirect : '/peers'
   res.redirect(redirectUrl)
 })
 
@@ -96,14 +98,19 @@ router.post('/:id/edit', requireSudoPassword, interfaceController.editInterface)
 router.post('/:id/delete', requireSudoPassword, interfaceController.deleteInterface)
 
 router.post('/import/:name', requireSudoPassword, async (req, res) => {
+  const name = sanitizeInterfaceName(req.params.name)
+  if (!name) {
+    req.session.flash = { error: 'Nom d\'interface invalide.' }
+    return res.redirect('/interface')
+  }
   try {
-    const iface = await interfaceController.importInterface(req.params.name)
+    const iface = await interfaceController.importInterface(name)
     const peerMsg = iface._importedPeerCount > 0
       ? ` (${iface._importedPeerCount} pair${iface._importedPeerCount > 1 ? 's' : ''} importé${iface._importedPeerCount > 1 ? 's' : ''})`
       : ''
     const msg = iface._isNewInterface
-      ? `Interface "${req.params.name}" importée avec succès${peerMsg}.`
-      : `${iface._importedPeerCount} pair${iface._importedPeerCount > 1 ? 's' : ''} importé${iface._importedPeerCount > 1 ? 's' : ''} depuis "${req.params.name}".`
+      ? `Interface "${name}" importée avec succès${peerMsg}.`
+      : `${iface._importedPeerCount} pair${iface._importedPeerCount > 1 ? 's' : ''} importé${iface._importedPeerCount > 1 ? 's' : ''} depuis "${name}".`
     req.session.flash = { success: msg }
   } catch (err) {
     req.session.flash = { error: `Import impossible : ${err.message}` }

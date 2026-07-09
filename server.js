@@ -1,5 +1,6 @@
 const express = require('express')
 const session = require('express-session')
+const helmet = require('helmet')
 const path = require('path')
 const hbs = require('hbs')
 require('dotenv').config()
@@ -10,6 +11,8 @@ const interfaceModel = require('./models/interface')
 const peerModel = require('./models/peer')
 const interfaceController = require('./controllers/interface')
 const sudo = require('./helpers/sudo')
+const csrfMiddleware = require('./middlewares/csrf')
+const { decrypt } = require('./helpers/crypto')
 const authRoutes = require('./routes/auth')
 const interfaceRoutes = require('./routes/interface')
 const peersRoutes = require('./routes/peers')
@@ -23,16 +26,30 @@ hbs.registerHelper('currentYear', () => new Date().getFullYear())
 app.set('view engine', 'hbs')
 app.set('views', path.join(__dirname, 'views'))
 app.set('view options', { layout: 'layouts/layout' })
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://cdn.jsdelivr.net"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+      imgSrc: ["'self'", "data:"],
+      fontSrc: ["'self'", "https://cdn.jsdelivr.net"],
+      connectSrc: ["'self'"]
+    }
+  }
+}))
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.urlencoded({ extended: false }))
 app.use(
   session({
     secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: { maxAge: 1000 * 60 * 60 * 24 }
   })
 )
+
+app.use(csrfMiddleware)
 
 app.use((req, res, next) => {
   res.locals.currentPath = req.path
@@ -43,7 +60,13 @@ app.use((req, res, next) => {
     res.locals.userName = req.session.userName || null
 
     if (req.session.sudoPassword) {
-      sudo.setPassword(req.session.sudoPassword)
+      const decrypted = decrypt(req.session.sudoPassword)
+      if (decrypted) {
+        sudo.setPassword(decrypted)
+      } else {
+        delete req.session.sudoPassword
+        sudo.clearPassword()
+      }
     } else {
       sudo.clearPassword()
     }

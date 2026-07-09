@@ -7,6 +7,7 @@ const interfaceModel = require('../models/interface')
 const { isAuthenticated, requireSudoPassword } = require('../middlewares/auth')
 const sudo = require('../helpers/sudo')
 const qrcode = require('../helpers/qrcode')
+const { sanitizeInt } = require('../helpers/sanitize')
 
 router.use(isAuthenticated)
 
@@ -50,7 +51,7 @@ function formatHandshake(ts) {
 }
 
 router.get('/', async (req, res) => {
-  const interfaceId = req.query.interface
+  const interfaceId = sanitizeInt(req.query.interface)
   let interfaces = interfaceModel.findAll()
 
   if (interfaces.length === 0) {
@@ -167,7 +168,12 @@ router.get('/:id/qrcode', isAuthenticated, async (req, res) => {
     req.session.flash = { error: 'qrcode non disponible. Installez-le avec : npm install qrcode' }
     return res.redirect('/peers')
   }
-  const peer = peerModel.findById(req.params.id)
+  const id = sanitizeInt(req.params.id)
+  if (!id) {
+    req.session.flash = { error: 'ID de pair invalide.' }
+    return res.redirect('/peers')
+  }
+  const peer = peerModel.findById(id)
   if (!peer) {
     req.session.flash = { error: 'Pair introuvable.' }
     return res.redirect('/peers')
