@@ -7,6 +7,8 @@ require('dotenv').config()
 const db = require('./db')
 const userModel = require('./models/user')
 const interfaceModel = require('./models/interface')
+const peerModel = require('./models/peer')
+const interfaceController = require('./controllers/interface')
 const sudo = require('./helpers/sudo')
 const authRoutes = require('./routes/auth')
 const interfaceRoutes = require('./routes/interface')
@@ -78,12 +80,111 @@ app.get('/logout', (req, res) => {
   })
 })
 
-app.get('/', (req, res) => {
+function formatBytes(bytes) {
+  if (!bytes || bytes === 0) return '0 B'
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(bytes) / Math.log(1024))
+  return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
+}
+
+function formatHandshake(ts) {
+  if (!ts || ts === 0) return null
+  const now = Math.floor(Date.now() / 1000)
+  const diff = now - ts
+  if (diff < 60) return 'à l\'instant'
+  if (diff < 3600) return `il y a ${Math.floor(diff / 60)} min`
+  if (diff < 86400) return `il y a ${Math.floor(diff / 3600)} h`
+  return `il y a ${Math.floor(diff / 86400)} j`
+}
+
+app.get('/', async (req, res) => {
   if (!req.session || !req.session.userId) {
     return res.redirect('/auth/login')
   }
+
+  const interfaces = interfaceModel.findAll()
+  const hasInterfaces = interfaces.length > 0
+
+  let totalConnectedPeers = 0
+  let totalPeers = 0
+  let totalTransferRx = 0
+  let totalTransferTx = 0
+  let latestHandshake = 0
+
+  const routingStatus = {}
+
+  const enrichedInterfaces = []
+  for (const iface of interfaces) {
+    const peers = peerModel.findByInterfaceId(iface.id)
+    const peerCount = peers.length
+    totalPeers += peerCount
+
+    let ifaceStatus = null
+    if (sudo.hasPassword()) {
+      try { ifaceStatus = await interfaceController.getStatus(iface.nom) } catch (e) {}
+      if (iface.active) {
+        try { routingStatus[iface.nom] = await interfaceController.getRoutingInfo(iface.nom, iface.adresse_ip) } catch (e) {}
+      }
+    }
+
+    let connectedPeers = 0
+    let ifaceLatestHs = 0
+    let totalRx = 0
+    let totalTx = 0
+
+    if (ifaceStatus && ifaceStatus.peers) {
+      for (const p of ifaceStatus.peers) {
+        totalRx += p.transferRx || 0
+        totalTx += p.transferTx || 0
+        if (p.latestHandshake > ifaceLatestHs) ifaceLatestHs = p.latestHandshake
+        if (p.latestHandshake > 0) connectedPeers++
+      }
+    }
+
+    totalConnectedPeers += connectedPeers
+    totalTransferRx += totalRx
+    totalTransferTx += totalTx
+    if (ifaceLatestHs > latestHandshake) latestHandshake = ifaceLatestHs
+
+    const routing = routingStatus[iface.nom]
+    enrichedInterfaces.push({
+      id: iface.id,
+      nom: iface.nom,
+      active: iface.active,
+      port: iface.port,
+      endpoint: iface.endpoint,
+      peerCount,
+      connectedPeers,
+      lastHandshake: formatHandshake(ifaceLatestHs),
+      totalRx: formatBytes(totalRx),
+      totalTx: formatBytes(totalTx),
+      routingOk: routing ? routing.allOk : null
+    })
+  }
+
+  const activeInterfaces = enrichedInterfaces.filter((i) => i.active).length
+  const routingOk = enrichedInterfaces.filter((i) => i.routingOk === true).length
+  const routingKo = enrichedInterfaces.filter((i) => i.routingOk === false).length
+  const routingNa = enrichedInterfaces.filter((i) => i.routingOk === null).length
+
   res.render('dashboard/index', {
-    title: 'Tableau de bord'
+    title: 'Tableau de bord',
+    interfaces: enrichedInterfaces,
+    hasInterfaces,
+    stats: {
+      activeInterfaces,
+      totalInterfaces: interfaces.length,
+      connectedPeers: totalConnectedPeers,
+      totalPeers,
+      totalTransferRx: formatBytes(totalTransferRx),
+      totalTransferTx: formatBytes(totalTransferTx),
+      latestHandshake: formatHandshake(latestHandshake)
+    },
+    routingSummary: {
+      ok: routingOk,
+      ko: routingKo,
+      na: routingNa
+    }
   })
 })
 

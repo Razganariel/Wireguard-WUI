@@ -95,6 +95,13 @@ router.get('/', async (req, res) => {
     }
   })
 
+  const interfaceList = interfaces.map((iface) => ({
+    id: iface.id,
+    nom: iface.nom,
+    active: iface.active,
+    peerCount: peerModel.findByInterfaceId(iface.id).length
+  }))
+
   const ifaceIp = selectedIface.adresse_ip || ''
   const ifaceMatch = ifaceIp.match(/^(\d+)\.(\d+)\.(\d+)\.\d+\/(\d+)$/)
   let suggestedPeerIp = ''
@@ -114,6 +121,7 @@ router.get('/', async (req, res) => {
     title: 'Pairs',
     peers,
     interfaces,
+    interfaceList,
     selectedInterface: selectedIface.id,
     selectedInterfaceName: selectedIface.nom,
     hasInterfaces: true,

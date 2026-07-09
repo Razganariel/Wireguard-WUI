@@ -270,23 +270,33 @@ function parseDump(stdout) {
 }
 
 function parseAllDump(stdout) {
-  const lines = stdout.trim().split('\n')
+  const lines = stdout.trim().split('\n').filter(Boolean)
   const result = {}
   let currentIface = null
 
   for (const line of lines) {
     const parts = line.split('\t')
-    if (parts.length === 4 && !parts[0].includes(':')) {
-      currentIface = parts[2] || `iface_${Object.keys(result).length}`
-      result[currentIface] = { interface: { publicKey: parts[0], listenPort: parseInt(parts[1], 10) }, peers: [] }
+    if (parts.length >= 4 && parts[0].length < 20) {
+      currentIface = parts[0]
+      result[currentIface] = {
+        interface: {
+          publicKey: parts[2],
+          listenPort: parseInt(parts[3], 10),
+          privateKey: parts[1],
+          fwmark: parts[4] || ''
+        },
+        peers: []
+      }
     } else if (parts.length >= 8 && currentIface) {
       result[currentIface].peers.push({
         publicKey: parts[0],
+        presharedKey: parts[1],
         endpoint: parts[2],
         allowedIps: parts[3],
         latestHandshake: parseInt(parts[4], 10),
         transferRx: parseInt(parts[5], 10),
-        transferTx: parseInt(parts[6], 10)
+        transferTx: parseInt(parts[6], 10),
+        persistentKeepalive: parseInt(parts[7], 10)
       })
     }
   }
