@@ -27,15 +27,6 @@
       </div>
     </div>
   </div>
-{{else if sudoNotSet}}
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="alert alert-info">
-        <a href="/auth/sudo-password" class="alert-link">Définissez le mot de passe sudo</a>
-        pour détecter les interfaces WireGuard existantes sur le système.
-      </div>
-    </div>
-  </div>
 {{/if}}
 
 {{#unless hasInterfaces}}
