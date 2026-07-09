@@ -25,6 +25,7 @@
         + Ajouter un pair
       </button>
       <form method="POST" action="/peers/detect" class="d-inline">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <button type="submit" class="btn btn-outline-info btn-sm">Détecter</button>
       </form>
     </div>
@@ -37,6 +38,7 @@
       </div>
       <div class="card-body">
         <form method="POST" action="/peers" data-validate>
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
           <input type="hidden" name="interface_id" value="{{selectedInterface}}">
           <div class="row g-3">
             <div class="col-md-4">
@@ -116,6 +118,7 @@
                 {{/if}}
                 <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editPeer{{id}}">Éditer</button>
                 <form method="POST" action="/peers/{{id}}/delete" class="d-inline" onsubmit="return confirm('Supprimer le pair {{nom}} ?')">
+                  <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
                   <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
                 </form>
               </td>
@@ -124,6 +127,7 @@
               <div class="modal-dialog">
                 <div class="modal-content">
                   <form method="POST" action="/peers/{{id}}/edit" data-validate>
+                    <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
                     <div class="modal-header">
                       <h5 class="modal-title">Éditer {{nom}}</h5>
                       <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

@@ -19,6 +19,7 @@
           <div class="d-flex flex-wrap gap-2">
             {{#each systemInterfaces}}
               <form method="POST" action="/interface/import/{{this}}" class="d-inline">
+                <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
                 <button type="submit" class="btn btn-sm btn-outline-warning">Importer {{this}}</button>
               </form>
             {{/each}}
@@ -39,6 +40,7 @@
         <div class="card-body">
           <p class="text-muted">Configurez votre interface WireGuard. Les clés seront générées automatiquement.</p>
           <form method="POST" action="/interface" data-validate>
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
             <div class="mb-3">
               <label for="nom" class="form-label">Nom de l'interface</label>
               <input type="text" class="form-control" id="nom" name="nom" placeholder="wg0" pattern="wg[0-9]+" required>
@@ -75,6 +77,7 @@
         + Nouvelle interface
       </button>
       <form method="POST" action="/interface/detect" class="d-inline">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <button type="submit" class="btn btn-outline-info">Détecter</button>
       </form>
     </div>
@@ -89,6 +92,7 @@
           </div>
           <div class="card-body">
           <form method="POST" action="/interface" data-validate>
+              <input type="hidden" name="_csrf" value="{{csrfToken}}">
               <div class="mb-3">
                 <label for="nom" class="form-label">Nom de l'interface</label>
                 <input type="text" class="form-control" id="nom" name="nom" placeholder="wg0" pattern="wg[0-9]+" required>
@@ -200,6 +204,7 @@
             <div class="d-flex gap-2 mt-3">
               <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editIface{{id}}">Éditer</button>
               <form method="POST" action="/interface/{{id}}/toggle" class="d-inline">
+                <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
                 {{#if active}}
                   <button type="submit" class="btn btn-sm btn-outline-warning">Arrêter</button>
                 {{else}}
@@ -207,6 +212,7 @@
                 {{/if}}
               </form>
               <form method="POST" action="/interface/{{id}}/delete" class="d-inline" onsubmit="return confirm('Supprimer l\\'interface {{nom}} ? Cette action est irréversible.')">
+                <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
                 <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
               </form>
               <a href="/peers?interface={{id}}" class="btn btn-sm btn-outline-primary ms-auto">Gérer les pairs</a>
@@ -216,6 +222,7 @@
               <div class="modal-dialog">
                 <div class="modal-content">
                   <form method="POST" action="/interface/{{id}}/edit">
+                    <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
                     <div class="modal-header">
                       <h5 class="modal-title">Éditer {{nom}}</h5>
                       <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
