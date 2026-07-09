@@ -11,6 +11,7 @@ const peerModel = require('./models/peer')
 const interfaceController = require('./controllers/interface')
 const sudo = require('./helpers/sudo')
 const csrfMiddleware = require('./middlewares/csrf')
+const { decrypt } = require('./helpers/crypto')
 const authRoutes = require('./routes/auth')
 const interfaceRoutes = require('./routes/interface')
 const peersRoutes = require('./routes/peers')
@@ -46,7 +47,13 @@ app.use((req, res, next) => {
     res.locals.userName = req.session.userName || null
 
     if (req.session.sudoPassword) {
-      sudo.setPassword(req.session.sudoPassword)
+      const decrypted = decrypt(req.session.sudoPassword)
+      if (decrypted) {
+        sudo.setPassword(decrypted)
+      } else {
+        delete req.session.sudoPassword
+        sudo.clearPassword()
+      }
     } else {
       sudo.clearPassword()
     }
