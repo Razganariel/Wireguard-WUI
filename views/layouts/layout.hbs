@@ -30,19 +30,7 @@
             </li>
           {{/if}}
         </ul>
-        {{#if user}}
-          {{#if hasInterfaces}}
-            <form method="POST" action="/interface/select" class="d-flex align-items-center me-3" id="globalIfaceSelector">
-              <span class="text-light me-2 small">Interface :</span>
-              <select name="interface_id" class="form-select form-select-sm" style="width: auto" onchange="this.form.submit()">
-                {{#each interfaces}}
-                  <option value="{{id}}" {{#if (eq ../selectedInterface id)}}selected{{/if}}>{{nom}}</option>
-                {{/each}}
-              </select>
-              <input type="hidden" name="redirect" value="{{currentPath}}">
-            </form>
-          {{/if}}
-        {{/if}}
+
         <ul class="navbar-nav ms-2 align-items-center">
           {{#if user}}
             <li class="nav-item me-2">
