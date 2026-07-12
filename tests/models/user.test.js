@@ -44,16 +44,15 @@ describe('user model', () => {
     expect(user).toBeDefined()
   })
 
-  it('handles 2fa fields', () => {
+  it('does not have 2fa columns in users table', () => {
     const id = userModel.create({
       prenom: 'TOTP',
       nom: 'User',
       email: 'totp@test.com',
       password: 'hash'
     })
-    userModel.update(id, { '2fa_enabled': 1, totp_secret: 'JBSWY3DPEHPK3PXP' })
     const user = userModel.findById(id)
-    expect(user['2fa_enabled']).toBe(1)
-    expect(user.totp_secret).toBe('JBSWY3DPEHPK3PXP')
+    expect(user['2fa_enabled']).toBeUndefined()
+    expect(user.totp_secret).toBeUndefined()
   })
 })

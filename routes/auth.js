@@ -5,6 +5,7 @@ const authController = require('../controllers/auth')
 const { isAuthenticated } = require('../middlewares/auth')
 const { sanitizeRaw } = require('../helpers/sanitize')
 const { encrypt } = require('../helpers/crypto')
+const log = require('../helpers/logger')
 const userModel = require('../models/user')
 
 const loginLimiter = rateLimit({
@@ -108,12 +109,14 @@ router.post('/sudo-password', isAuthenticated, sudoLimiter, (req, res) => {
     return res.redirect('/auth/sudo-password')
   }
   req.session.sudoPassword = encrypt(password)
+  log.info('Sudo', 'Mot de passe sudo défini')
   req.session.flash = { success: 'Mot de passe sudo enregistré.' }
   res.redirect('/')
 })
 
 router.get('/sudo-clear', isAuthenticated, (req, res) => {
   delete req.session.sudoPassword
+  log.info('Sudo', 'Mot de passe sudo effacé')
   req.session.flash = { success: 'Mot de passe sudo effacé.' }
   res.redirect('/')
 })

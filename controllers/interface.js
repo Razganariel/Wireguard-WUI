@@ -5,12 +5,14 @@ const os = require('os')
 const path = require('path')
 const execAsync = util.promisify(exec)
 const sudo = require('../helpers/sudo')
+const log = require('../helpers/logger')
 const { sanitizeInt, sanitizeCidr, sanitizePort, sanitizeEndpoint, sanitizeInterfaceName } = require('../helpers/sanitize')
 
 const interfaceModel = require('../models/interface')
 const peerModel = require('../models/peer')
 
 async function generateKeys() {
+  log.debug('Interface', 'Génération de clés WireGuard')
   const { stdout: privkey } = await execAsync('wg genkey')
   const privateKey = privkey.trim()
   const tmpFile = path.join(os.tmpdir(), `wgpriv_${Date.now()}`)
@@ -48,6 +50,7 @@ function buildConfig(iface) {
 }
 
 async function writeConfigFile(iface) {
+  log.debug('Interface', `Écriture du fichier config pour ${iface.nom}`)
   const configPath = `/etc/wireguard/${iface.nom}.conf`
   const configContent = buildConfig(iface)
   const tmpFile = path.join(os.tmpdir(), `wgconf_${iface.nom}_${Date.now()}.conf`)
@@ -201,6 +204,7 @@ async function removeRoutingRules(nom, adresse_ip) {
 async function bringUp(nom) {
   const iface = interfaceModel.findAll().find((i) => i.nom === nom)
   if (!iface) throw new Error(`Interface "${nom}" introuvable dans la base.`)
+  log.info('Interface', `Démarrage de l'interface ${nom}`)
   await writeConfigFile(iface)
   await sudo.exec(`wg-quick up ${nom}`)
   try { await addRoutingRules(nom, iface.adresse_ip) } catch (e) {}
@@ -211,9 +215,11 @@ async function bringDown(nom) {
   if (iface) {
     try { await removeRoutingRules(nom, iface.adresse_ip) } catch (e) {}
   }
+  log.info('Interface', `Arrêt de l'interface ${nom}`)
   try {
     await sudo.exec(`wg-quick down ${nom}`)
   } catch (e) {
+    log.debug('Interface', `wg-quick down échoué pour ${nom}, tentative ip link delete`)
     try { await sudo.exec(`wg show ${nom} >/dev/null 2>&1 && ip link delete ${nom}`) } catch (e2) {}
   }
 }
@@ -353,6 +359,7 @@ async function initInterface(req, res) {
   })
 
   if (!keygenOk) {
+    log.error('Interface', `Création ${nom} : échec génération des clés`)
     req.session.flash = {
       error: `Interface "${nom}" créée en DB mais impossible de générer les clés (wg genkey). Vérifiez que WireGuard est installé.`
     }
@@ -364,8 +371,10 @@ async function initInterface(req, res) {
     await writeConfigFile(iface)
     await bringUp(nom)
     interfaceModel.updateActive(id, true)
+    log.info('Interface', `Interface ${nom} initialisée et démarrée (id=${id})`)
     req.session.flash = { success: `Interface "${nom}" initialisée et démarrée avec succès.` }
   } catch (wgErr) {
+    log.error('Interface', `Création ${nom} : ${wgErr.message}`)
     req.session.flash = {
       error: `Interface créée en DB mais erreur WireGuard : ${wgErr.message}. Vérifiez que wg/wg-quick sont installés et sudo est configuré.`
     }
@@ -391,13 +400,16 @@ async function toggleInterface(req, res) {
     if (iface.active) {
       await bringDown(iface.nom)
       interfaceModel.updateActive(id, false)
+      log.info('Interface', `Interface ${iface.nom} arrêtée`)
       req.session.flash = { success: `Interface "${iface.nom}" arrêtée.` }
     } else {
       await bringUp(iface.nom)
       interfaceModel.updateActive(id, true)
+      log.info('Interface', `Interface ${iface.nom} démarrée`)
       req.session.flash = { success: `Interface "${iface.nom}" démarrée.` }
     }
   } catch (err) {
+    log.error('Interface', `Toggle ${iface.nom} : ${err.message}`)
     req.session.flash = { error: `Erreur : ${err.message}` }
   }
 
@@ -501,8 +513,10 @@ async function editInterface(req, res) {
 
     interfaceModel.update(id, { adresse_ip, port: portNum, endpoint: iface.endpoint })
 
+    log.info('Interface', `Interface ${iface.nom} mise à jour (ip=${adresse_ip}, port=${portNum})`)
     req.session.flash = { success: `Interface "${iface.nom}" mise à jour.` }
   } catch (err) {
+    log.error('Interface', `Édition ${iface.nom} : ${err.message}`)
     req.session.flash = { error: `Erreur : ${err.message}` }
   }
 
@@ -544,6 +558,7 @@ async function deleteInterface(req, res) {
     // best effort — cleanup done
   }
 
+  log.info('Interface', `Interface ${iface.nom} supprimée (id=${id})`)
   req.session.flash = { success: `Interface "${iface.nom}" supprimée.` }
   return res.redirect('/interface')
 }
@@ -652,6 +667,7 @@ function persistPeers(interfaceId, peerEntries) {
 }
 
 async function importInterface(nom) {
+  log.info('Interface', `Importation de l'interface système ${nom}`)
   const { stdout } = await sudo.exec(`cat /etc/wireguard/${nom}.conf`)
   const { privateKey, adresse_ip, port, peerEntries } = parseConfig(stdout)
 
@@ -697,6 +713,7 @@ async function importInterface(nom) {
 
 async function detectAndImportAll() {
   const names = await getSystemInterfaceNames()
+  log.info('Interface', `Détection des interfaces système : ${names.length} trouvée(s)`)
   let importedIfaces = 0
   let importedPeers = 0
   for (const nom of names) {
@@ -706,6 +723,7 @@ async function detectAndImportAll() {
     importedIfaces++
     importedPeers += iface._importedPeerCount
   }
+  log.info('Interface', `Importation terminée : ${importedIfaces} interface(s), ${importedPeers} peer(s)`)
   return { importedIfaces, importedPeers }
 }
 
