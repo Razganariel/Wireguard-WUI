@@ -499,8 +499,7 @@ async function editInterface(req, res) {
       }
     }
 
-    const db = require('../db')
-    db.prepare('UPDATE interfaces SET adresse_ip = ?, port = ?, endpoint = ? WHERE id = ?').run(adresse_ip, portNum, iface.endpoint, id)
+    interfaceModel.update(id, { adresse_ip, port: portNum, endpoint: iface.endpoint })
 
     req.session.flash = { success: `Interface "${iface.nom}" mise à jour.` }
   } catch (err) {

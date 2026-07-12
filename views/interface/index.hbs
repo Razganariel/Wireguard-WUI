@@ -213,7 +213,7 @@
                   <button type="submit" class="btn btn-sm btn-outline-success">Démarrer</button>
                 {{/if}}
               </form>
-              <form method="POST" action="/interface/{{id}}/delete" class="d-inline" onsubmit="return confirm('Supprimer l\\'interface {{nom}} ? Cette action est irréversible.')">
+              <form method="POST" action="/interface/{{id}}/delete" class="d-inline" data-confirm="Supprimer l'interface {{nom}} ? Cette action est irréversible.">
                 <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
                 <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
               </form>

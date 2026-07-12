@@ -79,7 +79,18 @@ router.get('/totp', (req, res) => {
   res.render('auth/totp', { title: 'Authentification' })
 })
 
-router.post('/totp', authController.verifyTotp)
+const totpLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    req.session.flash = { error: 'Trop de tentatives. Réessayez dans 15 minutes.' }
+    res.redirect('/auth/totp')
+  }
+})
+
+router.post('/totp', totpLimiter, authController.verifyTotp)
 
 router.get('/logout', authController.logout)
 

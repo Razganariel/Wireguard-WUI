@@ -117,7 +117,7 @@
                   <a href="/peers/{{id}}/qrcode" class="btn btn-sm btn-outline-info">QR</a>
                 {{/if}}
                 <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editPeer{{id}}">Éditer</button>
-                <form method="POST" action="/peers/{{id}}/delete" class="d-inline" onsubmit="return confirm('Supprimer le pair {{nom}} ?')">
+                <form method="POST" action="/peers/{{id}}/delete" class="d-inline" data-confirm="Supprimer le pair {{nom}} ?">
                   <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
                   <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
                 </form>
@@ -131,7 +131,7 @@
                     <a href="/peers/{{id}}/qrcode" class="btn btn-sm btn-outline-info">QR</a>
                   {{/if}}
                   <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editPeer{{id}}">Éditer</button>
-                  <form method="POST" action="/peers/{{id}}/delete" class="d-inline" onsubmit="return confirm('Supprimer le pair {{nom}} ?')">
+                  <form method="POST" action="/peers/{{id}}/delete" class="d-inline" data-confirm="Supprimer le pair {{nom}} ?">
                     <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
                     <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
                   </form>

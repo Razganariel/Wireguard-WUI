@@ -37,6 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   })
 
+  document.querySelectorAll('form[data-confirm]').forEach((form) => {
+    form.addEventListener('submit', (e) => {
+      if (!confirm(form.getAttribute('data-confirm'))) e.preventDefault()
+    })
+  })
+
   document.querySelectorAll('[data-toggle-password]').forEach((btn) => {
     btn.addEventListener('click', () => togglePassword(btn.getAttribute('data-toggle-password'), btn))
   })
@@ -60,11 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   }
 
-  document.querySelectorAll('.toast.show').forEach((toast) => {
-    setTimeout(() => {
-      const bsToast = bootstrap.Toast.getInstance(toast)
-      if (bsToast) bsToast.hide()
-      else toast.classList.remove('show')
-    }, 5000)
+  document.querySelectorAll('.toast').forEach((toast) => {
+    new bootstrap.Toast(toast, { autohide: true, delay: 5000 })
   })
 })

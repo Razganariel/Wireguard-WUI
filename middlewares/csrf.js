@@ -13,7 +13,7 @@ function csrfMiddleware(req, res, next) {
     const csrfBody = req.body._csrf
     if (!csrfBody || !tokens.verify(req.session.csrfSecret, csrfBody)) {
       req.session.flash = { error: 'Session invalide. Veuillez réessayer.' }
-      return res.redirect(req.get('Referer') || '/')
+      return res.redirect('/')
     }
   }
 

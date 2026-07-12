@@ -14,12 +14,9 @@ async function login(req, res) {
 
   const user = userModel.findByEmail(email)
 
-  if (!user) {
-    req.session.flash = { error: 'Identifiants incorrects.' }
-    return res.redirect('/auth/login')
-  }
-
-  const valid = await bcrypt.compare(password, user.password)
+  const dummyHash = '$2b$10$' + 'x'.repeat(53)
+  const hash = user ? user.password : dummyHash
+  const valid = await bcrypt.compare(password, hash)
 
   if (!valid) {
     req.session.flash = { error: 'Identifiants incorrects.' }
