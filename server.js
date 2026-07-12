@@ -158,6 +158,10 @@ app.post('/profile', async (req, res) => {
       req.session.flash = { error: 'Le nouveau mot de passe doit faire au moins 8 caractères.' }
       return res.redirect('/profile')
     }
+    if (req.body.new_password !== req.body.new_password_confirm) {
+      req.session.flash = { error: 'La confirmation du mot de passe ne correspond pas.' }
+      return res.redirect('/profile')
+    }
     const valid = await bcrypt.compare(req.body.current_password, user.password)
     if (!valid) {
       req.session.flash = { error: 'Le mot de passe actuel est incorrect.' }
