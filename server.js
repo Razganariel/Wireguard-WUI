@@ -3,9 +3,9 @@ const session = require('express-session')
 const helmet = require('helmet')
 const path = require('path')
 const hbs = require('hbs')
+const bcrypt = require('bcrypt')
 require('dotenv').config()
 
-const db = require('./db')
 const userModel = require('./models/user')
 const interfaceModel = require('./models/interface')
 const peerModel = require('./models/peer')
@@ -13,6 +13,11 @@ const interfaceController = require('./controllers/interface')
 const sudo = require('./helpers/sudo')
 const csrfMiddleware = require('./middlewares/csrf')
 const { decrypt } = require('./helpers/crypto')
+const { sanitize, sanitizeEmail } = require('./helpers/sanitize')
+const { getStrength } = require('./helpers/entropy')
+const { generateSecret, getOtpauthUrl, verifyToken } = require('./helpers/totp')
+const { toDataURL } = require('./helpers/qrcode')
+const { formatBytes, formatHandshake } = require('./helpers/format')
 const authRoutes = require('./routes/auth')
 const interfaceRoutes = require('./routes/interface')
 const peersRoutes = require('./routes/peers')
@@ -125,8 +130,6 @@ app.get('/profile', (req, res) => {
 
 app.post('/profile', async (req, res) => {
   if (!req.session || !req.session.userId) return res.redirect('/auth/login')
-  const bcrypt = require('bcrypt')
-  const { sanitize, sanitizeEmail } = require('./helpers/sanitize')
   const user = userModel.findById(req.session.userId)
   if (!user) return res.redirect('/logout')
 
@@ -164,7 +167,6 @@ app.post('/profile', async (req, res) => {
       return res.redirect('/profile')
     }
     if (passwordComplexity) {
-      const { getStrength } = require('./helpers/entropy')
       const { isValid } = getStrength(req.body.new_password)
       if (!isValid) {
         req.session.flash = { error: 'Le mot de passe est trop faible. Utilisez des majuscules, minuscules, chiffres et caractères spéciaux pour un mot de passe plus long (entropie ≥ 60 bits).' }
@@ -190,11 +192,9 @@ app.post('/profile/totp-generate', async (req, res) => {
   if (!req.session || !req.session.userId) return res.redirect('/auth/login')
   const user = userModel.findById(req.session.userId)
   if (!user) return res.redirect('/logout')
-  const { generateSecret, getOtpauthUrl } = require('./helpers/totp')
   const secret = generateSecret()
   req.session.pendingTotpSecret = secret
   const otpauth = getOtpauthUrl(secret, user.email)
-  const { toDataURL } = require('./helpers/qrcode')
   const qrDataUrl = await toDataURL(otpauth)
   res.render('profile/totp-setup', {
     title: 'Configurer 2FA',
@@ -211,8 +211,6 @@ app.post('/profile/totp-enable', async (req, res) => {
     req.session.flash = { error: 'Aucune clé en attente. Veuillez recommencer.' }
     return res.redirect('/profile')
   }
-  const { sanitize } = require('./helpers/sanitize')
-  const { verifyToken } = require('./helpers/totp')
   const token = sanitize(req.body.totp_token)
   if (!token || !verifyToken(req.session.pendingTotpSecret, token)) {
     req.session.flash = { error: 'Code invalide. Veuillez réessayer.' }
@@ -228,8 +226,6 @@ app.post('/profile/totp-enable', async (req, res) => {
 
 app.post('/profile/totp-disable', async (req, res) => {
   if (!req.session || !req.session.userId) return res.redirect('/auth/login')
-  const { sanitize } = require('./helpers/sanitize')
-  const bcrypt = require('bcrypt')
   const user = userModel.findById(req.session.userId)
   if (!user) return res.redirect('/logout')
   const password = sanitize(req.body.current_password)
@@ -252,23 +248,6 @@ app.get('/logout', (req, res) => {
     res.redirect('/auth/login')
   })
 })
-
-function formatBytes(bytes) {
-  if (!bytes || bytes === 0) return '0 B'
-  const units = ['B', 'KB', 'MB', 'GB', 'TB']
-  const i = Math.floor(Math.log(bytes) / Math.log(1024))
-  return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
-}
-
-function formatHandshake(ts) {
-  if (!ts || ts === 0) return null
-  const now = Math.floor(Date.now() / 1000)
-  const diff = now - ts
-  if (diff < 60) return 'à l\'instant'
-  if (diff < 3600) return `il y a ${Math.floor(diff / 60)} min`
-  if (diff < 86400) return `il y a ${Math.floor(diff / 3600)} h`
-  return `il y a ${Math.floor(diff / 86400)} j`
-}
 
 app.get('/', async (req, res) => {
   if (!req.session || !req.session.userId) {

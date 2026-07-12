@@ -28,6 +28,11 @@ function updateActive(id, active) {
   db.prepare('UPDATE interfaces SET active = ? WHERE id = ?').run(active ? 1 : 0, id)
 }
 
+function update(id, data) {
+  const { adresse_ip, port, endpoint } = data
+  db.prepare('UPDATE interfaces SET adresse_ip = ?, port = ?, endpoint = ? WHERE id = ?').run(adresse_ip, port, endpoint, id)
+}
+
 function remove(id) {
   db.prepare('DELETE FROM interfaces WHERE id = ?').run(id)
 }
@@ -39,5 +44,6 @@ module.exports = {
   count,
   create,
   updateActive,
+  update,
   remove
 }

@@ -72,16 +72,24 @@ function sanitizeEndpoint(str) {
 
 function sanitizeEmail(str) {
   if (typeof str !== 'string') return ''
-  const s = validator.normalizeEmail(str.trim())
-  if (!s) return ''
+  const s = str.trim().toLowerCase()
+  if (!validator.isEmail(s)) return ''
   return s
 }
 
 function sanitizeAllowedIps(str) {
   if (typeof str !== 'string') return ''
-  const s = str.trim()
-  if (!/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}(,\s*(\d{1,3}\.){3}\d{1,3}\/\d{1,2})*$/.test(s)) return ''
-  return s
+  const parts = str.split(',').map(p => p.trim()).filter(Boolean)
+  const valid = parts.every(p => {
+    const m = p.match(/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/)
+    if (!m) return false
+    const [ip, bits] = p.split('/')
+    if (!validator.isIP(ip, 4)) return false
+    const b = parseInt(bits, 10)
+    return b >= 0 && b <= 32
+  })
+  if (!valid) return ''
+  return parts.join(', ')
 }
 
 function sanitizeDns(str) {
