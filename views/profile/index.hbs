@@ -1,0 +1,47 @@
+<div class="row justify-content-center mt-3">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow">
+      <div class="card-body p-4">
+        <h4 class="card-title text-center mb-4">Mon profil</h4>
+        <form method="POST" action="/profile" data-validate>
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="prenom" class="form-label">Prénom</label>
+              <input type="text" class="form-control" id="prenom" name="prenom" value="{{user.prenom}}" required maxlength="100">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="nom" class="form-label">Nom</label>
+              <input type="text" class="form-control" id="nom" name="nom" value="{{user.nom}}" required maxlength="100">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{user.email}}" required>
+          </div>
+
+          <hr class="my-4">
+          <h5 class="mb-3">Changer le mot de passe <span class="text-muted small fw-normal">(optionnel)</span></h5>
+
+          <div class="mb-3">
+            <label for="current_password" class="form-label">Mot de passe actuel</label>
+            <input type="password" class="form-control" id="current_password" name="current_password" autocomplete="current-password">
+          </div>
+
+          <div class="mb-3">
+            <label for="new_password" class="form-label">Nouveau mot de passe</label>
+            <input type="password" class="form-control" id="new_password" name="new_password" minlength="8" autocomplete="new-password">
+            <div class="form-text">Min. 8 caractères. Laissez vide pour conserver l'actuel.</div>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <a href="/" class="btn btn-outline-secondary">Annuler</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
