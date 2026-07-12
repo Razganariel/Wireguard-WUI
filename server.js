@@ -120,7 +120,7 @@ app.get('/profile', (req, res) => {
   if (!req.session || !req.session.userId) return res.redirect('/auth/login')
   const user = userModel.findById(req.session.userId)
   if (!user) return res.redirect('/logout')
-  res.render('profile/index', { title: 'Mon profil', user, passwordComplexity: !!user.password_complexity })
+  res.render('profile/index', { title: 'Mon profil', user, passwordComplexity: !!user.password_complexity, totpEnabled: !!user['2fa_enabled'] })
 })
 
 app.post('/profile', async (req, res) => {
@@ -183,6 +183,67 @@ app.post('/profile', async (req, res) => {
   req.session.userName = `${prenom} ${nom}`
   req.session.userEmail = email
   req.session.flash = { success: 'Profil mis à jour.' }
+  res.redirect('/profile')
+})
+
+app.post('/profile/totp-generate', async (req, res) => {
+  if (!req.session || !req.session.userId) return res.redirect('/auth/login')
+  const user = userModel.findById(req.session.userId)
+  if (!user) return res.redirect('/logout')
+  const { generateSecret, getOtpauthUrl } = require('./helpers/totp')
+  const secret = generateSecret()
+  req.session.pendingTotpSecret = secret
+  const otpauth = getOtpauthUrl(secret, user.email)
+  const { toDataURL } = require('./helpers/qrcode')
+  const qrDataUrl = await toDataURL(otpauth)
+  res.render('profile/totp-setup', {
+    title: 'Configurer 2FA',
+    secret,
+    otpauth,
+    qrDataUrl,
+    email: user.email
+  })
+})
+
+app.post('/profile/totp-enable', async (req, res) => {
+  if (!req.session || !req.session.userId) return res.redirect('/auth/login')
+  if (!req.session.pendingTotpSecret) {
+    req.session.flash = { error: 'Aucune clé en attente. Veuillez recommencer.' }
+    return res.redirect('/profile')
+  }
+  const { sanitize } = require('./helpers/sanitize')
+  const { verifyToken } = require('./helpers/totp')
+  const token = sanitize(req.body.totp_token)
+  if (!token || !verifyToken(req.session.pendingTotpSecret, token)) {
+    req.session.flash = { error: 'Code invalide. Veuillez réessayer.' }
+    return res.redirect('/profile')
+  }
+  const user = userModel.findById(req.session.userId)
+  if (!user) return res.redirect('/logout')
+  userModel.update(user.id, { '2fa_enabled': 1, totp_secret: req.session.pendingTotpSecret })
+  delete req.session.pendingTotpSecret
+  req.session.flash = { success: 'Authentification à deux facteurs activée.' }
+  res.redirect('/profile')
+})
+
+app.post('/profile/totp-disable', async (req, res) => {
+  if (!req.session || !req.session.userId) return res.redirect('/auth/login')
+  const { sanitize } = require('./helpers/sanitize')
+  const bcrypt = require('bcrypt')
+  const user = userModel.findById(req.session.userId)
+  if (!user) return res.redirect('/logout')
+  const password = sanitize(req.body.current_password)
+  if (!password) {
+    req.session.flash = { error: 'Veuillez saisir votre mot de passe actuel.' }
+    return res.redirect('/profile')
+  }
+  const valid = await bcrypt.compare(password, user.password)
+  if (!valid) {
+    req.session.flash = { error: 'Mot de passe incorrect.' }
+    return res.redirect('/profile')
+  }
+  userModel.update(user.id, { '2fa_enabled': 0, totp_secret: null })
+  req.session.flash = { success: 'Authentification à deux facteurs désactivée.' }
   res.redirect('/profile')
 })
 

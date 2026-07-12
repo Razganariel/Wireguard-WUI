@@ -23,9 +23,10 @@ function create(user) {
 function update(id, data) {
   const fields = []
   const values = []
-  for (const key of ['prenom', 'nom', 'email', 'password', 'password_complexity']) {
+  const cols = { prenom: 'prenom', nom: 'nom', email: 'email', password: 'password', password_complexity: 'password_complexity', '2fa_enabled': '"2fa_enabled"', totp_secret: 'totp_secret' }
+  for (const [key, col] of Object.entries(cols)) {
     if (data[key] !== undefined) {
-      fields.push(`${key} = ?`)
+      fields.push(`${col} = ?`)
       values.push(data[key])
     }
   }

@@ -73,6 +73,36 @@
             <a href="/" class="btn btn-outline-secondary">Annuler</a>
           </div>
         </form>
+
+        <hr class="my-4">
+
+        <h5 class="mb-3">Authentification à deux facteurs</h5>
+        {{#if totpEnabled}}
+          <div class="alert alert-success d-flex align-items-center gap-2 mb-3">
+            <span>✓</span>
+            <span>L'authentification à deux facteurs est <strong>activée</strong>.</span>
+          </div>
+          <form method="POST" action="/profile/totp-disable" data-validate>
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+            <div class="mb-3">
+              <label for="disable_password" class="form-label">Mot de passe actuel</label>
+              <input type="password" class="form-control" id="disable_password" name="current_password" required>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-outline-danger">Désactiver 2FA</button>
+            </div>
+          </form>
+        {{else}}
+          <p class="text-muted small mb-3">
+            Ajoutez une couche de sécurité supplémentaire en activant l'authentification à deux facteurs.
+          </p>
+          <form method="POST" action="/profile/totp-generate">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+            <div class="d-grid">
+              <button type="submit" class="btn btn-outline-primary">Configurer 2FA</button>
+            </div>
+          </form>
+        {{/if}}
       </div>
     </div>
   </div>
