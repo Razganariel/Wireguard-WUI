@@ -116,6 +116,137 @@ app.use('/auth', authRoutes)
 app.use('/interface', interfaceRoutes)
 app.use('/peers', peersRoutes)
 
+app.get('/profile', (req, res) => {
+  if (!req.session || !req.session.userId) return res.redirect('/auth/login')
+  const user = userModel.findById(req.session.userId)
+  if (!user) return res.redirect('/logout')
+  res.render('profile/index', { title: 'Mon profil', user, passwordComplexity: !!user.password_complexity, totpEnabled: !!user['2fa_enabled'] })
+})
+
+app.post('/profile', async (req, res) => {
+  if (!req.session || !req.session.userId) return res.redirect('/auth/login')
+  const bcrypt = require('bcrypt')
+  const { sanitize, sanitizeEmail } = require('./helpers/sanitize')
+  const user = userModel.findById(req.session.userId)
+  if (!user) return res.redirect('/logout')
+
+  const prenom = sanitize(req.body.prenom)
+  const nom = sanitize(req.body.nom)
+  let email = sanitizeEmail(req.body.email)
+
+  if (!prenom || !nom) {
+    req.session.flash = { error: 'Le prénom et le nom sont obligatoires.' }
+    return res.redirect('/profile')
+  }
+  if (!email) {
+    req.session.flash = { error: 'Email invalide.' }
+    return res.redirect('/profile')
+  }
+
+  if (email !== user.email) {
+    const existing = userModel.findByEmail(email)
+    if (existing && existing.id !== user.id) {
+      req.session.flash = { error: 'Cet email est déjà utilisé.' }
+      return res.redirect('/profile')
+    }
+  }
+
+  const passwordComplexity = req.body.password_complexity === '1' ? 1 : 0
+  const updates = { prenom, nom, email, password_complexity: passwordComplexity }
+
+  if (req.body.current_password && req.body.new_password) {
+    if (req.body.new_password.length < 8) {
+      req.session.flash = { error: 'Le nouveau mot de passe doit faire au moins 8 caractères.' }
+      return res.redirect('/profile')
+    }
+    if (req.body.new_password !== req.body.new_password_confirm) {
+      req.session.flash = { error: 'La confirmation du mot de passe ne correspond pas.' }
+      return res.redirect('/profile')
+    }
+    if (passwordComplexity) {
+      const { getStrength } = require('./helpers/entropy')
+      const { isValid } = getStrength(req.body.new_password)
+      if (!isValid) {
+        req.session.flash = { error: 'Le mot de passe est trop faible. Utilisez des majuscules, minuscules, chiffres et caractères spéciaux pour un mot de passe plus long (entropie ≥ 60 bits).' }
+        return res.redirect('/profile')
+      }
+    }
+    const valid = await bcrypt.compare(req.body.current_password, user.password)
+    if (!valid) {
+      req.session.flash = { error: 'Le mot de passe actuel est incorrect.' }
+      return res.redirect('/profile')
+    }
+    updates.password = await bcrypt.hash(req.body.new_password, 10)
+  }
+
+  userModel.update(user.id, updates)
+  req.session.userName = `${prenom} ${nom}`
+  req.session.userEmail = email
+  req.session.flash = { success: 'Profil mis à jour.' }
+  res.redirect('/profile')
+})
+
+app.post('/profile/totp-generate', async (req, res) => {
+  if (!req.session || !req.session.userId) return res.redirect('/auth/login')
+  const user = userModel.findById(req.session.userId)
+  if (!user) return res.redirect('/logout')
+  const { generateSecret, getOtpauthUrl } = require('./helpers/totp')
+  const secret = generateSecret()
+  req.session.pendingTotpSecret = secret
+  const otpauth = getOtpauthUrl(secret, user.email)
+  const { toDataURL } = require('./helpers/qrcode')
+  const qrDataUrl = await toDataURL(otpauth)
+  res.render('profile/totp-setup', {
+    title: 'Configurer 2FA',
+    secret,
+    otpauth,
+    qrDataUrl,
+    email: user.email
+  })
+})
+
+app.post('/profile/totp-enable', async (req, res) => {
+  if (!req.session || !req.session.userId) return res.redirect('/auth/login')
+  if (!req.session.pendingTotpSecret) {
+    req.session.flash = { error: 'Aucune clé en attente. Veuillez recommencer.' }
+    return res.redirect('/profile')
+  }
+  const { sanitize } = require('./helpers/sanitize')
+  const { verifyToken } = require('./helpers/totp')
+  const token = sanitize(req.body.totp_token)
+  if (!token || !verifyToken(req.session.pendingTotpSecret, token)) {
+    req.session.flash = { error: 'Code invalide. Veuillez réessayer.' }
+    return res.redirect('/profile')
+  }
+  const user = userModel.findById(req.session.userId)
+  if (!user) return res.redirect('/logout')
+  userModel.update(user.id, { '2fa_enabled': 1, totp_secret: req.session.pendingTotpSecret })
+  delete req.session.pendingTotpSecret
+  req.session.flash = { success: 'Authentification à deux facteurs activée.' }
+  res.redirect('/profile')
+})
+
+app.post('/profile/totp-disable', async (req, res) => {
+  if (!req.session || !req.session.userId) return res.redirect('/auth/login')
+  const { sanitize } = require('./helpers/sanitize')
+  const bcrypt = require('bcrypt')
+  const user = userModel.findById(req.session.userId)
+  if (!user) return res.redirect('/logout')
+  const password = sanitize(req.body.current_password)
+  if (!password) {
+    req.session.flash = { error: 'Veuillez saisir votre mot de passe actuel.' }
+    return res.redirect('/profile')
+  }
+  const valid = await bcrypt.compare(password, user.password)
+  if (!valid) {
+    req.session.flash = { error: 'Mot de passe incorrect.' }
+    return res.redirect('/profile')
+  }
+  userModel.update(user.id, { '2fa_enabled': 0, totp_secret: null })
+  req.session.flash = { success: 'Authentification à deux facteurs désactivée.' }
+  res.redirect('/profile')
+})
+
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
     res.redirect('/auth/login')

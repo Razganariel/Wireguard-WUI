@@ -1,0 +1,109 @@
+<div class="row justify-content-center mt-3">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow">
+      <div class="card-body p-4">
+        <h4 class="card-title text-center mb-4">Mon profil</h4>
+        <form method="POST" action="/profile" data-validate>
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="prenom" class="form-label">Prénom</label>
+              <input type="text" class="form-control" id="prenom" name="prenom" value="{{user.prenom}}" required maxlength="100">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="nom" class="form-label">Nom</label>
+              <input type="text" class="form-control" id="nom" name="nom" value="{{user.nom}}" required maxlength="100">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{user.email}}" required>
+          </div>
+
+          <hr class="my-4">
+
+          <div class="form-check form-switch mb-4">
+            <input class="form-check-input" type="checkbox" id="password_complexity" name="password_complexity" value="1" {{#if passwordComplexity}}checked{{/if}}>
+            <label class="form-check-label" for="password_complexity">Exiger un mot de passe fort (entropie ≥ 60 bits)</label>
+          </div>
+
+          <h5 class="mb-3">Changer le mot de passe <span class="text-muted small fw-normal">(optionnel)</span></h5>
+
+          <div class="mb-3">
+            <label for="current_password" class="form-label">Mot de passe actuel</label>
+            <div class="input-group">
+              <input type="password" class="form-control" id="current_password" name="current_password" autocomplete="current-password">
+              <button type="button" class="btn btn-outline-secondary" data-toggle-password="current_password" aria-label="Afficher">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/><path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="new_password" class="form-label">Nouveau mot de passe</label>
+            <div class="input-group">
+              <input type="password" class="form-control" id="new_password" name="new_password" minlength="8" autocomplete="new-password">
+              <button type="button" class="btn btn-outline-secondary" data-toggle-password="new_password" aria-label="Afficher">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/><path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/></svg>
+              </button>
+            </div>
+            <div class="form-text">Min. 8 caractères. Laissez vide pour conserver l'actuel.</div>
+            <div id="entropy-meter" class="mt-2" style="display:none">
+              <div class="progress" style="height: 8px;">
+                <div class="progress-bar" id="entropy-bar" role="progressbar" style="width: 0%"></div>
+              </div>
+              <small class="text-muted mt-1 d-block">Force : <span id="entropy-label">—</span> (<span id="entropy-value">0</span> bits)</small>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="new_password_confirm" class="form-label">Confirmer le nouveau mot de passe</label>
+            <div class="input-group">
+              <input type="password" class="form-control" id="new_password_confirm" name="new_password_confirm" minlength="8" autocomplete="new-password">
+              <button type="button" class="btn btn-outline-secondary" data-toggle-password="new_password_confirm" aria-label="Afficher">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/><path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <a href="/" class="btn btn-outline-secondary">Annuler</a>
+          </div>
+        </form>
+
+        <hr class="my-4">
+
+        <h5 class="mb-3">Authentification à deux facteurs</h5>
+        {{#if totpEnabled}}
+          <div class="alert alert-success d-flex align-items-center gap-2 mb-3">
+            <span>✓</span>
+            <span>L'authentification à deux facteurs est <strong>activée</strong>.</span>
+          </div>
+          <form method="POST" action="/profile/totp-disable" data-validate>
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+            <div class="mb-3">
+              <label for="disable_password" class="form-label">Mot de passe actuel</label>
+              <input type="password" class="form-control" id="disable_password" name="current_password" required>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-outline-danger">Désactiver 2FA</button>
+            </div>
+          </form>
+        {{else}}
+          <p class="text-muted small mb-3">
+            Ajoutez une couche de sécurité supplémentaire en activant l'authentification à deux facteurs.
+          </p>
+          <form method="POST" action="/profile/totp-generate">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+            <div class="d-grid">
+              <button type="submit" class="btn btn-outline-primary">Configurer 2FA</button>
+            </div>
+          </form>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</div>

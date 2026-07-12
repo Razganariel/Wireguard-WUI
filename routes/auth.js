@@ -73,6 +73,14 @@ router.get('/login', (req, res) => {
 
 router.post('/login', loginLimiter, authController.login)
 
+router.get('/totp', (req, res) => {
+  if (!req.session.pendingUserId) return res.redirect('/auth/login')
+  if (req.session.userId) return res.redirect('/')
+  res.render('auth/totp', { title: 'Authentification' })
+})
+
+router.post('/totp', authController.verifyTotp)
+
 router.get('/logout', authController.logout)
 
 router.get('/sudo-password', isAuthenticated, (req, res) => {

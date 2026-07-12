@@ -1,0 +1,33 @@
+<div class="row justify-content-center mt-5">
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="card-title text-center mb-4">Authentification</h2>
+        <p class="text-center text-muted mb-4">
+          Saisissez le code à 6 chiffres généré par votre application d'authentification.
+        </p>
+        <form method="POST" action="/auth/totp" data-validate>
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
+          <div class="mb-3">
+            <label for="totp_token" class="form-label">Code d'authentification</label>
+            <input
+              type="text"
+              class="form-control text-center"
+              id="totp_token"
+              name="totp_token"
+              placeholder="000000"
+              inputmode="numeric"
+              pattern="[0-9]{6}"
+              maxlength="6"
+              required
+              autofocus
+            >
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Vérifier</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
