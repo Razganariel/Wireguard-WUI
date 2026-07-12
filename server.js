@@ -120,7 +120,7 @@ app.get('/profile', (req, res) => {
   if (!req.session || !req.session.userId) return res.redirect('/auth/login')
   const user = userModel.findById(req.session.userId)
   if (!user) return res.redirect('/logout')
-  res.render('profile/index', { title: 'Mon profil', user })
+  res.render('profile/index', { title: 'Mon profil', user, passwordComplexity: !!user.password_complexity })
 })
 
 app.post('/profile', async (req, res) => {
@@ -151,7 +151,8 @@ app.post('/profile', async (req, res) => {
     }
   }
 
-  const updates = { prenom, nom, email }
+  const passwordComplexity = req.body.password_complexity === '1' ? 1 : 0
+  const updates = { prenom, nom, email, password_complexity: passwordComplexity }
 
   if (req.body.current_password && req.body.new_password) {
     if (req.body.new_password.length < 8) {
@@ -161,6 +162,14 @@ app.post('/profile', async (req, res) => {
     if (req.body.new_password !== req.body.new_password_confirm) {
       req.session.flash = { error: 'La confirmation du mot de passe ne correspond pas.' }
       return res.redirect('/profile')
+    }
+    if (passwordComplexity) {
+      const { getStrength } = require('./helpers/entropy')
+      const { isValid } = getStrength(req.body.new_password)
+      if (!isValid) {
+        req.session.flash = { error: 'Le mot de passe est trop faible. Utilisez des majuscules, minuscules, chiffres et caractères spéciaux pour un mot de passe plus long (entropie ≥ 60 bits).' }
+        return res.redirect('/profile')
+      }
     }
     const valid = await bcrypt.compare(req.body.current_password, user.password)
     if (!valid) {

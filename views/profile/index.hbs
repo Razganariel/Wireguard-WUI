@@ -23,6 +23,12 @@
           </div>
 
           <hr class="my-4">
+
+          <div class="form-check form-switch mb-4">
+            <input class="form-check-input" type="checkbox" id="password_complexity" name="password_complexity" value="1" {{#if passwordComplexity}}checked{{/if}}>
+            <label class="form-check-label" for="password_complexity">Exiger un mot de passe fort (entropie ≥ 60 bits)</label>
+          </div>
+
           <h5 class="mb-3">Changer le mot de passe <span class="text-muted small fw-normal">(optionnel)</span></h5>
 
           <div class="mb-3">
@@ -44,6 +50,12 @@
               </button>
             </div>
             <div class="form-text">Min. 8 caractères. Laissez vide pour conserver l'actuel.</div>
+            <div id="entropy-meter" class="mt-2" style="display:none">
+              <div class="progress" style="height: 8px;">
+                <div class="progress-bar" id="entropy-bar" role="progressbar" style="width: 0%"></div>
+              </div>
+              <small class="text-muted mt-1 d-block">Force : <span id="entropy-label">—</span> (<span id="entropy-value">0</span> bits)</small>
+            </div>
           </div>
 
           <div class="mb-3">
