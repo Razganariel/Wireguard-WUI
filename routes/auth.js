@@ -5,6 +5,7 @@ const authController = require('../controllers/auth')
 const { isAuthenticated } = require('../middlewares/auth')
 const { sanitizeRaw } = require('../helpers/sanitize')
 const { encrypt } = require('../helpers/crypto')
+const userModel = require('../models/user')
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -25,6 +26,41 @@ const sudoLimiter = rateLimit({
   handler: (req, res) => {
     req.session.flash = { error: 'Trop de tentatives. Réessayez dans 15 minutes.' }
     res.redirect('/auth/sudo-password')
+  }
+})
+
+router.get('/setup', (req, res) => {
+  if (userModel.count() > 0) {
+    return res.redirect('/auth/login')
+  }
+  res.render('auth/setup', { title: 'Installation', layout: 'layouts/minimal' })
+})
+
+router.post('/setup', async (req, res) => {
+  if (userModel.count() > 0) {
+    return res.redirect('/auth/login')
+  }
+  const { prenom, nom, email, password } = req.body
+  if (!prenom || !nom || !email || !password || password.length < 8) {
+    req.session.flash = { error: 'Tous les champs sont obligatoires (mot de passe 8 caractères min).' }
+    return res.redirect('/auth/setup')
+  }
+  try {
+    const bcrypt = require('bcrypt')
+    const hashedPassword = await bcrypt.hash(password, 10)
+    userModel.create({ prenom, nom, email, password: hashedPassword })
+    req.session.userId = userModel.findByEmail(email).id
+    req.session.userEmail = email
+    req.session.userName = `${prenom} ${nom}`
+    req.session.flash = { success: 'Compte administrateur créé. Bienvenue !' }
+    return res.redirect('/')
+  } catch (err) {
+    if (err.message && err.message.includes('UNIQUE')) {
+      req.session.flash = { error: 'Cet email est déjà utilisé.' }
+    } else {
+      req.session.flash = { error: 'Erreur lors de la création du compte.' }
+    }
+    return res.redirect('/auth/setup')
   }
 })
 
