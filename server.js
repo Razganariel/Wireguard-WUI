@@ -27,14 +27,17 @@ app.set('view engine', 'hbs')
 app.set('views', path.join(__dirname, 'views'))
 app.set('view options', { layout: 'layouts/layout' })
 app.use(helmet({
+  strictTransportSecurity: false,
   contentSecurityPolicy: {
+    useDefaults: false,
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "https://cdn.jsdelivr.net"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
       imgSrc: ["'self'", "data:"],
       fontSrc: ["'self'", "https://cdn.jsdelivr.net"],
-      connectSrc: ["'self'"]
+      connectSrc: ["'self'"],
+      upgradeInsecureRequests: null
     }
   }
 }))
@@ -89,6 +92,13 @@ app.use((req, res, next) => {
       res.locals.selectedInterface = selectedIface ? selectedIface.id : null
       res.locals.selectedInterfaceName = selectedIface ? selectedIface.nom : null
     }
+  }
+  next()
+})
+
+app.use((req, res, next) => {
+  if (userModel.count() === 0 && !req.path.startsWith('/auth/setup') && !req.path.startsWith('/css/') && !req.path.startsWith('/js/') && req.path !== '/wireguard-color.svg') {
+    return res.redirect('/auth/setup')
   }
   next()
 })
@@ -220,29 +230,10 @@ app.use((err, req, res, next) => {
   res.status(500).render('errors/500', { title: '500 — Erreur serveur' })
 })
 
-const PORT_FINAL = PORT
-app.listen(PORT_FINAL, () => {
-  console.log(`WireGuard-WUI running on http://localhost:${PORT_FINAL}`)
-  seedOnStartup()
-})
-
-async function seedOnStartup() {
-  try {
-    const count = userModel.count()
-    if (count === 0) {
-      const bcrypt = require('bcrypt')
-      const hashedPassword = await bcrypt.hash('admin', 10)
-      userModel.create({
-        nom: 'Admin',
-        prenom: 'Admin',
-        email: 'admin@wireguard.local',
-        password: hashedPassword
-      })
-      console.log('Default admin created (admin@wireguard.local / admin)')
-    }
-  } catch (err) {
-    console.error('Seed on startup error:', err)
-  }
-}
-
 module.exports = app
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`WireGuard-WUI running on http://localhost:${PORT}`)
+  })
+}

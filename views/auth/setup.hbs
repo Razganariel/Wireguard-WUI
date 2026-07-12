@@ -1,0 +1,38 @@
+<div class="row justify-content-center mt-5">
+  <div class="col-md-6">
+    <div class="text-center mb-4">
+      <h1 class="display-6">Bienvenue</h1>
+      <p class="text-muted">WireGuard-WUI est une interface de gestion pour votre serveur VPN WireGuard.</p>
+      <p class="text-muted">Créez un compte administrateur pour sécuriser l'accès à l'outil.</p>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <form method="POST" action="/auth/setup" data-validate>
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="prenom" class="form-label">Prénom</label>
+              <input type="text" class="form-control" id="prenom" name="prenom" placeholder="Jean" required autofocus>
+            </div>
+            <div class="col-md-6">
+              <label for="nom" class="form-label">Nom</label>
+              <input type="text" class="form-control" id="nom" name="nom" placeholder="Dupont" required>
+            </div>
+            <div class="col-12">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder="jean@example.com" required>
+            </div>
+            <div class="col-12">
+              <label for="password" class="form-label">Mot de passe</label>
+              <input type="password" class="form-control" id="password" name="password" minlength="8" required>
+              <div class="form-text">8 caractères minimum.</div>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary w-100">Créer le compte administrateur</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
