@@ -64,9 +64,9 @@
           <tr>
             <th>Interface</th>
             <th>Statut</th>
-            <th>Port</th>
-            <th>Pairs</th>
-            <th>Dernier handshake</th>
+            <th class="d-none d-md-table-cell">Port</th>
+            <th class="d-none d-md-table-cell">Pairs</th>
+            <th class="d-none d-lg-table-cell">Dernier handshake</th>
             <th class="text-end">Actions</th>
           </tr>
         </thead>
@@ -81,9 +81,9 @@
                   <span class="badge bg-secondary">Inactif</span>
                 {{/if}}
               </td>
-              <td>{{port}}</td>
-              <td>{{connectedPeers}}/{{peerCount}}</td>
-              <td>
+              <td class="d-none d-md-table-cell">{{port}}</td>
+              <td class="d-none d-md-table-cell">{{connectedPeers}}/{{peerCount}}</td>
+              <td class="d-none d-lg-table-cell">
                 {{#if lastHandshake}}
                   {{lastHandshake}}
                 {{else}}
