@@ -134,10 +134,11 @@
             {{/if}}
           </div>
           <div class="card-body">
+            <div class="table-responsive">
             <table class="table table-sm">
               <tbody>
                 <tr>
-                  <th style="width: 40%">Adresse IP</th>
+                  <th>Adresse IP</th>
                   <td>{{adresse_ip}}</td>
                 </tr>
                 <tr>
@@ -168,6 +169,7 @@
                 </tr>
               </tbody>
             </table>
+            </div>
 
             {{#if routing}}
               {{#unless routing.allOk}}
@@ -201,7 +203,7 @@
               {{/unless}}
             {{/if}}
 
-            <div class="d-flex gap-2 mt-3">
+            <div class="d-flex gap-2 mt-3 justify-content-center flex-wrap">
               <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editIface{{id}}">Éditer</button>
               <form method="POST" action="/interface/{{id}}/toggle" class="d-inline">
                 <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
@@ -215,7 +217,7 @@
                 <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
                 <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
               </form>
-              <a href="/peers?interface={{id}}" class="btn btn-sm btn-outline-primary ms-auto">Gérer les pairs</a>
+              <a href="/peers?interface={{id}}" class="btn btn-sm btn-outline-primary">Pairs</a>
             </div>
 
             <div class="modal fade" id="editIface{{id}}" tabindex="-1" aria-hidden="true">
