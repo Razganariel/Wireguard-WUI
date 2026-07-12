@@ -128,6 +128,28 @@
     </div>
   </div>
 
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">Administration</h5>
+      </div>
+      <div class="card-body">
+        <p class="text-muted small mb-3">
+          Activez le mode debug pour journaliser toutes les opérations détaillées dans
+          <code>logs/app.log</code>.
+        </p>
+        <form method="POST" action="/profile/settings" id="debug-form">
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
+          <input type="hidden" name="debug_mode" value="0" id="debug_mode_hidden">
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="debug_mode" {{#if debugMode}}checked{{/if}}>
+            <label class="form-check-label" for="debug_mode">Mode debug</label>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <div class="col-12 text-center mt-2 mb-4">
     <a href="/" class="btn btn-outline-secondary">
       &larr; Retour au tableau de bord

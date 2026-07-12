@@ -18,6 +18,9 @@ const { getStrength } = require('./helpers/entropy')
 const { generateSecret, getOtpauthUrl, verifyToken } = require('./helpers/totp')
 const { toDataURL } = require('./helpers/qrcode')
 const { formatBytes, formatHandshake } = require('./helpers/format')
+const log = require('./helpers/logger')
+const logger = require('./helpers/logger')
+const settingsModel = require('./models/settings')
 const authRoutes = require('./routes/auth')
 const interfaceRoutes = require('./routes/interface')
 const peersRoutes = require('./routes/peers')
@@ -67,6 +70,14 @@ app.use(
 )
 
 app.use(csrfMiddleware)
+
+app.use((req, res, next) => {
+  const start = Date.now()
+  res.on('finish', () => {
+    log.debug('HTTP', `${req.method} ${req.path} → ${res.statusCode} (${Date.now() - start}ms)`)
+  })
+  next()
+})
 
 app.use((req, res, next) => {
   res.locals.currentPath = req.path
@@ -125,7 +136,16 @@ app.get('/profile', (req, res) => {
   if (!req.session || !req.session.userId) return res.redirect('/auth/login')
   const user = userModel.findById(req.session.userId)
   if (!user) return res.redirect('/logout')
-  res.render('profile/index', { title: 'Mon profil', user, passwordComplexity: !!user.password_complexity, totpEnabled: !!user['2fa_enabled'] })
+  const logLevel = logger.getLevel()
+  const passwordComplexity = settingsModel.getUserSetting(user.id, 'password_complexity') === '1'
+  const totpEnabled = settingsModel.getUserSetting(user.id, '2fa_enabled') === '1'
+  res.render('profile/index', {
+    title: 'Mon profil',
+    user,
+    passwordComplexity,
+    totpEnabled,
+    debugMode: logLevel === 'DEBUG'
+  })
 })
 
 app.post('/profile', async (req, res) => {
@@ -154,8 +174,9 @@ app.post('/profile', async (req, res) => {
     }
   }
 
-  const passwordComplexity = req.body.password_complexity === '1' ? 1 : 0
-  const updates = { prenom, nom, email, password_complexity: passwordComplexity }
+  const passwordComplexity = req.body.password_complexity === '1'
+  settingsModel.setUserSetting(user.id, 'password_complexity', passwordComplexity ? '1' : '0')
+  const updates = { prenom, nom, email }
 
   if (req.body.current_password && req.body.new_password) {
     if (req.body.new_password.length < 8) {
@@ -184,7 +205,24 @@ app.post('/profile', async (req, res) => {
   userModel.update(user.id, updates)
   req.session.userName = `${prenom} ${nom}`
   req.session.userEmail = email
+  log.info('Profile', `Profil mis à jour : ${email} (nom=${nom}, prenom=${prenom}, complexity=${passwordComplexity})`)
+  if (req.body.new_password) {
+    log.info('Profile', `Mot de passe changé pour ${email}`)
+  }
   req.session.flash = { success: 'Profil mis à jour.' }
+  res.redirect('/profile')
+})
+
+app.post('/profile/settings', (req, res) => {
+  if (!req.session || !req.session.userId) return res.redirect('/auth/login')
+  const user = userModel.findById(req.session.userId)
+  if (!user) return res.redirect('/logout')
+
+  const debugMode = req.body.debug_mode === '1'
+  settingsModel.set('log_level', debugMode ? 'DEBUG' : 'INFO')
+  logger.invalidateCache()
+  log.info('Settings', `Mode debug ${debugMode ? 'activé' : 'désactivé'} par ${user.email}`)
+  req.session.flash = { success: `Mode debug ${debugMode ? 'activé' : 'désactivé'}.` }
   res.redirect('/profile')
 })
 
@@ -218,8 +256,10 @@ app.post('/profile/totp-enable', async (req, res) => {
   }
   const user = userModel.findById(req.session.userId)
   if (!user) return res.redirect('/logout')
-  userModel.update(user.id, { '2fa_enabled': 1, totp_secret: req.session.pendingTotpSecret })
+  settingsModel.setUserSetting(user.id, '2fa_enabled', '1')
+  settingsModel.setUserSetting(user.id, 'totp_secret', req.session.pendingTotpSecret)
   delete req.session.pendingTotpSecret
+  log.info('Profile', `2FA activée pour ${user.email}`)
   req.session.flash = { success: 'Authentification à deux facteurs activée.' }
   res.redirect('/profile')
 })
@@ -238,7 +278,9 @@ app.post('/profile/totp-disable', async (req, res) => {
     req.session.flash = { error: 'Mot de passe incorrect.' }
     return res.redirect('/profile')
   }
-  userModel.update(user.id, { '2fa_enabled': 0, totp_secret: null })
+  settingsModel.setUserSetting(user.id, '2fa_enabled', '0')
+  settingsModel.setUserSetting(user.id, 'totp_secret', null)
+  log.info('Profile', `2FA désactivée pour ${user.email}`)
   req.session.flash = { success: 'Authentification à deux facteurs désactivée.' }
   res.redirect('/profile')
 })
@@ -345,6 +387,7 @@ app.use((req, res) => {
 })
 
 app.use((err, req, res, next) => {
+  log.error('Serveur', `Erreur non gérée : ${err.message} — ${req.method} ${req.path}`)
   console.error('Unhandled error:', err)
   res.status(500).render('errors/500', { title: '500 — Erreur serveur' })
 })
@@ -354,5 +397,7 @@ module.exports = app
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`WireGuard-WUI running on http://localhost:${PORT}`)
+    log.info('Serveur', `WireGuard-WUI démarré sur le port ${PORT}`)
+    log.info('Serveur', `Niveau de log : ${logger.getLevel()}`)
   })
 }

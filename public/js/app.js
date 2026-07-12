@@ -69,4 +69,14 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.toast').forEach((toast) => {
     new bootstrap.Toast(toast, { autohide: true, delay: 5000 })
   })
+
+  const debugCheckbox = document.getElementById('debug_mode')
+  const debugHidden = document.getElementById('debug_mode_hidden')
+  const debugForm = document.getElementById('debug-form')
+  if (debugCheckbox && debugHidden && debugForm) {
+    debugCheckbox.addEventListener('change', function () {
+      debugHidden.value = this.checked ? '1' : '0'
+      debugForm.submit()
+    })
+  }
 })

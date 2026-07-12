@@ -6,9 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
   prenom        TEXT NOT NULL,
   email         TEXT UNIQUE NOT NULL,
   password      TEXT NOT NULL,
-  groupe        TEXT NOT NULL DEFAULT 'admin',
-  "2fa_enabled"  BOOLEAN NOT NULL DEFAULT FALSE,
-  totp_secret   BLOB
+  groupe        TEXT NOT NULL DEFAULT 'admin'
 );
 
 CREATE TABLE IF NOT EXISTS interfaces (
@@ -37,4 +35,9 @@ CREATE TABLE IF NOT EXISTS peers (
   active               BOOLEAN NOT NULL DEFAULT TRUE,
   created_at           DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at           DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS settings (
+  key   TEXT PRIMARY KEY,
+  value TEXT
 );
