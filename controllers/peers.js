@@ -70,34 +70,34 @@ async function createPeer(req, res) {
   const persistent_keepalive = sanitizeInt(req.body.persistent_keepalive) || 25
 
   if (!interface_id || !nom || !adresse_ip) {
-    req.session.flash = { error: 'Interface, nom et adresse IP sont obligatoires.' }
+    req.session.flash = { error: req.t('error.peer_required_fields') }
     return res.redirect(`/peers?interface=${interface_id || ''}`)
   }
 
   if (!adresse_ip) {
-    req.session.flash = { error: 'L\'adresse IP doit être au format IPv4 (ex: 10.0.0.2).' }
+    req.session.flash = { error: req.t('error.ipv4_format') }
     return res.redirect(`/peers?interface=${interface_id}`)
   }
 
   if (!allowed_ips) {
-    req.session.flash = { error: 'Allowed IPs doit être au format CIDR (ex: 0.0.0.0/0).' }
+    req.session.flash = { error: req.t('error.allowed_ips_cidr_format') }
     return res.redirect(`/peers?interface=${interface_id}`)
   }
 
   if (req.body.dns && !dns) {
-    req.session.flash = { error: 'Le DNS doit être une adresse IPv4 valide.' }
+    req.session.flash = { error: req.t('error.dns_ipv4') }
     return res.redirect(`/peers?interface=${interface_id}`)
   }
 
   const iface = interfaceModel.findById(interface_id)
   if (!iface) {
-    req.session.flash = { error: 'Interface introuvable.' }
+    req.session.flash = { error: req.t('error.interface_not_found') }
     return res.redirect('/peers')
   }
 
   const existing = peerModel.findByInterfaceId(iface.id)
   if (existing.some((p) => p.adresse_ip === adresse_ip)) {
-    req.session.flash = { error: `Un peer avec l'adresse IP ${adresse_ip} existe déjà sur cette interface.` }
+    req.session.flash = { error: req.t('error.peer_ip_duplicate', { ip: adresse_ip }) }
     return res.redirect(`/peers?interface=${interface_id}`)
   }
 
@@ -131,7 +131,7 @@ async function createPeer(req, res) {
 
   if (!keygenOk) {
     req.session.flash = {
-      error: `Peer "${nom}" créé en DB mais impossible de générer les clés (wg genkey). Vérifiez que WireGuard est installé.`
+      error: req.t('error.peer_keygen_failed', { nom })
     }
     return res.redirect(`/peers?interface=${interface_id}`)
   }
@@ -140,25 +140,25 @@ async function createPeer(req, res) {
     await addPeerToInterface(iface, { ...peerData, public_key: publicKey })
   } catch (wgErr) {
     req.session.flash = {
-      error: `Peer créé en DB mais erreur WireGuard : ${wgErr.message}. Vérifiez que l'interface est active et sudo configuré.`
+      error: req.t('error.peer_wireguard_failed', { message: wgErr.message })
     }
     return res.redirect(`/peers?interface=${interface_id}`)
   }
 
   log.info('Peers', `Peer "${nom}" créé sur interface ${iface.nom} (ip=${adresse_ip})`)
-  req.session.flash = { success: `Peer "${nom}" ajouté avec succès.` }
+  req.session.flash = { success: req.t('success.peer_created', { nom }) }
   return res.redirect(`/peers?interface=${interface_id}`)
 }
 
 async function editPeer(req, res) {
   const id = sanitizeInt(req.params.id)
   if (!id) {
-    req.session.flash = { error: 'ID de pair invalide.' }
+    req.session.flash = { error: req.t('error.invalid_peer_id') }
     return res.redirect('/peers')
   }
   const peer = peerModel.findById(id)
   if (!peer) {
-    req.session.flash = { error: 'Pair introuvable.' }
+    req.session.flash = { error: req.t('error.peer_not_found') }
     return res.redirect('/peers')
   }
 
@@ -169,29 +169,29 @@ async function editPeer(req, res) {
   const persistent_keepalive = sanitizeInt(req.body.persistent_keepalive) || 25
 
   if (!nom || !adresse_ip) {
-    req.session.flash = { error: 'Nom et adresse IP sont obligatoires.' }
+    req.session.flash = { error: req.t('error.name_ip_required') }
     return res.redirect(`/peers?interface=${peer.interface_id}`)
   }
 
   if (!adresse_ip) {
-    req.session.flash = { error: 'L\'adresse IP doit être au format IPv4 (ex: 10.0.0.2).' }
+    req.session.flash = { error: req.t('error.ipv4_format') }
     return res.redirect(`/peers?interface=${peer.interface_id}`)
   }
 
   if (!allowed_ips) {
-    req.session.flash = { error: 'Allowed IPs doit être au format CIDR (ex: 0.0.0.0/0).' }
+    req.session.flash = { error: req.t('error.allowed_ips_cidr_format') }
     return res.redirect(`/peers?interface=${peer.interface_id}`)
   }
 
   if (req.body.dns && !dns) {
-    req.session.flash = { error: 'Le DNS doit être une adresse IPv4 valide.' }
+    req.session.flash = { error: req.t('error.dns_ipv4') }
     return res.redirect(`/peers?interface=${peer.interface_id}`)
   }
 
   if (adresse_ip !== peer.adresse_ip) {
     const ifacePeers = peerModel.findByInterfaceId(peer.interface_id)
     if (ifacePeers.some((p) => p.id !== parseInt(id, 10) && p.adresse_ip === adresse_ip)) {
-      req.session.flash = { error: `L'adresse IP ${adresse_ip} est déjà utilisée sur cette interface.` }
+      req.session.flash = { error: req.t('error.ip_already_used', { ip: adresse_ip }) }
       return res.redirect(`/peers?interface=${peer.interface_id}`)
     }
   }
@@ -215,16 +215,16 @@ async function editPeer(req, res) {
           persistent_keepalive: oldPeer.persistent_keepalive
         })
         await interfaceController.writeConfigFile(iface)
-        req.session.flash = { error: `Erreur lors de l'application : ${syncErr.message}. Modifications annulées.` }
+        req.session.flash = { error: req.t('error.peer_config_apply_failed', { message: syncErr.message }) }
         return res.redirect(`/peers?interface=${peer.interface_id}`)
       }
     }
 
     log.info('Peers', `Peer "${nom}" (id=${id}) mis à jour sur interface ${iface.nom}`)
-    req.session.flash = { success: `Pair "${nom}" mis à jour.` }
+    req.session.flash = { success: req.t('success.peer_updated', { nom }) }
   } catch (err) {
     log.error('Peers', `Édition peer id=${id} : ${err.message}`)
-    req.session.flash = { error: `Erreur : ${err.message}` }
+    req.session.flash = { error: req.t('error.generic', { message: err.message }) }
   }
 
   return res.redirect(`/peers?interface=${peer.interface_id}`)
@@ -233,13 +233,13 @@ async function editPeer(req, res) {
 async function deletePeer(req, res) {
   const id = sanitizeInt(req.params.id)
   if (!id) {
-    req.session.flash = { error: 'ID de pair invalide.' }
+    req.session.flash = { error: req.t('error.invalid_peer_id') }
     return res.redirect('/peers')
   }
   const peer = peerModel.findById(id)
 
   if (!peer) {
-    req.session.flash = { error: 'Peer introuvable.' }
+    req.session.flash = { error: req.t('error.peer_not_found') }
     return res.redirect('/peers')
   }
 
@@ -255,7 +255,7 @@ async function deletePeer(req, res) {
 
   peerModel.remove(id)
   log.info('Peers', `Peer "${peer.nom}" (id=${id}) supprimé`)
-  req.session.flash = { success: `Peer "${peer.nom}" supprimé.` }
+  req.session.flash = { success: req.t('success.peer_deleted', { nom: peer.nom }) }
   return res.redirect(`/peers?interface=${peer.interface_id}`)
 }
 
@@ -281,19 +281,19 @@ function buildClientConfig(peer, iface) {
 async function downloadConfig(req, res) {
   const id = sanitizeInt(req.params.id)
   if (!id) {
-    req.session.flash = { error: 'ID de pair invalide.' }
+    req.session.flash = { error: req.t('error.invalid_peer_id') }
     return res.redirect('/peers')
   }
   const peer = peerModel.findById(id)
 
   if (!peer) {
-    req.session.flash = { error: 'Peer introuvable.' }
+    req.session.flash = { error: req.t('error.peer_not_found') }
     return res.redirect('/peers')
   }
 
   const iface = interfaceModel.findById(peer.interface_id)
   if (!iface) {
-    req.session.flash = { error: 'Interface introuvable.' }
+    req.session.flash = { error: req.t('error.interface_not_found') }
     return res.redirect('/peers')
   }
   const config = buildClientConfig(peer, iface)

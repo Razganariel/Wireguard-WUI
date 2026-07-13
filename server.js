@@ -6,6 +6,17 @@ const hbs = require('hbs')
 const bcrypt = require('bcrypt')
 require('dotenv').config()
 
+const i18next = require('i18next')
+const FsBackend = require('i18next-fs-backend')
+const i18nextMiddleware = require('i18next-http-middleware')
+
+i18next.use(FsBackend).use(i18nextMiddleware.LanguageDetector).init({
+  backend: { loadPath: path.join(__dirname, 'locales', '{{lng}}', 'translation.json') },
+  fallbackLng: 'en',
+  preload: ['fr', 'en'],
+  detection: { order: ['querystring', 'cookie', 'header'], caches: ['cookie'] }
+})
+
 const userModel = require('./models/user')
 const interfaceModel = require('./models/interface')
 const peerModel = require('./models/peer')
@@ -30,6 +41,12 @@ const PORT = process.env.PORT || 3000
 
 hbs.registerHelper('eq', (a, b) => a === b)
 hbs.registerHelper('currentYear', () => new Date().getFullYear())
+hbs.registerHelper('__', function (...args) {
+  const options = args.pop()
+  const root = options.data && options.data.root
+  const t = (root && root.t) || (this && this.t) || i18next.t
+  return t(args[0], options.hash)
+})
 
 app.set('view engine', 'hbs')
 app.set('views', path.join(__dirname, 'views'))
@@ -69,7 +86,30 @@ app.use(
   })
 )
 
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store')
+  next()
+})
+app.use(i18nextMiddleware.handle(i18next, { attachLocals: true }))
 app.use(csrfMiddleware)
+
+app.use((req, res, next) => {
+  if (req.session && req.session.userId) {
+    const savedLang = settingsModel.getUserSetting(req.session.userId, 'language')
+    if (savedLang && req.i18n) {
+      if (savedLang !== req.language) {
+        req.i18n.changeLanguage(savedLang)
+        res.cookie('i18next', savedLang, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: false })
+      }
+      res.locals.lang = savedLang
+    } else {
+      res.locals.lang = req.language || 'fr'
+    }
+  } else {
+    res.locals.lang = req.language || 'fr'
+  }
+  next()
+})
 
 app.use((req, res, next) => {
   const start = Date.now()
@@ -140,7 +180,7 @@ app.get('/profile', (req, res) => {
   const passwordComplexity = settingsModel.getUserSetting(user.id, 'password_complexity') === '1'
   const totpEnabled = settingsModel.getUserSetting(user.id, '2fa_enabled') === '1'
   res.render('profile/index', {
-    title: 'Mon profil',
+    title: req.t('profile.title'),
     user,
     passwordComplexity,
     totpEnabled,
@@ -158,18 +198,18 @@ app.post('/profile', async (req, res) => {
   let email = sanitizeEmail(req.body.email)
 
   if (!prenom || !nom) {
-    req.session.flash = { error: 'Le prénom et le nom sont obligatoires.' }
+    req.session.flash = { error: req.t('error.first_name_last_name_required') }
     return res.redirect('/profile')
   }
   if (!email) {
-    req.session.flash = { error: 'Email invalide.' }
+    req.session.flash = { error: req.t('error.invalid_email') }
     return res.redirect('/profile')
   }
 
   if (email !== user.email) {
     const existing = userModel.findByEmail(email)
     if (existing && existing.id !== user.id) {
-      req.session.flash = { error: 'Cet email est déjà utilisé.' }
+      req.session.flash = { error: req.t('error.email_already_used') }
       return res.redirect('/profile')
     }
   }
@@ -180,23 +220,23 @@ app.post('/profile', async (req, res) => {
 
   if (req.body.current_password && req.body.new_password) {
     if (req.body.new_password.length < 8) {
-      req.session.flash = { error: 'Le nouveau mot de passe doit faire au moins 8 caractères.' }
+      req.session.flash = { error: req.t('error.new_password_min_length') }
       return res.redirect('/profile')
     }
     if (req.body.new_password !== req.body.new_password_confirm) {
-      req.session.flash = { error: 'La confirmation du mot de passe ne correspond pas.' }
+      req.session.flash = { error: req.t('error.password_confirmation_mismatch') }
       return res.redirect('/profile')
     }
     if (passwordComplexity) {
       const { isValid } = getStrength(req.body.new_password)
       if (!isValid) {
-        req.session.flash = { error: 'Le mot de passe est trop faible. Utilisez des majuscules, minuscules, chiffres et caractères spéciaux pour un mot de passe plus long (entropie ≥ 60 bits).' }
+        req.session.flash = { error: req.t('error.password_too_weak') }
         return res.redirect('/profile')
       }
     }
     const valid = await bcrypt.compare(req.body.current_password, user.password)
     if (!valid) {
-      req.session.flash = { error: 'Le mot de passe actuel est incorrect.' }
+      req.session.flash = { error: req.t('error.current_password_incorrect') }
       return res.redirect('/profile')
     }
     updates.password = await bcrypt.hash(req.body.new_password, 10)
@@ -209,7 +249,7 @@ app.post('/profile', async (req, res) => {
   if (req.body.new_password) {
     log.info('Profile', `Mot de passe changé pour ${email}`)
   }
-  req.session.flash = { success: 'Profil mis à jour.' }
+  req.session.flash = { success: req.t('success.profile_updated') }
   res.redirect('/profile')
 })
 
@@ -222,7 +262,7 @@ app.post('/profile/settings', (req, res) => {
   settingsModel.set('log_level', debugMode ? 'DEBUG' : 'INFO')
   logger.invalidateCache()
   log.info('Settings', `Mode debug ${debugMode ? 'activé' : 'désactivé'} par ${user.email}`)
-  req.session.flash = { success: `Mode debug ${debugMode ? 'activé' : 'désactivé'}.` }
+  req.session.flash = { success: debugMode ? req.t('success.debug_mode_enabled') : req.t('success.debug_mode_disabled') }
   res.redirect('/profile')
 })
 
@@ -235,7 +275,7 @@ app.post('/profile/totp-generate', async (req, res) => {
   const otpauth = getOtpauthUrl(secret, user.email)
   const qrDataUrl = await toDataURL(otpauth)
   res.render('profile/totp-setup', {
-    title: 'Configurer 2FA',
+    title: req.t('totp_setup.title'),
     secret,
     otpauth,
     qrDataUrl,
@@ -246,12 +286,12 @@ app.post('/profile/totp-generate', async (req, res) => {
 app.post('/profile/totp-enable', async (req, res) => {
   if (!req.session || !req.session.userId) return res.redirect('/auth/login')
   if (!req.session.pendingTotpSecret) {
-    req.session.flash = { error: 'Aucune clé en attente. Veuillez recommencer.' }
+    req.session.flash = { error: req.t('error.no_pending_key') }
     return res.redirect('/profile')
   }
   const token = sanitize(req.body.totp_token)
   if (!token || !verifyToken(req.session.pendingTotpSecret, token)) {
-    req.session.flash = { error: 'Code invalide. Veuillez réessayer.' }
+    req.session.flash = { error: req.t('error.invalid_code') }
     return res.redirect('/profile')
   }
   const user = userModel.findById(req.session.userId)
@@ -260,7 +300,7 @@ app.post('/profile/totp-enable', async (req, res) => {
   settingsModel.setUserSetting(user.id, 'totp_secret', req.session.pendingTotpSecret)
   delete req.session.pendingTotpSecret
   log.info('Profile', `2FA activée pour ${user.email}`)
-  req.session.flash = { success: 'Authentification à deux facteurs activée.' }
+  req.session.flash = { success: req.t('success.2fa_enabled') }
   res.redirect('/profile')
 })
 
@@ -270,19 +310,32 @@ app.post('/profile/totp-disable', async (req, res) => {
   if (!user) return res.redirect('/logout')
   const password = sanitize(req.body.current_password)
   if (!password) {
-    req.session.flash = { error: 'Veuillez saisir votre mot de passe actuel.' }
+    req.session.flash = { error: req.t('error.enter_current_password') }
     return res.redirect('/profile')
   }
   const valid = await bcrypt.compare(password, user.password)
   if (!valid) {
-    req.session.flash = { error: 'Mot de passe incorrect.' }
+    req.session.flash = { error: req.t('error.incorrect_password') }
     return res.redirect('/profile')
   }
   settingsModel.setUserSetting(user.id, '2fa_enabled', '0')
   settingsModel.setUserSetting(user.id, 'totp_secret', null)
   log.info('Profile', `2FA désactivée pour ${user.email}`)
-  req.session.flash = { success: 'Authentification à deux facteurs désactivée.' }
+  req.session.flash = { success: req.t('success.2fa_disabled') }
   res.redirect('/profile')
+})
+
+const AVAILABLE_LANGS = ['en', 'fr']
+
+app.get('/profile/language', (req, res) => {
+  const lang = req.query.lang
+  if (!AVAILABLE_LANGS.includes(lang)) return res.redirect(req.get('Referer') || '/')
+  if (req.i18n) req.i18n.changeLanguage(lang)
+  res.cookie('i18next', lang, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: false })
+  if (req.session && req.session.userId) {
+    settingsModel.setUserSetting(req.session.userId, 'language', lang)
+  }
+  res.redirect(req.get('Referer') || '/')
 })
 
 app.get('/logout', (req, res) => {
@@ -349,9 +402,9 @@ app.get('/', async (req, res) => {
       endpoint: iface.endpoint,
       peerCount,
       connectedPeers,
-      lastHandshake: formatHandshake(ifaceLatestHs),
-      totalRx: formatBytes(totalRx),
-      totalTx: formatBytes(totalTx),
+      lastHandshake: formatHandshake(ifaceLatestHs, req.t),
+      totalRx: formatBytes(totalRx, req.t),
+      totalTx: formatBytes(totalTx, req.t),
       routingOk: routing ? routing.allOk : null
     })
   }
@@ -362,7 +415,7 @@ app.get('/', async (req, res) => {
   const routingNa = enrichedInterfaces.filter((i) => i.routingOk === null).length
 
   res.render('dashboard/index', {
-    title: 'Tableau de bord',
+    title: req.t('dashboard.title'),
     interfaces: enrichedInterfaces,
     hasInterfaces,
     stats: {
@@ -370,9 +423,9 @@ app.get('/', async (req, res) => {
       totalInterfaces: interfaces.length,
       connectedPeers: totalConnectedPeers,
       totalPeers,
-      totalTransferRx: formatBytes(totalTransferRx),
-      totalTransferTx: formatBytes(totalTransferTx),
-      latestHandshake: formatHandshake(latestHandshake)
+      totalTransferRx: formatBytes(totalTransferRx, req.t),
+      totalTransferTx: formatBytes(totalTransferTx, req.t),
+      latestHandshake: formatHandshake(latestHandshake, req.t)
     },
     routingSummary: {
       ok: routingOk,
@@ -383,13 +436,13 @@ app.get('/', async (req, res) => {
 })
 
 app.use((req, res) => {
-  res.status(404).render('errors/404', { title: '404 — Page introuvable' })
+  res.status(404).render('errors/404', { title: req.t('error.404.title') })
 })
 
 app.use((err, req, res, next) => {
   log.error('Serveur', `Erreur non gérée : ${err.message} — ${req.method} ${req.path}`)
   console.error('Unhandled error:', err)
-  res.status(500).render('errors/500', { title: '500 — Erreur serveur' })
+  res.status(500).render('errors/500', { title: req.t('error.500.title') })
 })
 
 module.exports = app

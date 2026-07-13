@@ -10,7 +10,7 @@ async function login(req, res) {
   const password = sanitize(req.body.password)
 
   if (!email || !password) {
-    req.session.flash = { error: 'Veuillez saisir votre email et votre mot de passe.' }
+    req.session.flash = { error: req.t('error.enter_email_password') }
     return res.redirect('/auth/login')
   }
 
@@ -22,7 +22,7 @@ async function login(req, res) {
 
   if (!valid) {
     log.info('Auth', `Tentative de connexion échouée pour ${email}`)
-    req.session.flash = { error: 'Identifiants incorrects.' }
+    req.session.flash = { error: req.t('error.invalid_credentials') }
     return res.redirect('/auth/login')
   }
 
@@ -40,7 +40,7 @@ async function login(req, res) {
   req.session.userId = user.id
   req.session.userEmail = user.email
   req.session.userName = `${user.prenom} ${user.nom}`
-  req.session.flash = { success: 'Connexion réussie. Bienvenue !' }
+  req.session.flash = { success: req.t('success.login_welcome') }
   log.info('Auth', `Connexion réussie : ${user.email} (${user.prenom} ${user.nom})`)
 
   return res.redirect('/')
@@ -53,7 +53,7 @@ async function verifyTotp(req, res) {
 
   const token = sanitize(req.body.totp_token)
   if (!token) {
-    req.session.flash = { error: 'Veuillez saisir le code d\'authentification.' }
+    req.session.flash = { error: req.t('error.enter_auth_code') }
     return res.redirect('/auth/totp')
   }
 
@@ -61,13 +61,13 @@ async function verifyTotp(req, res) {
   const totpSecret = settingsModel.getUserSetting(req.session.pendingUserId, 'totp_secret')
   if (!user || !totpSecret) {
     log.info('Auth', `TOTP échoué : utilisateur ${req.session.pendingUserId} introuvable ou 2FA non configuré`)
-    req.session.flash = { error: 'Configuration 2FA invalide.' }
+    req.session.flash = { error: req.t('error.invalid_2fa_config') }
     return res.redirect('/auth/login')
   }
 
   if (!verifyToken(totpSecret, token)) {
     log.info('Auth', `TOTP code invalide pour ${user.email}`)
-    req.session.flash = { error: 'Code invalide. Veuillez réessayer.' }
+    req.session.flash = { error: req.t('error.invalid_code') }
     return res.redirect('/auth/totp')
   }
 
@@ -77,7 +77,7 @@ async function verifyTotp(req, res) {
   delete req.session.pendingUserId
   delete req.session.pendingUserEmail
   delete req.session.pendingUserName
-  req.session.flash = { success: 'Connexion réussie. Bienvenue !' }
+  req.session.flash = { success: req.t('success.login_welcome') }
   log.info('Auth', `Connexion TOTP réussie : ${user.email}`)
 
   return res.redirect('/')

@@ -15,7 +15,7 @@ describe('GET /auth/login', () => {
   it('renders login page', async () => {
     const res = await fetchUrl('/auth/login')
     expect(res.status).toBe(200)
-    expect(res.text).toContain('Connexion')
+    expect(res.text).toContain('Log in')
   })
 })
 
@@ -63,7 +63,7 @@ describe('POST /auth/login', () => {
       headers: { Cookie: cookieHeader(jar) }
     })
     expect(dashRes.status).toBe(200)
-    expect(dashRes.text).toContain('Tableau de bord')
+    expect(dashRes.text).toContain('Dashboard')
   })
 })
 

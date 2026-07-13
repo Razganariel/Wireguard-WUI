@@ -6,6 +6,7 @@ const path = require('path')
 const execAsync = util.promisify(exec)
 const sudo = require('../helpers/sudo')
 const log = require('../helpers/logger')
+const i18next = require('i18next')
 const { sanitizeInt, sanitizeCidr, sanitizePort, sanitizeEndpoint, sanitizeInterfaceName } = require('../helpers/sanitize')
 
 const interfaceModel = require('../models/interface')
@@ -203,7 +204,7 @@ async function removeRoutingRules(nom, adresse_ip) {
 
 async function bringUp(nom) {
   const iface = interfaceModel.findAll().find((i) => i.nom === nom)
-  if (!iface) throw new Error(`Interface "${nom}" introuvable dans la base.`)
+  if (!iface) throw new Error(`Interface "${nom}" not found in database`)
   log.info('Interface', `Démarrage de l'interface ${nom}`)
   await writeConfigFile(iface)
   await sudo.exec(`wg-quick up ${nom}`)
@@ -318,22 +319,22 @@ async function initInterface(req, res) {
   const endpoint = sanitizeEndpoint(req.body.endpoint)
 
   if (!nom) {
-    req.session.flash = { error: 'Le nom de l\'interface doit respecter le format wg0, wg1, etc.' }
+    req.session.flash = { error: req.t('error.interface_name_format') }
     return res.redirect('/interface')
   }
 
   if (!adresse_ip) {
-    req.session.flash = { error: 'L\'adresse IP doit être au format CIDR (ex: 10.0.0.1/24).' }
+    req.session.flash = { error: req.t('error.ip_cidr_format') }
     return res.redirect('/interface')
   }
 
   if (portNum === null) {
-    req.session.flash = { error: 'Le port doit être un nombre entre 1 et 65535.' }
+    req.session.flash = { error: req.t('error.port_range') }
     return res.redirect('/interface')
   }
 
   if (interfaceModel.findAll().some((i) => i.nom === nom)) {
-    req.session.flash = { error: `L'interface "${nom}" existe déjà.` }
+    req.session.flash = { error: req.t('error.interface_exists', { nom }) }
     return res.redirect('/interface')
   }
 
@@ -361,7 +362,7 @@ async function initInterface(req, res) {
   if (!keygenOk) {
     log.error('Interface', `Création ${nom} : échec génération des clés`)
     req.session.flash = {
-      error: `Interface "${nom}" créée en DB mais impossible de générer les clés (wg genkey). Vérifiez que WireGuard est installé.`
+      error: req.t('error.key_generation_failed', { nom })
     }
     return res.redirect('/interface')
   }
@@ -372,11 +373,11 @@ async function initInterface(req, res) {
     await bringUp(nom)
     interfaceModel.updateActive(id, true)
     log.info('Interface', `Interface ${nom} initialisée et démarrée (id=${id})`)
-    req.session.flash = { success: `Interface "${nom}" initialisée et démarrée avec succès.` }
+    req.session.flash = { success: req.t('success.interface_initialized', { nom }) }
   } catch (wgErr) {
     log.error('Interface', `Création ${nom} : ${wgErr.message}`)
     req.session.flash = {
-      error: `Interface créée en DB mais erreur WireGuard : ${wgErr.message}. Vérifiez que wg/wg-quick sont installés et sudo est configuré.`
+      error: req.t('error.wireguard_start_failed', { message: wgErr.message })
     }
   }
 
@@ -386,13 +387,13 @@ async function initInterface(req, res) {
 async function toggleInterface(req, res) {
   const id = sanitizeInt(req.params.id)
   if (!id) {
-    req.session.flash = { error: 'ID d\'interface invalide.' }
+    req.session.flash = { error: req.t('error.invalid_interface_id') }
     return res.redirect('/interface')
   }
   const iface = interfaceModel.findById(id)
 
   if (!iface) {
-    req.session.flash = { error: 'Interface introuvable.' }
+    req.session.flash = { error: req.t('error.interface_not_found') }
     return res.redirect('/interface')
   }
 
@@ -401,16 +402,16 @@ async function toggleInterface(req, res) {
       await bringDown(iface.nom)
       interfaceModel.updateActive(id, false)
       log.info('Interface', `Interface ${iface.nom} arrêtée`)
-      req.session.flash = { success: `Interface "${iface.nom}" arrêtée.` }
+      req.session.flash = { success: req.t('success.interface_stopped', { nom: iface.nom }) }
     } else {
       await bringUp(iface.nom)
       interfaceModel.updateActive(id, true)
       log.info('Interface', `Interface ${iface.nom} démarrée`)
-      req.session.flash = { success: `Interface "${iface.nom}" démarrée.` }
+      req.session.flash = { success: req.t('success.interface_started', { nom: iface.nom }) }
     }
   } catch (err) {
     log.error('Interface', `Toggle ${iface.nom} : ${err.message}`)
-    req.session.flash = { error: `Erreur : ${err.message}` }
+    req.session.flash = { error: req.t('error.generic', { message: err.message }) }
   }
 
   return res.redirect('/interface')
@@ -442,7 +443,7 @@ function buildWireGuardConfig(iface) {
 
 async function syncConfig(nom) {
   const iface = interfaceModel.findAll().find((i) => i.nom === nom)
-  if (!iface) throw new Error(`Interface "${nom}" introuvable.`)
+  if (!iface) throw new Error(`Interface "${nom}" not found`)
   const wgConfig = buildWireGuardConfig(iface)
   const tmpFile = path.join(os.tmpdir(), `wgsync_${nom}_${Date.now()}.conf`)
   fs.writeFileSync(tmpFile, wgConfig)
@@ -456,13 +457,13 @@ async function syncConfig(nom) {
 async function editInterface(req, res) {
   const id = sanitizeInt(req.params.id)
   if (!id) {
-    req.session.flash = { error: 'ID d\'interface invalide.' }
+    req.session.flash = { error: req.t('error.invalid_interface_id') }
     return res.redirect('/interface')
   }
   const iface = interfaceModel.findById(id)
 
   if (!iface) {
-    req.session.flash = { error: 'Interface introuvable.' }
+    req.session.flash = { error: req.t('error.interface_not_found') }
     return res.redirect('/interface')
   }
 
@@ -471,12 +472,12 @@ async function editInterface(req, res) {
   const endpoint = sanitizeEndpoint(req.body.endpoint)
 
   if (!adresse_ip) {
-    req.session.flash = { error: 'L\'adresse IP doit être au format CIDR (ex: 10.0.0.1/24).' }
+    req.session.flash = { error: req.t('error.ip_cidr_format') }
     return res.redirect('/interface')
   }
 
   if (portNum === null) {
-    req.session.flash = { error: 'Le port doit être un nombre entre 1 et 65535.' }
+    req.session.flash = { error: req.t('error.port_range') }
     return res.redirect('/interface')
   }
 
@@ -506,7 +507,7 @@ async function editInterface(req, res) {
         if (subnetChanged) {
           try { await addRoutingRules(iface.nom, oldConfig.adresse_ip) } catch (e) {}
         }
-        req.session.flash = { error: `Erreur lors de l'application de la configuration : ${syncErr.message}. Les modifications ont été annulées.` }
+        req.session.flash = { error: req.t('error.config_apply_failed', { message: syncErr.message }) }
         return res.redirect('/interface')
       }
     }
@@ -514,10 +515,10 @@ async function editInterface(req, res) {
     interfaceModel.update(id, { adresse_ip, port: portNum, endpoint: iface.endpoint })
 
     log.info('Interface', `Interface ${iface.nom} mise à jour (ip=${adresse_ip}, port=${portNum})`)
-    req.session.flash = { success: `Interface "${iface.nom}" mise à jour.` }
+    req.session.flash = { success: req.t('success.interface_updated', { nom: iface.nom }) }
   } catch (err) {
     log.error('Interface', `Édition ${iface.nom} : ${err.message}`)
-    req.session.flash = { error: `Erreur : ${err.message}` }
+    req.session.flash = { error: req.t('error.generic', { message: err.message }) }
   }
 
   return res.redirect('/interface')
@@ -526,26 +527,26 @@ async function editInterface(req, res) {
 async function deleteInterface(req, res) {
   const id = sanitizeInt(req.params.id)
   if (!id) {
-    req.session.flash = { error: 'ID d\'interface invalide.' }
+    req.session.flash = { error: req.t('error.invalid_interface_id') }
     return res.redirect('/interface')
   }
   const iface = interfaceModel.findById(id)
 
   if (!iface) {
-    req.session.flash = { error: 'Interface introuvable.' }
+    req.session.flash = { error: req.t('error.interface_not_found') }
     return res.redirect('/interface')
   }
 
   const peers = peerModel.findByInterfaceId(id)
   if (peers.length > 0) {
-    req.session.flash = { error: `Impossible de supprimer l'interface "${iface.nom}" : des pairs lui sont encore associés. Supprimez d'abord tous les pairs de cette interface.` }
+    req.session.flash = { error: req.t('error.cannot_delete_interface_with_peers', { nom: iface.nom }) }
     return res.redirect('/interface')
   }
 
   try {
     interfaceModel.remove(id)
   } catch (err) {
-    req.session.flash = { error: `Erreur lors de la suppression : ${err.message}` }
+    req.session.flash = { error: req.t('error.delete_failed', { message: err.message }) }
     return res.redirect('/interface')
   }
 
@@ -559,7 +560,7 @@ async function deleteInterface(req, res) {
   }
 
   log.info('Interface', `Interface ${iface.nom} supprimée (id=${id})`)
-  req.session.flash = { success: `Interface "${iface.nom}" supprimée.` }
+  req.session.flash = { success: req.t('success.interface_deleted', { nom: iface.nom }) }
   return res.redirect('/interface')
 }
 
@@ -672,7 +673,7 @@ async function importInterface(nom) {
   const { privateKey, adresse_ip, port, peerEntries } = parseConfig(stdout)
 
   if (!privateKey || !adresse_ip) {
-    throw new Error(`Impossible de parser la configuration de ${nom} : PrivateKey ou Address manquant.`)
+    throw new Error(`Cannot parse config for ${nom}: missing PrivateKey or Address`)
   }
 
   let publicKey = 'IMPORT_FAILED'
@@ -729,7 +730,7 @@ async function detectAndImportAll() {
 
 async function importPeersFromInterface(nom) {
   const iface = interfaceModel.findAll().find((i) => i.nom === nom)
-  if (!iface) throw new Error(`Interface "${nom}" introuvable dans la base.`)
+  if (!iface) throw new Error(`Interface "${nom}" not found in database`)
 
   const allPeers = []
 
