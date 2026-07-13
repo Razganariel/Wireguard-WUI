@@ -41,9 +41,10 @@ const PORT = process.env.PORT || 3000
 
 hbs.registerHelper('eq', (a, b) => a === b)
 hbs.registerHelper('currentYear', () => new Date().getFullYear())
-hbs.registerHelper('__', (...args) => {
+hbs.registerHelper('__', function (...args) {
   const options = args.pop()
-  return i18next.t(args[0], options.hash)
+  const t = (this && this.t) || i18next.t
+  return t(args[0], options.hash)
 })
 
 app.set('view engine', 'hbs')
@@ -84,11 +85,28 @@ app.use(
   })
 )
 
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store')
+  next()
+})
+app.use(i18nextMiddleware.handle(i18next, { attachLocals: true }))
 app.use(csrfMiddleware)
-app.use(i18nextMiddleware.handle(i18next))
 
 app.use((req, res, next) => {
-  res.locals.lang = req.language || 'fr'
+  if (req.session && req.session.userId) {
+    const savedLang = settingsModel.getUserSetting(req.session.userId, 'language')
+    if (savedLang && req.i18n) {
+      if (savedLang !== req.language) {
+        req.i18n.changeLanguage(savedLang)
+        res.cookie('i18next', savedLang, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: false })
+      }
+      res.locals.lang = savedLang
+    } else {
+      res.locals.lang = req.language || 'fr'
+    }
+  } else {
+    res.locals.lang = req.language || 'fr'
+  }
   next()
 })
 
@@ -304,6 +322,19 @@ app.post('/profile/totp-disable', async (req, res) => {
   log.info('Profile', `2FA désactivée pour ${user.email}`)
   req.session.flash = { success: req.t('success.2fa_disabled') }
   res.redirect('/profile')
+})
+
+const AVAILABLE_LANGS = ['fr', 'en']
+
+app.get('/profile/language', (req, res) => {
+  const lang = req.query.lang
+  if (!AVAILABLE_LANGS.includes(lang)) return res.redirect(req.get('Referer') || '/')
+  if (req.i18n) req.i18n.changeLanguage(lang)
+  res.cookie('i18next', lang, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: false })
+  if (req.session && req.session.userId) {
+    settingsModel.setUserSetting(req.session.userId, 'language', lang)
+  }
+  res.redirect(req.get('Referer') || '/')
 })
 
 app.get('/logout', (req, res) => {
