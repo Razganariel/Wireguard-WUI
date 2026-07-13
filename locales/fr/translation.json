@@ -342,6 +342,11 @@
     "gigabyte": "Go",
     "terabyte": "To"
   },
+  "modal": {
+    "confirm_title": "Confirmer",
+    "btn_cancel": "Annuler",
+    "btn_confirm": "Supprimer"
+  },
   "badge": {
     "enabled": "Activé",
     "disabled": "Désactivé",
