@@ -37,11 +37,36 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   })
 
+  let pendingForm = null
+  const confirmModal = document.getElementById('confirmModal')
+  const confirmModalBody = document.getElementById('confirmModalBody')
+  const confirmModalBtn = document.getElementById('confirmModalBtn')
+  const bsConfirmModal = confirmModal ? new bootstrap.Modal(confirmModal) : null
+
   document.querySelectorAll('form[data-confirm]').forEach((form) => {
     form.addEventListener('submit', (e) => {
-      if (!confirm(form.getAttribute('data-confirm'))) e.preventDefault()
+      e.preventDefault()
+      pendingForm = form
+      confirmModalBody.textContent = form.getAttribute('data-confirm')
+      bsConfirmModal.show()
     })
   })
+
+  if (confirmModalBtn) {
+    confirmModalBtn.addEventListener('click', () => {
+      if (pendingForm) {
+        pendingForm.submit()
+        pendingForm = null
+      }
+      bsConfirmModal.hide()
+    })
+  }
+
+  if (confirmModal) {
+    confirmModal.addEventListener('hidden.bs.modal', () => {
+      pendingForm = null
+    })
+  }
 
   document.querySelectorAll('[data-toggle-password]').forEach((btn) => {
     btn.addEventListener('click', () => togglePassword(btn.getAttribute('data-toggle-password'), btn))

@@ -349,6 +349,11 @@
     "gigabyte": "GB",
     "terabyte": "TB"
   },
+  "modal": {
+    "confirm_title": "Confirm",
+    "btn_cancel": "Cancel",
+    "btn_confirm": "Delete"
+  },
   "badge": {
     "enabled": "Enabled",
     "disabled": "Disabled",

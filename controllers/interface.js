@@ -538,17 +538,11 @@ async function deleteInterface(req, res) {
   }
 
   const peers = peerModel.findByInterfaceId(id)
-  if (peers.length > 0) {
-    req.session.flash = { error: req.t('error.cannot_delete_interface_with_peers', { nom: iface.nom }) }
-    return res.redirect('/interface')
+  for (const peer of peers) {
+    peerModel.remove(peer.id)
   }
 
-  try {
-    interfaceModel.remove(id)
-  } catch (err) {
-    req.session.flash = { error: req.t('error.delete_failed', { message: err.message }) }
-    return res.redirect('/interface')
-  }
+  interfaceModel.remove(id)
 
   try {
     if (iface.active) {
@@ -556,10 +550,11 @@ async function deleteInterface(req, res) {
     }
     await sudo.exec(`rm -f /etc/wireguard/${iface.nom}.conf`)
   } catch (err) {
-    // best effort — cleanup done
+    log.error('Interface', `Nettoyage WireGuard pour ${iface.nom} : ${err.message}`)
   }
 
-  log.info('Interface', `Interface ${iface.nom} supprimée (id=${id})`)
+  const peerCount = peers.length
+  log.info('Interface', `Interface ${iface.nom} supprimée (id=${id}) avec ${peerCount} pair(s)`)
   req.session.flash = { success: req.t('success.interface_deleted', { nom: iface.nom }) }
   return res.redirect('/interface')
 }
