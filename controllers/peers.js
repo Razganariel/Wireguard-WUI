@@ -56,11 +56,6 @@ async function addPeerToInterface(iface, peer) {
   }
 }
 
-async function removePeerFromInterface(iface, publicKey) {
-  await sudo.exec(`wg set ${iface.nom} peer ${publicKey} remove`)
-  await interfaceController.writeConfigFile(iface)
-}
-
 async function createPeer(req, res) {
   const interface_id = sanitizeInt(req.body.interface_id)
   const nom = sanitizePeerName(req.body.nom)
@@ -245,15 +240,21 @@ async function deletePeer(req, res) {
 
   const iface = interfaceModel.findById(peer.interface_id)
 
+  peerModel.remove(id)
+
   try {
-    if (iface && iface.active) {
-      await removePeerFromInterface(iface, peer.public_key)
+    if (iface) {
+      if (iface.active) {
+        await sudo.exec(`wg set ${iface.nom} peer ${peer.public_key} remove`)
+      }
+      await interfaceController.writeConfigFile(iface)
     }
   } catch (err) {
-    // best effort — still remove from DB
+    log.error('Peers', `Erreur lors de la suppression du pair "${peer.nom}" de WireGuard: ${err.message}`)
+    req.session.flash = { error: req.t('error.generic', { message: err.message }) }
+    return res.redirect(`/peers?interface=${peer.interface_id}`)
   }
 
-  peerModel.remove(id)
   log.info('Peers', `Peer "${peer.nom}" (id=${id}) supprimé`)
   req.session.flash = { success: req.t('success.peer_deleted', { nom: peer.nom }) }
   return res.redirect(`/peers?interface=${peer.interface_id}`)
