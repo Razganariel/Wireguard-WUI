@@ -1,6 +1,6 @@
 <div class="row mb-4">
   <div class="col">
-    <h1>Tableau de bord</h1>
+    <h1>{{__ 'dashboard.title'}}</h1>
   </div>
 </div>
 
@@ -9,7 +9,7 @@
     <div class="card text-center h-100">
       <div class="card-body">
         <h3 class="mb-1">{{stats.activeInterfaces}}<small class="text-muted fs-5">/{{stats.totalInterfaces}}</small></h3>
-        <p class="text-muted small mb-0">Interfaces actives</p>
+        <p class="text-muted small mb-0">{{__ 'dashboard.stat.active_interfaces'}}</p>
       </div>
     </div>
   </div>
@@ -17,7 +17,7 @@
     <div class="card text-center h-100">
       <div class="card-body">
         <h3 class="mb-1">{{stats.connectedPeers}}<small class="text-muted fs-5">/{{stats.totalPeers}}</small></h3>
-        <p class="text-muted small mb-0">Pairs connectés</p>
+        <p class="text-muted small mb-0">{{__ 'dashboard.stat.connected_peers'}}</p>
       </div>
     </div>
   </div>
@@ -25,7 +25,7 @@
     <div class="card text-center h-100">
       <div class="card-body">
         <h3 class="mb-1 text-success">{{stats.totalTransferRx}}</h3>
-        <p class="text-muted small mb-0">Download</p>
+        <p class="text-muted small mb-0">{{__ 'dashboard.stat.download'}}</p>
       </div>
     </div>
   </div>
@@ -33,7 +33,7 @@
     <div class="card text-center h-100">
       <div class="card-body">
         <h3 class="mb-1 text-primary">{{stats.totalTransferTx}}</h3>
-        <p class="text-muted small mb-0">Upload</p>
+        <p class="text-muted small mb-0">{{__ 'dashboard.stat.upload'}}</p>
       </div>
     </div>
   </div>
@@ -43,9 +43,9 @@
         {{#if stats.latestHandshake}}
           <h3 class="mb-1">{{stats.latestHandshake}}</h3>
         {{else}}
-          <h3 class="mb-1 text-muted">—</h3>
+          <h3 class="mb-1 text-muted">{{__ 'text.dash'}}</h3>
         {{/if}}
-        <p class="text-muted small mb-0">Dernier handshake</p>
+        <p class="text-muted small mb-0">{{__ 'dashboard.stat.latest_handshake'}}</p>
       </div>
     </div>
   </div>
@@ -54,20 +54,20 @@
 {{#if hasInterfaces}}
   <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">Interfaces</h5>
-      <a href="/interface" class="btn btn-sm btn-outline-primary">Gérer</a>
+      <h5 class="mb-0">{{__ 'dashboard.section.interfaces'}}</h5>
+      <a href="/interface" class="btn btn-sm btn-outline-primary">{{__ 'dashboard.btn.manage'}}</a>
     </div>
     <div class="card-body p-0">
       <div class="table-responsive">
       <table class="table table-hover mb-0">
         <thead>
           <tr>
-            <th>Interface</th>
-            <th>Statut</th>
-            <th class="d-none d-md-table-cell">Port</th>
-            <th class="d-none d-md-table-cell">Pairs</th>
-            <th class="d-none d-lg-table-cell">Dernier handshake</th>
-            <th class="text-end">Actions</th>
+            <th>{{__ 'dashboard.table.interface'}}</th>
+            <th>{{__ 'dashboard.table.status'}}</th>
+            <th class="d-none d-md-table-cell">{{__ 'dashboard.table.port'}}</th>
+            <th class="d-none d-md-table-cell">{{__ 'dashboard.table.peers'}}</th>
+            <th class="d-none d-lg-table-cell">{{__ 'dashboard.table.latest_handshake'}}</th>
+            <th class="text-end">{{__ 'dashboard.table.actions'}}</th>
           </tr>
         </thead>
         <tbody>
@@ -76,9 +76,9 @@
               <td><strong>{{nom}}</strong>{{#if endpoint}} <code class="small text-muted">{{endpoint}}</code>{{/if}}</td>
               <td>
                 {{#if active}}
-                  <span class="badge bg-success">Actif</span>
+                  <span class="badge bg-success">{{__ 'dashboard.badge.active'}}</span>
                 {{else}}
-                  <span class="badge bg-secondary">Inactif</span>
+                  <span class="badge bg-secondary">{{__ 'dashboard.badge.inactive'}}</span>
                 {{/if}}
               </td>
               <td class="d-none d-md-table-cell">{{port}}</td>
@@ -87,11 +87,11 @@
                 {{#if lastHandshake}}
                   {{lastHandshake}}
                 {{else}}
-                  <span class="text-muted">—</span>
+                  <span class="text-muted">{{__ 'text.dash'}}</span>
                 {{/if}}
               </td>
               <td class="text-end">
-                <a href="/peers?interface={{id}}" class="btn btn-sm btn-outline-primary">Pairs</a>
+                <a href="/peers?interface={{id}}" class="btn btn-sm btn-outline-primary">{{__ 'dashboard.btn.peers'}}</a>
               </td>
             </tr>
           {{/each}}
@@ -103,17 +103,17 @@
 
   <div class="card mb-4">
     <div class="card-header">
-      <h5 class="mb-0">Routage</h5>
+      <h5 class="mb-0">{{__ 'dashboard.section.routing'}}</h5>
     </div>
     <div class="card-body">
       {{#if routingSummary.ok}}
         <p>
-          <span class="text-success">✓ {{routingSummary.ok}} interface(s) correctement routée(s)</span>
-          {{#if routingSummary.ko}}<span class="text-danger ms-3">✗ {{routingSummary.ko}} non configurée(s)</span>{{/if}}
-          {{#if routingSummary.na}}<span class="text-muted ms-3">— {{routingSummary.na}} non vérifiable(s)</span>{{/if}}
+          <span class="text-success">{{__ 'dashboard.routing.ok' count=routingSummary.ok}}</span>
+          {{#if routingSummary.ko}}<span class="text-danger ms-3">{{__ 'dashboard.routing.ko' count=routingSummary.ko}}</span>{{/if}}
+          {{#if routingSummary.na}}<span class="text-muted ms-3">{{__ 'dashboard.routing.na' count=routingSummary.na}}</span>{{/if}}
         </p>
       {{else}}
-        <p class="text-muted">Aucune information de routage disponible.</p>
+        <p class="text-muted">{{__ 'dashboard.routing.no_info'}}</p>
       {{/if}}
 
       <div class="row g-2 mt-2">
@@ -123,12 +123,12 @@
               <div class="d-flex align-items-center small">
                 <span class="me-2">{{nom}} :</span>
                 {{#if (eq routingOk true)}}
-                  <span class="text-success">✅ OK</span>
+                  <span class="text-success">{{__ 'dashboard.routing.status_ok'}}</span>
                 {{else}}
                   {{#if (eq routingOk false)}}
-                    <span class="text-danger">❌ Non configuré</span>
+                    <span class="text-danger">{{__ 'dashboard.routing.status_not_configured'}}</span>
                   {{else}}
-                    <span class="text-muted">— Non vérifiable</span>
+                    <span class="text-muted">{{__ 'dashboard.routing.status_not_checkable'}}</span>
                   {{/if}}
                 {{/if}}
               </div>
@@ -140,7 +140,7 @@
   </div>
 {{else}}
   <div class="text-center py-5">
-    <p class="text-muted">Aucune interface WireGuard configurée.</p>
-    <a href="/interface" class="btn btn-primary">Créer une interface</a>
+    <p class="text-muted">{{__ 'dashboard.no_interfaces'}}</p>
+    <a href="/interface" class="btn btn-primary">{{__ 'dashboard.btn.create_interface'}}</a>
   </div>
 {{/if}}

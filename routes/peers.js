@@ -8,6 +8,7 @@ const { isAuthenticated, requireSudoPassword } = require('../middlewares/auth')
 const sudo = require('../helpers/sudo')
 const qrcode = require('../helpers/qrcode')
 const { sanitizeInt } = require('../helpers/sanitize')
+const { formatHandshake } = require('../helpers/format')
 
 router.use(isAuthenticated)
 
@@ -40,23 +41,13 @@ function formatBytes(bytes) {
   return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
 }
 
-function formatHandshake(ts) {
-  if (!ts || ts === 0) return null
-  const now = Math.floor(Date.now() / 1000)
-  const diff = now - ts
-  if (diff < 60) return 'il y a quelques secondes'
-  if (diff < 3600) return `il y a ${Math.floor(diff / 60)} min`
-  if (diff < 86400) return `il y a ${Math.floor(diff / 3600)} h`
-  return `il y a ${Math.floor(diff / 86400)} j`
-}
-
 router.get('/', async (req, res) => {
   const interfaceId = sanitizeInt(req.query.interface)
   let interfaces = interfaceModel.findAll()
 
   if (interfaces.length === 0) {
     return res.render('peers/index', {
-      title: 'Pairs',
+      title: req.t('peers.title'),
       peers: [],
       interfaces: [],
       selectedInterface: null,
@@ -88,7 +79,7 @@ router.get('/', async (req, res) => {
     return {
       ...peer,
       endpoint: status ? status.endpoint : '—',
-      handshake: status ? formatHandshake(status.latestHandshake) : null,
+      handshake: status ? formatHandshake(status.latestHandshake, req.t) : null,
       handshakeRaw: status ? status.latestHandshake : 0,
       transferRx: status ? formatBytes(status.transferRx) : '—',
       transferTx: status ? formatBytes(status.transferTx) : '—',
@@ -119,7 +110,7 @@ router.get('/', async (req, res) => {
   }
 
   res.render('peers/index', {
-    title: 'Pairs',
+    title: req.t('peers.title'),
     peers,
     interfaces,
     interfaceList,
@@ -134,23 +125,23 @@ router.get('/', async (req, res) => {
 router.post('/detect', requireSudoPassword, async (req, res) => {
   const ifaceId = req.session.selectedInterfaceId
   if (!ifaceId) {
-    req.session.flash = { error: 'Aucune interface sélectionnée.' }
+    req.session.flash = { error: req.t('error.no_interface_selected') }
     return res.redirect('/peers')
   }
   const iface = interfaceModel.findById(ifaceId)
   if (!iface) {
-    req.session.flash = { error: 'Interface introuvable.' }
+    req.session.flash = { error: req.t('error.interface_not_found') }
     return res.redirect('/peers')
   }
   try {
     const count = await interfaceController.importPeersFromInterface(iface.nom)
     if (count > 0) {
-      req.session.flash = { success: `${count} pair${count > 1 ? 's' : ''} importé${count > 1 ? 's' : ''} depuis "${iface.nom}".` }
+      req.session.flash = { success: req.t('success.peers_detected', { count, nom: iface.nom }) }
     } else {
-      req.session.flash = { success: 'Aucun nouveau pair détecté.' }
+      req.session.flash = { success: req.t('success.no_new_peers') }
     }
   } catch (err) {
-    req.session.flash = { error: `Erreur : ${err.message}` }
+    req.session.flash = { error: req.t('error.generic', { message: err.message }) }
   }
   res.redirect('/peers')
 })
@@ -165,17 +156,17 @@ router.get('/:id/config', peerController.downloadConfig)
 
 router.get('/:id/qrcode', isAuthenticated, async (req, res) => {
   if (!qrcode.isAvailable()) {
-    req.session.flash = { error: 'qrcode non disponible. Installez-le avec : npm install qrcode' }
+    req.session.flash = { error: req.t('error.qrcode_not_available') }
     return res.redirect('/peers')
   }
   const id = sanitizeInt(req.params.id)
   if (!id) {
-    req.session.flash = { error: 'ID de pair invalide.' }
+    req.session.flash = { error: req.t('error.invalid_peer_id') }
     return res.redirect('/peers')
   }
   const peer = peerModel.findById(id)
   if (!peer) {
-    req.session.flash = { error: 'Pair introuvable.' }
+    req.session.flash = { error: req.t('error.peer_not_found') }
     return res.redirect('/peers')
   }
   const iface = interfaceModel.findById(peer.interface_id)
@@ -183,12 +174,12 @@ router.get('/:id/qrcode', isAuthenticated, async (req, res) => {
   try {
     const dataUrl = await qrcode.toDataURL(config)
     res.render('peers/qrcode', {
-      title: `QR Code — ${peer.nom}`,
+      title: req.t('qrcode.title', { nom: peer.nom }),
       qrDataUrl: dataUrl,
       peerName: peer.nom
     })
   } catch (err) {
-    req.session.flash = { error: 'Erreur lors de la génération du QR code.' }
+    req.session.flash = { error: req.t('error.qrcode_generation_failed') }
     res.redirect('/peers')
   }
 })

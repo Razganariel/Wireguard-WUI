@@ -19,7 +19,7 @@ async function requireSudoPassword(req, res, next) {
     return next()
   }
   log.debug('Auth', `Mot de passe sudo requis — ${req.method} ${req.path}`)
-  req.session.flash = { error: 'Veuillez d\'abord définir le mot de passe sudo.' }
+  req.session.flash = { error: req.t('error.define_sudo_password_first') }
   return res.redirect('/auth/sudo-password')
 }
 

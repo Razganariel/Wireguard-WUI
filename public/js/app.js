@@ -60,9 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const pct = Math.min(100, Math.round(entropy / 80 * 100))
       bar.style.width = pct + '%'
       val.textContent = entropy
-      if (entropy >= 60) { bar.className = 'progress-bar bg-success'; label.textContent = 'Fort' }
-      else if (entropy >= 40) { bar.className = 'progress-bar bg-warning'; label.textContent = 'Moyen' }
-      else { bar.className = 'progress-bar bg-danger'; label.textContent = 'Faible' }
+      const strong = label.getAttribute('data-strong') || 'Strong'
+      const medium = label.getAttribute('data-medium') || 'Medium'
+      const weak = label.getAttribute('data-weak') || 'Weak'
+      if (entropy >= 60) { bar.className = 'progress-bar bg-success'; label.textContent = strong }
+      else if (entropy >= 40) { bar.className = 'progress-bar bg-warning'; label.textContent = medium }
+      else { bar.className = 'progress-bar bg-danger'; label.textContent = weak }
     })
   }
 
