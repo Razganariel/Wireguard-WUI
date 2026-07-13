@@ -66,30 +66,23 @@
     "stat": {
       "active_interfaces": "Interfaces actives",
       "connected_peers": "Pairs connectés",
-    "download": "Download",
-    "upload": "Upload",
-    "latest_handshake": "Dernier handshake"
-  },
-  "section": {
-    "interfaces": "Interfaces",
-    "routing": "Routage"
-  },
-  "table": {
-    "interface": "Interface",
-    "status": "Statut",
-    "port": "Port",
-    "peers": "Pairs",
-    "latest_handshake": "Dernier handshake",
-    "actions": "Actions"
+      "download": "Téléchargement",
+      "upload": "Upload",
+      "latest_handshake": "Dernier handshake"
     },
-  "unit": {
-    "byte": "o",
-    "kilobyte": "Ko",
-    "megabyte": "Mo",
-    "gigabyte": "Go",
-    "terabyte": "To"
-  },
-  "badge": {
+    "section": {
+      "interfaces": "Interfaces",
+      "routing": "Routage"
+    },
+    "table": {
+      "interface": "Interface",
+      "status": "Statut",
+      "port": "Port",
+      "peers": "Pairs",
+      "latest_handshake": "Dernier handshake",
+      "actions": "Actions"
+    },
+    "badge": {
       "active": "Actif",
       "inactive": "Inactif"
     },
@@ -277,7 +270,7 @@
       "endpoint": "Point de terminaison",
       "public_key": "Clé publique",
       "connected_peers": "Pairs connectés",
-      "download": "Download",
+      "download": "Téléchargement",
       "upload": "Upload"
     },
     "routing_not_configured": "Routage non configuré.",
@@ -341,6 +334,13 @@
     "title": "QR Code — {{nom}}",
     "description": "Scannez ce QR code avec l'application WireGuard pour ajouter ce pair.",
     "btn_back": "Retour"
+  },
+  "unit": {
+    "byte": "o",
+    "kilobyte": "Ko",
+    "megabyte": "Mo",
+    "gigabyte": "Go",
+    "terabyte": "To"
   },
   "badge": {
     "enabled": "Activé",

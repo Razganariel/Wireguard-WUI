@@ -12,7 +12,7 @@ const i18nextMiddleware = require('i18next-http-middleware')
 
 i18next.use(FsBackend).use(i18nextMiddleware.LanguageDetector).init({
   backend: { loadPath: path.join(__dirname, 'locales', '{{lng}}', 'translation.json') },
-  fallbackLng: 'fr',
+  fallbackLng: 'en',
   preload: ['fr', 'en'],
   detection: { order: ['querystring', 'cookie', 'header'], caches: ['cookie'] }
 })
@@ -325,7 +325,7 @@ app.post('/profile/totp-disable', async (req, res) => {
   res.redirect('/profile')
 })
 
-const AVAILABLE_LANGS = ['fr', 'en']
+const AVAILABLE_LANGS = ['en', 'fr']
 
 app.get('/profile/language', (req, res) => {
   const lang = req.query.lang

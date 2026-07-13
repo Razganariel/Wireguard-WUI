@@ -38,6 +38,6 @@ describe('Peers routes', () => {
       headers: { Cookie: cookieHeader(jar) }
     })
     expect(res.status).toBe(200)
-    expect(res.text).toContain('Pairs')
+    expect(res.text).toContain('Peers')
   })
 })
