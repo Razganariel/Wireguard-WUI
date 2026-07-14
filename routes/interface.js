@@ -9,15 +9,6 @@ router.use(isAuthenticated)
 router.get('/', async (req, res) => {
   const interfaces = interfaceModel.findAll()
 
-  let statuses = {}
-  if (interfaces.length > 0) {
-    try {
-      statuses = await interfaceController.getAllStatus()
-    } catch (err) {
-      statuses = {}
-    }
-  }
-
   function formatBytes(bytes) {
     if (!bytes || bytes === 0) return '0 B'
     const units = ['B', 'KB', 'MB', 'GB', 'TB']
@@ -25,8 +16,12 @@ router.get('/', async (req, res) => {
     return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
   }
 
-  const enrichedInterfaces = interfaces.map((iface) => {
-    const status = statuses[iface.nom]
+  const enrichedInterfaces = []
+  for (const iface of interfaces) {
+    let status = null
+    if (req.session.sudoPassword) {
+      try { status = await interfaceController.getStatus(iface.nom) } catch (e) {}
+    }
     let totalRx = 0, totalTx = 0
     if (status && status.peers) {
       for (const p of status.peers) {
@@ -34,7 +29,7 @@ router.get('/', async (req, res) => {
         totalTx += p.transferTx || 0
       }
     }
-    return {
+    enrichedInterfaces.push({
       ...iface,
       status: status || null,
       peerCount: status ? status.peers.length : 0,
@@ -43,8 +38,8 @@ router.get('/', async (req, res) => {
         : 0,
       totalRx: formatBytes(totalRx),
       totalTx: formatBytes(totalTx)
-    }
-  })
+    })
+  }
 
   let systemInterfaces = []
   let sudoNotSet = false

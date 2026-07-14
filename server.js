@@ -105,13 +105,6 @@ app.get('/', async (req, res) => {
   const interfaces = interfaceModel.findAll()
   const hasInterfaces = interfaces.length > 0
 
-  let allStatus = {}
-  if (sudo.hasPassword()) {
-    try {
-      allStatus = await interfaceController.getAllStatus()
-    } catch (e) {}
-  }
-
   let totalConnectedPeers = 0
   let totalPeers = 0
   let totalTransferRx = 0
@@ -119,22 +112,21 @@ app.get('/', async (req, res) => {
   let latestHandshake = 0
 
   const routingStatus = {}
-  if (sudo.hasPassword()) {
-    for (const iface of interfaces) {
-      if (iface.active) {
-        try {
-          routingStatus[iface.nom] = await interfaceController.getRoutingInfo(iface.nom, iface.adresse_ip)
-        } catch (e) {}
-      }
-    }
-  }
 
-  const enrichedInterfaces = interfaces.map((iface) => {
+  const enrichedInterfaces = []
+  for (const iface of interfaces) {
     const peers = peerModel.findByInterfaceId(iface.id)
     const peerCount = peers.length
     totalPeers += peerCount
 
-    const ifaceStatus = allStatus[iface.nom]
+    let ifaceStatus = null
+    if (sudo.hasPassword()) {
+      try { ifaceStatus = await interfaceController.getStatus(iface.nom) } catch (e) {}
+      if (iface.active) {
+        try { routingStatus[iface.nom] = await interfaceController.getRoutingInfo(iface.nom, iface.adresse_ip) } catch (e) {}
+      }
+    }
+
     let connectedPeers = 0
     let ifaceLatestHs = 0
     let totalRx = 0
@@ -155,7 +147,7 @@ app.get('/', async (req, res) => {
     if (ifaceLatestHs > latestHandshake) latestHandshake = ifaceLatestHs
 
     const routing = routingStatus[iface.nom]
-    return {
+    enrichedInterfaces.push({
       id: iface.id,
       nom: iface.nom,
       active: iface.active,
@@ -167,8 +159,8 @@ app.get('/', async (req, res) => {
       totalRx: formatBytes(totalRx),
       totalTx: formatBytes(totalTx),
       routingOk: routing ? routing.allOk : null
-    }
-  })
+    })
+  }
 
   const activeInterfaces = enrichedInterfaces.filter((i) => i.active).length
   const routingOk = enrichedInterfaces.filter((i) => i.routingOk === true).length
