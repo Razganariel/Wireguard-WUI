@@ -342,6 +342,13 @@
     "description": "Scan this QR code with the WireGuard app to add this peer.",
     "btn_back": "Back"
   },
+  "unit": {
+    "byte": "B",
+    "kilobyte": "KB",
+    "megabyte": "MB",
+    "gigabyte": "GB",
+    "terabyte": "TB"
+  },
   "badge": {
     "enabled": "Enabled",
     "disabled": "Disabled",
