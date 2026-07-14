@@ -69,5 +69,6 @@ module.exports = {
   setPassword,
   clearPassword,
   hasPassword,
+  isCommandSafe,
   exec: execSudo
 }
