@@ -104,11 +104,50 @@
                 {{#if ../qrcodeAvailable}}
                   <a href="/peers/{{id}}/qrcode" class="btn btn-sm btn-outline-info">QR</a>
                 {{/if}}
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editPeer{{id}}">Éditer</button>
                 <form method="POST" action="/peers/{{id}}/delete" class="d-inline" onsubmit="return confirm('Supprimer le pair {{nom}} ?')">
                   <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
                 </form>
               </td>
             </tr>
+            <div class="modal fade" id="editPeer{{id}}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <form method="POST" action="/peers/{{id}}/edit" data-validate>
+                    <div class="modal-header">
+                      <h5 class="modal-title">Éditer {{nom}}</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="mb-3">
+                        <label for="nom{{id}}" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="nom{{id}}" name="nom" value="{{nom}}" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="adresse_ip{{id}}" class="form-label">Adresse IP</label>
+                        <input type="text" class="form-control" id="adresse_ip{{id}}" name="adresse_ip" value="{{adresse_ip}}" pattern="^(\d{1,3}\.){3}\d{1,3}$" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="allowed_ips{{id}}" class="form-label">Allowed IPs</label>
+                        <input type="text" class="form-control" id="allowed_ips{{id}}" name="allowed_ips" value="{{allowed_ips}}">
+                      </div>
+                      <div class="mb-3">
+                        <label for="dns{{id}}" class="form-label">DNS</label>
+                        <input type="text" class="form-control" id="dns{{id}}" name="dns" value="{{dns}}">
+                      </div>
+                      <div class="mb-3">
+                        <label for="persistent_keepalive{{id}}" class="form-label">Persistent Keepalive</label>
+                        <input type="number" class="form-control" id="persistent_keepalive{{id}}" name="persistent_keepalive" value="{{persistent_keepalive}}" min="0" max="3600">
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                      <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
           {{/each}}
         </tbody>
       </table>

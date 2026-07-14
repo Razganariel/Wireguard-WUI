@@ -67,6 +67,8 @@ router.post('/select', (req, res) => {
 
 router.post('/:id/toggle', requireSudoPassword, interfaceController.toggleInterface)
 
+router.post('/:id/edit', requireSudoPassword, interfaceController.editInterface)
+
 router.post('/:id/delete', requireSudoPassword, interfaceController.deleteInterface)
 
 router.post('/import/:name', requireSudoPassword, async (req, res) => {
