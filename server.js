@@ -26,8 +26,14 @@ hbs.registerHelper('currentYear', () => new Date().getFullYear())
 app.set('view engine', 'hbs')
 app.set('views', path.join(__dirname, 'views'))
 app.set('view options', { layout: 'layouts/layout' })
+
+if (process.env.TRUST_PROXY) {
+  const trust = isNaN(process.env.TRUST_PROXY) ? process.env.TRUST_PROXY : parseInt(process.env.TRUST_PROXY, 10)
+  app.set('trust proxy', trust)
+}
+
 app.use(helmet({
-  strictTransportSecurity: false,
+  strictTransportSecurity: process.env.ENABLE_HSTS ? {} : false,
   contentSecurityPolicy: {
     useDefaults: false,
     directives: {
@@ -37,7 +43,7 @@ app.use(helmet({
       imgSrc: ["'self'", "data:"],
       fontSrc: ["'self'", "https://cdn.jsdelivr.net"],
       connectSrc: ["'self'"],
-      upgradeInsecureRequests: null
+      upgradeInsecureRequests: process.env.ENABLE_UPGRADE_HTTPS ? [] : null
     }
   }
 }))
@@ -48,7 +54,10 @@ app.use(
     secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 }
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24,
+      secure: process.env.SESSION_SECURE === 'true'
+    }
   })
 )
 
