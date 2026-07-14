@@ -6,6 +6,7 @@ const peerModel = require('../models/peer')
 const interfaceModel = require('../models/interface')
 const { isAuthenticated, requireSudoPassword } = require('../middlewares/auth')
 const sudo = require('../helpers/sudo')
+const qrcode = require('../helpers/qrcode')
 
 router.use(isAuthenticated)
 
@@ -58,7 +59,8 @@ router.get('/', async (req, res) => {
       peers: [],
       interfaces: [],
       selectedInterface: null,
-      hasInterfaces: false
+      hasInterfaces: false,
+      qrcodeAvailable: qrcode.isAvailable()
     })
   }
 
@@ -99,7 +101,8 @@ router.get('/', async (req, res) => {
     interfaces,
     selectedInterface: selectedIface.id,
     selectedInterfaceName: selectedIface.nom,
-    hasInterfaces: true
+    hasInterfaces: true,
+    qrcodeAvailable: qrcode.isAvailable()
   })
 })
 
@@ -132,5 +135,30 @@ router.post('/', requireSudoPassword, peerController.createPeer)
 router.post('/:id/delete', requireSudoPassword, peerController.deletePeer)
 
 router.get('/:id/config', peerController.downloadConfig)
+
+router.get('/:id/qrcode', isAuthenticated, async (req, res) => {
+  if (!qrcode.isAvailable()) {
+    req.session.flash = { error: 'qrcode non disponible. Installez-le avec : npm install qrcode' }
+    return res.redirect('/peers')
+  }
+  const peer = peerModel.findById(req.params.id)
+  if (!peer) {
+    req.session.flash = { error: 'Pair introuvable.' }
+    return res.redirect('/peers')
+  }
+  const iface = interfaceModel.findById(peer.interface_id)
+  const config = peerController.buildClientConfig(peer, iface)
+  try {
+    const dataUrl = await qrcode.toDataURL(config)
+    res.render('peers/qrcode', {
+      title: `QR Code — ${peer.nom}`,
+      qrDataUrl: dataUrl,
+      peerName: peer.nom
+    })
+  } catch (err) {
+    req.session.flash = { error: 'Erreur lors de la génération du QR code.' }
+    res.redirect('/peers')
+  }
+})
 
 module.exports = router
