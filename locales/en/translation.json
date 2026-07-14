@@ -82,7 +82,14 @@
       "latest_handshake": "Latest handshake",
       "actions": "Actions"
     },
-    "badge": {
+  "unit": {
+    "byte": "B",
+    "kilobyte": "KB",
+    "megabyte": "MB",
+    "gigabyte": "GB",
+    "terabyte": "TB"
+  },
+  "badge": {
       "active": "Active",
       "inactive": "Inactive"
     },

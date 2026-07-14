@@ -8,7 +8,7 @@ const { isAuthenticated, requireSudoPassword } = require('../middlewares/auth')
 const sudo = require('../helpers/sudo')
 const qrcode = require('../helpers/qrcode')
 const { sanitizeInt } = require('../helpers/sanitize')
-const { formatHandshake } = require('../helpers/format')
+const { formatHandshake, formatBytes } = require('../helpers/format')
 
 router.use(isAuthenticated)
 
@@ -32,13 +32,6 @@ async function getPeerStatuses(nom) {
   } catch (err) {
     return {}
   }
-}
-
-function formatBytes(bytes) {
-  if (!bytes || bytes === 0) return '0 B'
-  const units = ['B', 'KB', 'MB', 'GB', 'TB']
-  const i = Math.floor(Math.log(bytes) / Math.log(1024))
-  return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
 }
 
 router.get('/', async (req, res) => {
@@ -81,8 +74,8 @@ router.get('/', async (req, res) => {
       endpoint: status ? status.endpoint : '—',
       handshake: status ? formatHandshake(status.latestHandshake, req.t) : null,
       handshakeRaw: status ? status.latestHandshake : 0,
-      transferRx: status ? formatBytes(status.transferRx) : '—',
-      transferTx: status ? formatBytes(status.transferTx) : '—',
+      transferRx: status ? formatBytes(status.transferRx, req.t) : '—',
+      transferTx: status ? formatBytes(status.transferTx, req.t) : '—',
       isConnected: status ? status.latestHandshake > 0 : false
     }
   })

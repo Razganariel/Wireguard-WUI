@@ -43,7 +43,8 @@ hbs.registerHelper('eq', (a, b) => a === b)
 hbs.registerHelper('currentYear', () => new Date().getFullYear())
 hbs.registerHelper('__', function (...args) {
   const options = args.pop()
-  const t = (this && this.t) || i18next.t
+  const root = options.data && options.data.root
+  const t = (root && root.t) || (this && this.t) || i18next.t
   return t(args[0], options.hash)
 })
 
@@ -402,8 +403,8 @@ app.get('/', async (req, res) => {
       peerCount,
       connectedPeers,
       lastHandshake: formatHandshake(ifaceLatestHs, req.t),
-      totalRx: formatBytes(totalRx),
-      totalTx: formatBytes(totalTx),
+      totalRx: formatBytes(totalRx, req.t),
+      totalTx: formatBytes(totalTx, req.t),
       routingOk: routing ? routing.allOk : null
     })
   }
@@ -422,8 +423,8 @@ app.get('/', async (req, res) => {
       totalInterfaces: interfaces.length,
       connectedPeers: totalConnectedPeers,
       totalPeers,
-      totalTransferRx: formatBytes(totalTransferRx),
-      totalTransferTx: formatBytes(totalTransferTx),
+      totalTransferRx: formatBytes(totalTransferRx, req.t),
+      totalTransferTx: formatBytes(totalTransferTx, req.t),
       latestHandshake: formatHandshake(latestHandshake, req.t)
     },
     routingSummary: {

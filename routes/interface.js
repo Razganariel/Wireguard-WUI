@@ -3,19 +3,13 @@ const router = express.Router()
 const interfaceController = require('../controllers/interface')
 const interfaceModel = require('../models/interface')
 const { isAuthenticated, requireSudoPassword } = require('../middlewares/auth')
+const { formatBytes } = require('../helpers/format')
 const { sanitizeInt, sanitizeInterfaceName } = require('../helpers/sanitize')
 
 router.use(isAuthenticated)
 
 router.get('/', async (req, res) => {
   const interfaces = interfaceModel.findAll()
-
-  function formatBytes(bytes) {
-    if (!bytes || bytes === 0) return '0 B'
-    const units = ['B', 'KB', 'MB', 'GB', 'TB']
-    const i = Math.floor(Math.log(bytes) / Math.log(1024))
-    return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
-  }
 
   const enrichedInterfaces = []
   for (const iface of interfaces) {
@@ -37,8 +31,8 @@ router.get('/', async (req, res) => {
       connectedPeers: status
         ? status.peers.filter((p) => p.latestHandshake > 0).length
         : 0,
-      totalRx: formatBytes(totalRx),
-      totalTx: formatBytes(totalTx)
+      totalRx: formatBytes(totalRx, req.t),
+      totalTx: formatBytes(totalTx, req.t)
     })
   }
 

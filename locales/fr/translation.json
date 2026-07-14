@@ -66,23 +66,30 @@
     "stat": {
       "active_interfaces": "Interfaces actives",
       "connected_peers": "Pairs connectés",
-      "download": "Download",
-      "upload": "Upload",
-      "latest_handshake": "Dernier handshake"
+    "download": "Download",
+    "upload": "Upload",
+    "latest_handshake": "Dernier handshake"
+  },
+  "section": {
+    "interfaces": "Interfaces",
+    "routing": "Routage"
+  },
+  "table": {
+    "interface": "Interface",
+    "status": "Statut",
+    "port": "Port",
+    "peers": "Pairs",
+    "latest_handshake": "Dernier handshake",
+    "actions": "Actions"
     },
-    "section": {
-      "interfaces": "Interfaces",
-      "routing": "Routage"
-    },
-    "table": {
-      "interface": "Interface",
-      "status": "Statut",
-      "port": "Port",
-      "peers": "Pairs",
-      "latest_handshake": "Dernier handshake",
-      "actions": "Actions"
-    },
-    "badge": {
+  "unit": {
+    "byte": "o",
+    "kilobyte": "Ko",
+    "megabyte": "Mo",
+    "gigabyte": "Go",
+    "terabyte": "To"
+  },
+  "badge": {
       "active": "Actif",
       "inactive": "Inactif"
     },
@@ -299,7 +306,7 @@
     "name_label": "Nom",
     "name_placeholder": "Téléphone de Alice",
     "ip_label": "Adresse IP",
-    "allowed_ips_label": "Allowed IPs",
+    "allowed_ips_label": "IP autorisées",
     "ip_help": "IP du pair sur le réseau VPN (attribuée dans le tunnel).",
     "allowed_ips_help": "Trafic redirigé vers le VPN. 0.0.0.0/0 = tout le trafic (full tunnel). Mettez le sous-réseau du serveur pour un split tunnel (ex: 10.0.0.0/24).",
     "allowed_ips_help_short": "Trafic redirigé vers le VPN. 0.0.0.0/0 = tout le trafic, ou un sous-réseau spécifique.",
@@ -311,7 +318,7 @@
     "table": {
       "name": "Nom",
       "ip": "Adresse IP",
-      "allowed_ips": "Allowed IPs",
+      "allowed_ips": "IP autorisées",
       "handshake": "Handshake",
       "transfer": "Transfert",
       "status": "Statut",
@@ -345,7 +352,7 @@
   "text": {
     "dash": "—",
     "never": "jamais",
-    "zero_bytes": "0 B",
+    "zero_bytes": "0 o",
     "just_now": "à l'instant",
     "seconds_ago": "il y a quelques secondes",
     "minutes_ago": "il y a {{count}} min",
