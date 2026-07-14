@@ -1,99 +1,120 @@
 # WireGuard-WUI
 
-WireGuard-WUI est une interface web (Web User Interface) permettant de gérer son serveur VPN WireGuard simplement depuis un navigateur.
+WireGuard-WUI is a web interface to manage your WireGuard VPN server from your browser.
 
-## Fonctionnalités
+## Features
 
-- **Configuration du serveur** — initialisation et gestion des interfaces WireGuard
-- **Gestion des pairs** — créer, lister, supprimer des peers avec génération automatique des clés
-- **Configuration client** — téléchargement du fichier `.conf` prêt à l'emploi pour chaque peer
-- **Multi-interfaces** — support de plusieurs interfaces WireGuard (wg0, wg1, etc.)
-- **Authentification** — session-based avec bcrypt
-- **Déploiement en service** — installation bare-metal uniquement
-- **Interface responsive** — construite avec Express + Handlebars + Bootstrap 5
+- **Full interface management** — create, start, stop, edit, delete WireGuard interfaces with automatic key generation and configuration file written to `/etc/wireguard/`
+- **Peer management** — create, edit, delete peers with automatic key generation (including pre-shared keys), IP suggestion, duplicate detection
+- **Live statistics** — dashboard with active interface counters, connected peers, data volume (RX/TX), latest handshake
+- **Client configuration** — download ready-to-use `.conf` files and QR codes for each peer
+- **Routing and firewall** — automatic iptables (MASQUERADE, FORWARD) or firewalld configuration with system firewall auto-detection
+- **System import** — detect and import existing interfaces and peers from `/etc/wireguard/`
+- **Full authentication** — email + password (bcrypt), TOTP 2FA, rate-limited attempts
+- **CSRF protection** — per-session token validated on every POST/PUT/DELETE request
+- **Application firewall (Helmet)** — CSP, optional HSTS, security HTTP headers
+- **Secure sudo entries** — sudo password encrypted in session (AES-256-GCM), whitelisted commands, shell injection prevention
+- **Internationalization** — 7 languages (German, English, Spanish, French, Irish, Italian, Portuguese) with automatic browser language detection
+- **User profile** — edit profile, change password with strength meter (entropy), enable/disable TOTP 2FA, toggle debug mode
+- **Logging** — application logs in `logs/app.log` with 3 levels (DEBUG, INFO, ERROR), level configurable from the interface
+- **Automated installation** — complete `install.sh` script (system user creation, systemd service, sudoers configuration, hardened permissions)
 
-## Stack technique
+## Tech stack
 
-| Couche | Technologie |
+| Layer | Technology |
 |---|---|
-| **Backend** | Node.js + Express |
-| **Template** | Handlebars (hbs) + Bootstrap 5 |
-| **Base de données** | SQLite (better-sqlite3) |
-| **Session** | express-session |
-| **Authentification** | bcrypt |
+| **Backend** | Node.js 20+ / Express 4 |
+| **Template** | Handlebars (hbs) + Bootstrap 5 (CDN) |
+| **Database** | SQLite (better-sqlite3, no ORM) |
+| **Authentication** | bcrypt (passwords) + otplib (TOTP 2FA) |
+| **Security** | Helmet (CSP/HSTS), csrf (tokens), express-rate-limit |
+| **VPN** | WireGuard (`wg`, `wg-quick`) via sudo |
+| **I18n** | i18next with file backend |
 
-## Architecture
+## Prerequisites
 
-```
-┌─────────────┐     ┌──────────┐      ┌──────────┐
-│  Browser    │────▶│ Express  │────▶│ SQLite   │
-│  (Handlebars│     │ Routes   │      │ (users,  │
-│   + Boot5)  │     │ + Auth   │      │  peers)  │
-└─────────────┘     └────┬─────┘      └──────────┘
-                         │
-                         ▼
-                   ┌──────────┐
-                   │  sudo wg │
-                   │  commands│
-                   └──────────┘
-```
+- **Node.js** 20+ and npm
+- **WireGuard** installed on the system (`wg`, `wg-quick`)
+- **sudo** to execute WireGuard commands
 
-## Prérequis
-
-- **Node.js** 16+ et npm
-- **WireGuard** installé sur le système (`wg`, `wg-quick`)
-- **sudo** configuré pour exécuter `wg` et `wg-quick` sans mot de passe
-
-### Configuration sudo (obligatoire)
-
-```bash
-sudo visudo -f /etc/sudoers.d/wireguard-wui
-```
-
-```
-www-data ALL=(root) NOPASSWD: /usr/bin/wg, /usr/bin/wg-quick
-```
-
-## Démarrage rapide
-
-### Bare-metal
+## Quick start
 
 ```bash
 git clone https://github.com/Razganariel/Wireguard-WUI.git
 cd Wireguard-WUI
 cp .env.example .env
-# Éditer .env avec vos valeurs
+# Edit .env with your values (especially SESSION_SECRET)
 npm install
 npm start
 ```
 
+Browse to `http://localhost:3000` — the first visitor is redirected to admin account creation.
+
+## Automated installation (production)
+
+```bash
+sudo ./install.sh
+```
+
+The script:
+1. Creates the `wireguard-wui` system user and group
+2. Copies sources to `/opt/wireguard-wui`
+3. Installs production dependencies
+4. Creates the `.env` file with the entered values (PORT, SESSION_SECRET, DB_PATH)
+5. Installs the `wireguard-wui.service` systemd unit
+6. Creates the sudoers configuration with allowed commands
+
+```bash
+systemctl enable --now wireguard-wui
+```
 
 ## Configuration
 
-Variables d'environnement (fichier `.env`) :
+### Environment variables (`.env` file)
 
-| Variable | Défaut | Description |
+| Variable | Default | Description |
 |---|---|---|
-| `PORT` | `3000` | Port de l'application |
-| `SESSION_SECRET` | — | Clé secrète pour les sessions (obligatoire) |
-| `DB_PATH` | `./db/wireguard-wui.db` | Chemin vers le fichier SQLite |
+| `PORT` | `3000` | HTTP listening port |
+| `SESSION_SECRET` | — | Session encryption secret (required, use a long random string) |
+| `DB_PATH` | `./db/wireguard-wui.db` | Path to the SQLite database file |
+| `TRUST_PROXY` | — | Trust proxy setting (e.g. `1`, `'loopback'`) when behind a reverse proxy |
+| `ENABLE_HSTS` | — | Enable Strict-Transport-Security header (requires HTTPS) |
+| `ENABLE_UPGRADE_HTTPS` | — | Enable HTTPS upgrade in CSP (`upgrade-insecure-requests`) |
+| `SESSION_SECURE` | — | Secure session cookies (HTTPS only) |
+| `LOG_LEVEL` | `INFO` | Initial log level (INFO or DEBUG) |
 
-## Utilisation
+### sudo configuration
 
-1. Accéder à l'interface sur `http://<ip>:<port>`
-2. Se connecter avec les identifiants par défaut :
-   - Email : `admin@wireguard.local`
-   - Mot de passe : `admin`
-3. **Changer le mot de passe immédiatement** après la première connexion
-4. Accéder à la page de configuration pour initialiser une interface WireGuard
-5. Ajouter des pairs et télécharger leurs configurations clients
+If you are not using the automated install script, configure sudo manually:
 
+```bash
+visudo -f /etc/sudoers.d/wireguard-wui
+```
 
-## Licence & Utilisation
+```
+wireguard-wui ALL=(root) NOPASSWD: /usr/bin/wg-quick *, /usr/bin/wg show *, /usr/bin/wg syncconf *, /usr/bin/wg set *, /usr/bin/wg pubkey, /usr/bin/iptables *, /usr/bin/ip link *, /usr/bin/firewall-cmd *, /usr/bin/cp, /usr/bin/chmod, /usr/bin/rm, /usr/bin/cat, /usr/bin/find
+```
 
-Ce projet est distribué sous la licence **GNU Affero General Public License v3.0 (AGPL-3.0)**. 
+> Adjust the user (`wireguard-wui`) to match your setup.
 
-**Pourquoi l'AGPL ?** 
-Nous avons choisi cette licence pour garantir que ce projet reste un bien commun. L'AGPL assure que si quelqu'un modifie ce code ou l'utilise pour offrir un service en ligne, il a l'obligation de partager les modifications et le code source avec la communauté. Cela empêche toute tentative d'appropriation commerciale fermée du projet.
+## Tests
 
-Pour consulter le texte intégral des termes de la licence, veuillez consulter le fichier [LICENSE](./LICENSE).
+```bash
+npm test
+```
+
+Vitest test suite covering helpers, middlewares, models and routes.
+
+## Support the project
+
+If you find this project useful, you can support me on Ko-fi:
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/razganariel)
+
+## License
+
+This project is distributed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+
+Why AGPL? We chose this license to ensure this project remains a common good. AGPL guarantees that if someone modifies this code or uses it to provide an online service, they are required to share the modifications and source code with the community. This prevents any attempt at closed-source commercial appropriation of the project.
+
+For the full license text, see the [LICENSE](./LICENSE) file.

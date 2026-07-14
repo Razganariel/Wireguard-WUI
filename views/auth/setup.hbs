@@ -1,0 +1,39 @@
+{{! SPDX-License-Identifier: AGPL-3.0-only }}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-6">
+    <div class="text-center mb-4">
+      <h1 class="display-6">{{__ 'auth.setup.welcome'}}</h1>
+      <p class="text-muted">{{__ 'auth.setup.description'}}</p>
+      <p class="text-muted">{{__ 'auth.setup.prompt'}}</p>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <form method="POST" action="/auth/setup" data-validate>
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="prenom" class="form-label">{{__ 'auth.setup.first_name_label'}}</label>
+              <input type="text" class="form-control" id="prenom" name="prenom" placeholder="{{__ 'auth.setup.first_name_placeholder'}}" required autofocus>
+            </div>
+            <div class="col-md-6">
+              <label for="nom" class="form-label">{{__ 'auth.setup.last_name_label'}}</label>
+              <input type="text" class="form-control" id="nom" name="nom" placeholder="{{__ 'auth.setup.last_name_placeholder'}}" required>
+            </div>
+            <div class="col-12">
+              <label for="email" class="form-label">{{__ 'auth.setup.email_label'}}</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder="{{__ 'auth.setup.email_placeholder'}}" required>
+            </div>
+            <div class="col-12">
+              <label for="password" class="form-label">{{__ 'auth.setup.password_label'}}</label>
+              <input type="password" class="form-control" id="password" name="password" minlength="8" required>
+              <div class="form-text">{{__ 'auth.setup.password_help'}}</div>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary w-100">{{__ 'auth.setup.submit'}}</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

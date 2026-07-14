@@ -1,0 +1,140 @@
+{{! SPDX-License-Identifier: AGPL-3.0-only }}
+<!DOCTYPE html>
+<html lang="{{lang}}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="/wireguard-color.svg">
+</head>
+<body class="d-flex flex-column min-vh-100">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+        <img src="/wireguard-color.svg" alt="WireGuard" width="28" height="28">
+        <strong>{{__ 'brand.name'}}</strong>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          {{#if user}}
+            <li class="nav-item">
+              <a class="nav-link" href="/">{{__ 'nav.dashboard'}}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/interface">{{__ 'nav.interfaces'}}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/peers">{{__ 'nav.peers'}}</a>
+            </li>
+          {{/if}}
+        </ul>
+
+        <ul class="navbar-nav ms-2 align-items-center">
+          {{#if user}}
+            <li class="nav-item me-2">
+              <a href="/auth/sudo-password" class="text-decoration-none">
+                {{#if hasSudoPassword}}
+                  <span class="badge bg-success">{{__ 'nav.sudo_active'}}</span>
+                {{else}}
+                  <span class="badge bg-warning text-dark">{{__ 'nav.sudo_inactive'}}</span>
+                {{/if}}
+              </a>
+            </li>
+            <li class="nav-item me-2">
+              <form method="GET" action="/profile/language" class="d-inline">
+                <select name="lang" class="form-select form-select-sm bg-dark text-light border-secondary" style="cursor:pointer" data-auto-submit>
+                  <option value="de" {{#if (eq lang 'de')}}selected{{/if}}>DE</option>
+                  <option value="en" {{#if (eq lang 'en')}}selected{{/if}}>EN</option>
+                  <option value="es" {{#if (eq lang 'es')}}selected{{/if}}>ES</option>
+                  <option value="fr" {{#if (eq lang 'fr')}}selected{{/if}}>FR</option>
+                  <option value="ga" {{#if (eq lang 'ga')}}selected{{/if}}>GA</option>
+                  <option value="it" {{#if (eq lang 'it')}}selected{{/if}}>IT</option>
+                  <option value="pt" {{#if (eq lang 'pt')}}selected{{/if}}>PT</option>
+                </select>
+              </form>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/profile">{{userName}}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">{{__ 'nav.logout'}}</a>
+            </li>
+          {{else}}
+            <li class="nav-item">
+              <a class="nav-link" href="/auth/login">{{__ 'nav.login'}}</a>
+            </li>
+          {{/if}}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container mt-4 flex-grow-1">
+    {{#if user}}
+      {{#unless hasSudoPassword}}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+          <a href="/auth/sudo-password" class="alert-link">{{__ 'alert.sudo_password.link'}}</a>
+          {{__ 'alert.sudo_password.description'}}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {{/unless}}
+    {{/if}}
+    {{#if flash}}
+      {{#if flash.success}}
+        <div class="toast-container position-fixed end-0 p-3" style="z-index: 9999; top: 60px;">
+          <div class="toast show align-items-center text-bg-success border-0" role="alert" data-bs-delay="5000">
+            <div class="d-flex">
+              <div class="toast-body">{{flash.success}}</div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+          </div>
+        </div>
+      {{/if}}
+      {{#if flash.error}}
+        <div class="toast-container position-fixed end-0 p-3" style="z-index: 9999; top: 60px;">
+          <div class="toast show align-items-center text-bg-danger border-0" role="alert" data-bs-delay="8000">
+            <div class="d-flex">
+              <div class="toast-body">{{flash.error}}</div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+          </div>
+        </div>
+      {{/if}}
+    {{/if}}
+
+    {{{body}}}
+  </main>
+
+  <footer class="bg-dark text-light py-3 mt-auto">
+    <div class="container text-center">
+      <span class="small">{{__ 'footer.copyright' year=currentYear}}</span>
+      <span class="small mx-2">|</span>
+      <a href="https://ko-fi.com/razganariel" target="_blank" rel="noopener" class="small text-light text-decoration-none">{{__ 'footer.support'}}</a>
+    </div>
+  </footer>
+
+  <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{__ 'modal.confirm_title'}}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="confirmModalBody"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{__ 'modal.btn_cancel'}}</button>
+          <button type="button" class="btn btn-danger" id="confirmModalBtn">{{__ 'modal.btn_confirm'}}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+/* SPDX-License-Identifier: AGPL-3.0-only */
+
+body {
+  background-color: #f8f9fa
+}
+
+main {
+  padding-bottom: 2rem
+}
+
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, .075)
+}
+
+code {
+  word-break: break-all
+}
+
+footer {
+  font-size: .875rem
+}
+
+.toast-container {
+  min-width: 300px
+}
+
+.nav-pills .nav-link {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+  transition: box-shadow .15s ease-in-out;
+}
+.nav-pills .nav-link:hover {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, .15);
+}
+.nav-pills .nav-link.active {
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, .2);
+}

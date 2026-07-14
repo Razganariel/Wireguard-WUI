@@ -1,0 +1,193 @@
+{{! SPDX-License-Identifier: AGPL-3.0-only }}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="mb-0">{{__ 'peers.title'}}</h1>
+</div>
+
+{{#unless hasInterfaces}}
+  <div class="alert alert-info">
+    {{__ 'peers.no_interface_alert'}} <a href="/interface">{{__ 'peers.create_interface_link'}}</a> {{__ 'peers.no_interface_alert_suffix'}}
+  </div>
+{{/unless}}
+
+{{#if hasInterfaces}}
+<ul class="nav nav-pills mb-4">
+  {{#each interfaceList}}
+    <li class="nav-item">
+      <a class="nav-link {{#if (eq ../selectedInterface id)}}active{{/if}}" href="/peers?interface={{id}}">
+        {{nom}}
+        <span class="badge {{#if active}}bg-success{{else}}bg-secondary{{/if}} ms-1">{{peerCount}}</span>
+      </a>
+    </li>
+  {{/each}}
+</ul>
+  <div class="row mb-4">
+    <div class="col d-flex gap-2">
+      <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#addPeerForm">
+        {{__ 'peers.btn_add'}}
+      </button>
+      <form method="POST" action="/peers/detect" class="d-inline">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <button type="submit" class="btn btn-outline-info btn-sm">{{__ 'peers.btn_detect'}}</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="collapse mb-4" id="addPeerForm">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">{{__ 'peers.add_header'}}</h5>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="/peers" data-validate>
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
+          <input type="hidden" name="interface_id" value="{{selectedInterface}}">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="nom" class="form-label">{{__ 'peers.name_label'}}</label>
+              <input type="text" class="form-control" id="nom" name="nom" placeholder="{{__ 'peers.name_placeholder'}}" required>
+            </div>
+            <div class="col-md-4">
+              <label for="adresse_ip" class="form-label">{{__ 'peers.ip_label'}}</label>
+              <input type="text" class="form-control" id="adresse_ip" name="adresse_ip" placeholder="{{suggestedPeerIp}}" value="{{suggestedPeerIp}}" required>
+              <div class="form-text">{{__ 'peers.ip_help'}}</div>
+            </div>
+            <div class="col-md-4">
+              <label for="allowed_ips" class="form-label">{{__ 'peers.allowed_ips_label'}}</label>
+              <input type="text" class="form-control" id="allowed_ips" name="allowed_ips" value="0.0.0.0/0">
+              <div class="form-text">{{__ 'peers.allowed_ips_help'}}</div>
+            </div>
+            <div class="col-md-4">
+              <label for="dns" class="form-label">{{__ 'peers.dns_label'}}</label>
+              <input type="text" class="form-control" id="dns" name="dns" placeholder="1.1.1.1">
+              <div class="form-text">{{__ 'peers.dns_help'}}</div>
+            </div>
+            <div class="col-md-4">
+              <label for="persistent_keepalive" class="form-label">{{__ 'peers.keepalive_label'}}</label>
+              <input type="number" class="form-control" id="persistent_keepalive" name="persistent_keepalive" value="25">
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary">{{__ 'peers.btn_create'}}</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {{#if peers.length}}
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>{{__ 'peers.table.name'}}</th>
+            <th>{{__ 'peers.table.ip'}}</th>
+            <th class="d-none d-md-table-cell">{{__ 'peers.table.allowed_ips'}}</th>
+            <th class="d-none d-lg-table-cell">{{__ 'peers.table.handshake'}}</th>
+            <th class="d-none d-md-table-cell">{{__ 'peers.table.transfer'}}</th>
+            <th>{{__ 'peers.table.status'}}</th>
+            <th class="text-center d-none d-md-table-cell">{{__ 'peers.table.actions'}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each peers}}
+            <tr class="{{#unless isConnected}}table-danger{{/unless}}">
+              <td><strong>{{nom}}</strong></td>
+              <td>{{adresse_ip}}</td>
+              <td class="d-none d-md-table-cell"><code class="small">{{allowed_ips}}</code></td>
+              <td class="d-none d-lg-table-cell">
+                {{#if handshake}}
+                  {{handshake}}
+                {{else}}
+                  <span class="text-muted">{{__ 'peers.never'}}</span>
+                {{/if}}
+              </td>
+              <td class="d-none d-md-table-cell">
+                <span class="text-success">{{__ 'text.download_arrow' bytes=transferRx}}</span>
+                <span class="text-primary">{{__ 'text.upload_arrow' bytes=transferTx}}</span>
+              </td>
+              <td>
+                {{#if isConnected}}
+                  <span class="badge bg-success">{{__ 'peers.connected'}}</span>
+                {{else}}
+                  <span class="badge bg-danger">{{__ 'peers.inactive'}}</span>
+                {{/if}}
+              </td>
+              <td class="text-center d-none d-md-table-cell">
+                <a href="/peers/{{id}}/config" class="btn btn-sm btn-outline-secondary">{{__ 'peers.btn_config'}}</a>
+                {{#if ../qrcodeAvailable}}
+                  <a href="/peers/{{id}}/qrcode" class="btn btn-sm btn-outline-info">{{__ 'peers.btn_qr'}}</a>
+                {{/if}}
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editPeer{{id}}">{{__ 'peers.btn_edit'}}</button>
+                <form method="POST" action="/peers/{{id}}/delete" class="d-inline" data-confirm="{{__ 'peers.confirm_delete' nom=nom}}">
+                  <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
+                  <button type="submit" class="btn btn-sm btn-outline-danger">{{__ 'peers.btn_delete'}}</button>
+                </form>
+              </td>
+            </tr>
+            <tr class="d-md-none">
+              <td colspan="7" class="border-0 pt-0">
+                <div class="d-flex gap-1 flex-wrap justify-content-center">
+                  <a href="/peers/{{id}}/config" class="btn btn-sm btn-outline-secondary">{{__ 'peers.btn_config'}}</a>
+                  {{#if ../qrcodeAvailable}}
+                    <a href="/peers/{{id}}/qrcode" class="btn btn-sm btn-outline-info">{{__ 'peers.btn_qr'}}</a>
+                  {{/if}}
+                  <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editPeer{{id}}">{{__ 'peers.btn_edit'}}</button>
+                  <form method="POST" action="/peers/{{id}}/delete" class="d-inline" data-confirm="{{__ 'peers.confirm_delete' nom=nom}}">
+                    <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">{{__ 'peers.btn_delete'}}</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            <div class="modal fade" id="editPeer{{id}}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <form method="POST" action="/peers/{{id}}/edit" data-validate>
+                    <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
+                    <div class="modal-header">
+                      <h5 class="modal-title">{{__ 'peers.modal_edit_title' nom=nom}}</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="mb-3">
+                        <label for="nom{{id}}" class="form-label">{{__ 'peers.name_label'}}</label>
+                        <input type="text" class="form-control" id="nom{{id}}" name="nom" value="{{nom}}" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="adresse_ip{{id}}" class="form-label">{{__ 'peers.ip_label'}}</label>
+                        <input type="text" class="form-control" id="adresse_ip{{id}}" name="adresse_ip" value="{{adresse_ip}}" pattern="^(\d{1,3}\.){3}\d{1,3}$" required>
+                        <div class="form-text">{{__ 'peers.ip_help_short'}}</div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="allowed_ips{{id}}" class="form-label">{{__ 'peers.allowed_ips_label'}}</label>
+                        <input type="text" class="form-control" id="allowed_ips{{id}}" name="allowed_ips" value="{{allowed_ips}}">
+                        <div class="form-text">{{__ 'peers.allowed_ips_help_short'}}</div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="dns{{id}}" class="form-label">{{__ 'peers.dns_label'}}</label>
+                        <input type="text" class="form-control" id="dns{{id}}" name="dns" value="{{dns}}">
+                        <div class="form-text">{{__ 'peers.dns_help'}}</div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="persistent_keepalive{{id}}" class="form-label">{{__ 'peers.keepalive_label'}}</label>
+                        <input type="number" class="form-control" id="persistent_keepalive{{id}}" name="persistent_keepalive" value="{{persistent_keepalive}}" min="0" max="3600">
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{__ 'peers.modal_btn_cancel'}}</button>
+                      <button type="submit" class="btn btn-primary">{{__ 'peers.modal_btn_save'}}</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  {{else}}
+    <div class="alert alert-info">
+      {{__ 'peers.no_peers_alert' nom=selectedInterfaceName}}
+    </div>
+  {{/if}}
+{{/if}}

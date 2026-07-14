@@ -1,0 +1,38 @@
+{{! SPDX-License-Identifier: AGPL-3.0-only }}
+<div class="row justify-content-center mt-3">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow">
+      <div class="card-body p-4 text-center">
+        <h4 class="card-title mb-4">{{__ 'totp_setup.title'}}</h4>
+
+        <p class="text-muted mb-3">
+          {{__ 'totp_setup.scan_description'}}
+        </p>
+
+        {{#if qrDataUrl}}
+          <img src="{{qrDataUrl}}" alt="QR Code" class="img-fluid mb-3" style="max-width: 240px; width: 100%;">
+        {{/if}}
+
+        <div class="mb-3">
+          <p class="mb-1 small text-muted">{{__ 'totp_setup.manual_label'}}</p>
+          <code class="user-select-all" style="font-size: 0.85rem; word-break: break-all;">{{secret}}</code>
+        </div>
+
+        <hr>
+
+        <form method="POST" action="/profile/totp-enable" data-validate>
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
+          <div class="mb-3">
+            <label for="totp_token" class="form-label">{{__ 'totp_setup.code_label'}}</label>
+            <input type="text" class="form-control text-center" id="totp_token" name="totp_token"
+              placeholder="{{__ 'totp_setup.code_placeholder'}}" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required autofocus>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success">{{__ 'totp_setup.btn_enable'}}</button>
+            <a href="/profile" class="btn btn-outline-secondary">{{__ 'totp_setup.btn_cancel'}}</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,379 @@
+{
+  "brand": {
+    "name": "WireGuard-WUI"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "interfaces": "Schnittstellen",
+    "peers": "Peers",
+    "sudo_active": "Sudo",
+    "sudo_inactive": "Sudo",
+    "logout": "Abmelden",
+    "login": "Anmelden"
+  },
+  "alert": {
+    "sudo_password": {
+      "link": "Sudo-Passwort festlegen",
+      "description": "um die Schnittstellenerkennung und die Verwaltung von Routing-Regeln zu aktivieren."
+    }
+  },
+  "footer": {
+    "copyright": "WireGuard-WUI — GPL v3 — {{year}}",
+    "support": "Unterstütze mich auf Ko-fi"
+  },
+  "auth": {
+    "login": {
+      "title": "Anmelden",
+      "subtitle": "WireGuard-Verwaltungsoberfläche — Verwalten Sie Ihre VPN-Schnittstellen und deren Peers ganz einfach.",
+      "email_label": "E-Mail",
+      "email_placeholder": "admin@wireguard.local",
+      "password_label": "Passwort",
+      "password_placeholder": "••••••••",
+      "submit": "Anmelden"
+    },
+    "setup": {
+      "title": "Einrichtung",
+      "welcome": "Willkommen",
+      "description": "WireGuard-WUI ist eine Verwaltungsoberfläche für Ihren WireGuard-VPN-Server.",
+      "prompt": "Erstellen Sie ein Administratorkonto, um den Zugriff auf das Tool zu sichern.",
+      "first_name_label": "Vorname",
+      "first_name_placeholder": "Max",
+      "last_name_label": "Nachname",
+      "last_name_placeholder": "Mustermann",
+      "email_label": "E-Mail",
+      "email_placeholder": "max@example.com",
+      "password_label": "Passwort",
+      "password_help": "Mindestens 8 Zeichen.",
+      "submit": "Administratorkonto erstellen"
+    },
+    "totp": {
+      "title": "Authentifizierung",
+      "description": "Geben Sie den 6-stelligen Code ein, der von Ihrer Authentifizierungs-App generiert wurde.",
+      "code_label": "Authentifizierungscode",
+      "code_placeholder": "000000",
+      "submit": "Überprüfen"
+    },
+    "sudo": {
+      "title": "Sudo-Passwort",
+      "description": "WireGuard-WUI benötigt das Sudo-Passwort, um WireGuard-Befehle auszuführen.",
+      "password_label": "Sudo-Passwort",
+      "btn_update": "Aktualisieren",
+      "btn_clear": "Passwort löschen",
+      "btn_validate": "Absenden"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "stat": {
+      "active_interfaces": "Aktive Schnittstellen",
+      "connected_peers": "Verbundene Peers",
+      "download": "Download",
+      "upload": "Upload",
+      "latest_handshake": "Letzter Handshake"
+    },
+    "section": {
+      "interfaces": "Schnittstellen",
+      "routing": "Routing"
+    },
+    "table": {
+      "interface": "Schnittstelle",
+      "status": "Status",
+      "port": "Port",
+      "peers": "Peers",
+      "latest_handshake": "Letzter Handshake",
+      "actions": "Aktionen"
+    },
+    "unit": {
+      "byte": "B",
+      "kilobyte": "KB",
+      "megabyte": "MB",
+      "gigabyte": "GB",
+      "terabyte": "TB"
+    },
+    "badge": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "btn": {
+      "manage": "Verwalten",
+      "peers": "Peers",
+      "create_interface": "Schnittstelle erstellen"
+    },
+    "routing": {
+      "ok": "✓ {{count}} Schnittstelle(n) korrekt geroutet",
+      "ko": "✗ {{count}} nicht konfiguriert",
+      "na": "— {{count}} nicht überprüfbar",
+      "no_info": "Keine Routing-Informationen verfügbar.",
+      "status_ok": "✅ OK",
+      "status_not_configured": "❌ Nicht konfiguriert",
+      "status_not_checkable": "— Nicht überprüfbar"
+    },
+    "no_interfaces": "Keine WireGuard-Schnittstellen konfiguriert."
+  },
+  "error": {
+    "404": {
+      "title": "404 — Seite nicht gefunden",
+      "message": "Die angeforderte Seite existiert nicht."
+    },
+    "500": {
+      "title": "500 — Serverfehler",
+      "message": "Ein unerwarteter Fehler ist aufgetreten.",
+      "retry": "Bitte versuchen Sie es erneut. Wenn das Problem weiterhin besteht, überprüfen Sie die Server-Logs."
+    },
+    "generic": "Fehler: {{message}}",
+    "invalid_interface_id": "Ungültige Schnittstellen-ID.",
+    "interface_not_found": "Schnittstelle nicht gefunden.",
+    "interface_name_format": "Der Schnittstellenname muss dem Format wg0, wg1 usw. entsprechen.",
+    "ip_cidr_format": "Die IP-Adresse muss im CIDR-Format vorliegen (z. B. 10.0.0.1/24).",
+    "port_range": "Der Port muss eine Zahl zwischen 1 und 65535 sein.",
+    "interface_exists": "Die Schnittstelle \"{{nom}}\" existiert bereits.",
+    "key_generation_failed": "Schnittstelle \"{{nom}}\" in der Datenbank erstellt, aber die Schlüsselerzeugung ist fehlgeschlagen (wg genkey). Überprüfen Sie, ob WireGuard installiert ist.",
+    "wireguard_start_failed": "Schnittstelle in der Datenbank erstellt, aber WireGuard-Fehler: {{message}}. Überprüfen Sie, ob wg/wg-quick installiert sind und sudo konfiguriert ist.",
+    "config_apply_failed": "Fehler beim Anwenden der Konfiguration: {{message}}. Die Änderungen wurden rückgängig gemacht.",
+    "cannot_delete_interface_with_peers": "Die Schnittstelle \"{{nom}}\" kann nicht gelöscht werden: Es sind noch Peers zugeordnet. Entfernen Sie zuerst alle Peers dieser Schnittstelle.",
+    "delete_failed": "Fehler beim Löschen: {{message}}",
+    "invalid_peer_id": "Ungültige Peer-ID.",
+    "peer_not_found": "Peer nicht gefunden.",
+    "peer_required_fields": "Schnittstelle, Name und IP-Adresse sind erforderlich.",
+    "ipv4_format": "Die IP-Adresse muss im IPv4-Format vorliegen (z. B. 10.0.0.2).",
+    "allowed_ips_cidr_format": "Erlaubte IPs müssen im CIDR-Format vorliegen (z. B. 0.0.0.0/0).",
+    "dns_ipv4": "Der DNS muss eine gültige IPv4-Adresse sein.",
+    "peer_ip_duplicate": "Ein Peer mit der IP-Adresse {{ip}} existiert bereits auf dieser Schnittstelle.",
+    "peer_keygen_failed": "Peer \"{{nom}}\" in der Datenbank erstellt, aber die Schlüsselerzeugung ist fehlgeschlagen (wg genkey). Überprüfen Sie, ob WireGuard installiert ist.",
+    "peer_wireguard_failed": "Peer in der Datenbank erstellt, aber WireGuard-Fehler: {{message}}. Überprüfen Sie, ob die Schnittstelle aktiv ist und sudo konfiguriert ist.",
+    "name_ip_required": "Name und IP-Adresse sind erforderlich.",
+    "ip_already_used": "Die IP-Adresse {{ip}} wird auf dieser Schnittstelle bereits verwendet.",
+    "peer_config_apply_failed": "Fehler beim Anwenden der Konfiguration: {{message}}. Änderungen rückgängig gemacht.",
+    "enter_email_password": "Bitte geben Sie Ihre E-Mail und Ihr Passwort ein.",
+    "invalid_credentials": "Ungültige Anmeldedaten.",
+    "enter_auth_code": "Bitte geben Sie den Authentifizierungscode ein.",
+    "invalid_2fa_config": "Ungültige 2FA-Konfiguration.",
+    "invalid_code": "Ungültiger Code. Bitte versuchen Sie es erneut.",
+    "first_name_last_name_required": "Vor- und Nachname sind erforderlich.",
+    "invalid_email": "Ungültige E-Mail.",
+    "email_already_used": "Diese E-Mail wird bereits verwendet.",
+    "new_password_min_length": "Das neue Passwort muss mindestens 8 Zeichen lang sein.",
+    "password_confirmation_mismatch": "Die Passwortbestätigung stimmt nicht überein.",
+    "password_too_weak": "Das Passwort ist zu schwach. Verwenden Sie Groß- und Kleinbuchstaben, Zahlen und Sonderzeichen für ein längeres Passwort (Entropie ≥ 60 Bit).",
+    "current_password_incorrect": "Das aktuelle Passwort ist falsch.",
+    "no_pending_key": "Kein ausstehender Schlüssel. Bitte beginnen Sie erneut.",
+    "enter_current_password": "Bitte geben Sie Ihr aktuelles Passwort ein.",
+    "incorrect_password": "Falsches Passwort.",
+    "too_many_attempts": "Zu viele Versuche. Versuchen Sie es in 15 Minuten erneut.",
+    "all_fields_required": "Alle Felder sind erforderlich (Passwort mindestens 8 Zeichen).",
+    "account_creation_failed": "Fehler beim Erstellen des Kontos.",
+    "password_required": "Ein Passwort ist erforderlich.",
+    "define_sudo_password_first": "Bitte legen Sie zuerst das Sudo-Passwort fest.",
+    "invalid_session": "Ungültige Sitzung. Bitte versuchen Sie es erneut.",
+    "sudo_password_not_set": "Sudo-Passwort nicht festgelegt",
+    "sudo_command_not_allowed": "Nicht autorisierter Sudo-Befehl.",
+    "sudo_password_incorrect": "Falsches Sudo-Passwort. Gehen Sie zu /auth/sudo-password, um es zu korrigieren.",
+    "import_failed": "Import fehlgeschlagen: {{message}}",
+    "detection_failed": "Erkennungsfehler: {{message}}",
+    "invalid_interface_name": "Ungültiger Schnittstellenname.",
+    "no_interface_selected": "Keine Schnittstelle ausgewählt.",
+    "qrcode_not_available": "QR-Code nicht verfügbar. Installieren mit: npm install qrcode",
+    "qrcode_generation_failed": "Fehler beim Erstellen des QR-Codes."
+  },
+  "success": {
+    "login_welcome": "Anmeldung erfolgreich. Willkommen!",
+    "profile_updated": "Profil aktualisiert.",
+    "debug_mode_enabled": "Debug-Modus aktiviert.",
+    "debug_mode_disabled": "Debug-Modus deaktiviert.",
+    "2fa_enabled": "Zwei-Faktor-Authentifizierung aktiviert.",
+    "2fa_disabled": "Zwei-Faktor-Authentifizierung deaktiviert.",
+    "account_created": "Administratorkonto erstellt. Willkommen!",
+    "sudo_password_saved": "Sudo-Passwort gespeichert.",
+    "sudo_password_cleared": "Sudo-Passwort gelöscht.",
+    "interface_initialized": "Schnittstelle \"{{nom}}\" erfolgreich initialisiert und gestartet.",
+    "interface_stopped": "Schnittstelle \"{{nom}}\" gestoppt.",
+    "interface_started": "Schnittstelle \"{{nom}}\" gestartet.",
+    "interface_updated": "Schnittstelle \"{{nom}}\" aktualisiert.",
+    "interface_deleted": "Schnittstelle \"{{nom}}\" gelöscht.",
+    "interface_imported": "Schnittstelle \"{{nom}}\" erfolgreich importiert.",
+    "peers_imported_from": "{{count}} Peer(s) von \"{{nom}}\" importiert.",
+    "no_new_interfaces": "Keine neuen Schnittstellen oder Peers erkannt.",
+    "detection_complete": "Erkennung abgeschlossen: {{details}}.",
+    "peer_created": "Peer \"{{nom}}\" erfolgreich hinzugefügt.",
+    "peer_updated": "Peer \"{{nom}}\" aktualisiert.",
+    "peer_deleted": "Peer \"{{nom}}\" gelöscht.",
+    "peers_detected": "{{count}} Peer(s) von \"{{nom}}\" importiert.",
+    "no_new_peers": "Keine neuen Peers erkannt."
+  },
+  "profile": {
+    "title": "Mein Profil",
+    "back_to_dashboard": "← Zurück zum Dashboard",
+    "personal_info": {
+      "title": "Persönliche Informationen",
+      "first_name": "Vorname",
+      "last_name": "Nachname",
+      "email": "E-Mail",
+      "btn_save": "Speichern"
+    },
+    "password": {
+      "title": "Passwort",
+      "complexity_label": "Starkes Passwort erforderlich",
+      "current_label": "Aktuelles Passwort",
+      "current_placeholder": "Erforderlich zum Ändern",
+      "new_label": "Neues Passwort",
+      "new_placeholder": "Mindestens 8 Zeichen",
+      "confirm_label": "Passwort bestätigen",
+      "confirm_placeholder": "Neues Passwort erneut eingeben",
+      "btn_change": "Passwort ändern",
+      "strength_label": "Stärke",
+      "show": "Anzeigen"
+    },
+    "twofactor": {
+      "title": "Zwei-Faktor-Authentifizierung",
+      "enabled": "Aktiviert",
+      "disabled": "Deaktiviert",
+      "disable_description": "Die Zwei-Faktor-Authentifizierung erhöht die Sicherheit Ihres Kontos. Geben Sie Ihr Passwort ein, um sie zu deaktivieren.",
+      "enable_description": "Fügen Sie eine zusätzliche Sicherheitsebene hinzu, indem Sie die Zwei-Faktor-Authentifizierung aktivieren. Sie müssen nach Ihrem Passwort einen 6-stelligen Code aus Ihrer Authentifizierungs-App eingeben.",
+      "current_password_label": "Aktuelles Passwort",
+      "btn_disable": "2FA deaktivieren",
+      "btn_setup": "2FA einrichten"
+    },
+    "admin": {
+      "title": "Verwaltung",
+      "debug_description": "Aktivieren Sie den Debug-Modus, um alle detaillierten Vorgänge in logs/app.log zu protokollieren.",
+      "debug_mode": "Debug-Modus"
+    }
+  },
+  "totp_setup": {
+    "title": "Zwei-Faktor-Authentifizierung einrichten",
+    "scan_description": "Scannen Sie diesen QR-Code mit Ihrer Authentifizierungs-App (Google Authenticator, Authy usw.) oder geben Sie den Schlüssel manuell ein.",
+    "manual_label": "Oder geben Sie diesen Schlüssel manuell ein:",
+    "code_label": "Bestätigungscode",
+    "code_placeholder": "000000",
+    "btn_enable": "Aktivieren",
+    "btn_cancel": "Abbrechen"
+  },
+  "interface": {
+    "title": "WireGuard-Schnittstelle",
+    "system_detected": "Erkannte Systemschnittstellen",
+    "import_description": "Die folgenden Schnittstellen existieren in /etc/wireguard/, sind aber noch nicht in der Datenbank. Importieren Sie sie, um sie über die Weboberfläche zu verwalten.",
+    "btn_import": "{{nom}} importieren",
+    "init_header": "Schnittstelle initialisieren",
+    "init_description": "Konfigurieren Sie Ihre WireGuard-Schnittstelle. Schlüssel werden automatisch generiert.",
+    "name_label": "Schnittstellenname",
+    "name_help": "Format: wg0, wg1, wg2…",
+    "ip_label": "IP-Adresse",
+    "port_label": "Listening-Port",
+    "port_help": "Vergessen Sie nicht, diesen Port auf Ihrem Router zu öffnen (Port-Weiterleitung) für Fernverbindungen.",
+    "endpoint_label": "Endpunkt (optional)",
+    "endpoint_placeholder": "ihre-domain.com",
+    "endpoint_help_full": "Öffentliche Adresse (IP oder Domain) für den externen Zugriff. Der Port wird automatisch hinzugefügt. Wenn leer, wird die Tunnel-IP verwendet.",
+    "endpoint_help_short": "Öffentliche Adresse (IP oder Domain) für den externen Zugriff. Der Port wird automatisch hinzugefügt.",
+    "unit_iface": "{{count}} Schnittstelle",
+    "unit_iface_plural": "{{count}} Schnittstellen",
+    "unit_peer": "{{count}} Peer",
+    "unit_peer_plural": "{{count}} Peers",
+    "btn_init": "Schnittstelle initialisieren",
+    "btn_new": "+ Neue Schnittstelle",
+    "btn_detect": "Erkennen",
+    "btn_initialize_short": "Initialisieren",
+    "table": {
+      "ip": "IP-Adresse",
+      "port": "Port",
+      "endpoint": "Endpunkt",
+      "public_key": "Öffentlicher Schlüssel",
+      "connected_peers": "Verbundene Peers",
+      "download": "Download",
+      "upload": "Upload"
+    },
+    "routing_not_configured": "Routing nicht konfiguriert.",
+    "routing_impact": "Verbundene Peers können nicht auf das Netzwerk zugreifen.",
+    "btn_view_commands": "Befehle anzeigen",
+    "label_iptables": "iptables-Befehle:",
+    "label_firewall_alternative": "Oder mit {{type}} (Alternative):",
+    "btn_edit": "Bearbeiten",
+    "btn_stop": "Stoppen",
+    "btn_start": "Starten",
+    "btn_delete": "Löschen",
+    "btn_peers": "Peers",
+    "confirm_delete": "Schnittstelle {{nom}} löschen? Diese Aktion ist unwiderruflich.",
+    "modal_edit_title": "{{nom}} bearbeiten",
+    "modal_btn_cancel": "Abbrechen",
+    "modal_btn_save": "Speichern"
+  },
+  "peers": {
+    "title": "Peers",
+    "no_interface_alert": "Keine WireGuard-Schnittstellen konfiguriert.",
+    "create_interface_link": "Schnittstelle erstellen",
+    "no_interface_alert_suffix": "zuerst.",
+    "btn_add": "+ Peer hinzufügen",
+    "btn_detect": "Erkennen",
+    "add_header": "Peer hinzufügen",
+    "name_label": "Name",
+    "name_placeholder": "Alices Handy",
+    "ip_label": "IP-Adresse",
+    "allowed_ips_label": "Erlaubte IPs",
+    "ip_help": "IP-Adresse des Peers im VPN-Netzwerk (innerhalb des Tunnels zugewiesen).",
+    "allowed_ips_help": "Über das VPN umgeleiteter Datenverkehr. 0.0.0.0/0 = gesamter Datenverkehr (Full Tunnel). Legen Sie das Server-Subnetz für Split Tunnel fest (z. B. 10.0.0.0/24).",
+    "allowed_ips_help_short": "Über das VPN umgeleiteter Datenverkehr. 0.0.0.0/0 = gesamter Datenverkehr oder ein bestimmtes Subnetz.",
+    "dns_label": "DNS",
+    "dns_help": "Verwenden Sie die IP der VPN-Schnittstelle, wenn der Server als DNS-Resolver fungiert.",
+    "keepalive_label": "Persistenter Keepalive",
+    "btn_create": "Peer erstellen",
+    "ip_help_short": "IP-Adresse des Peers im VPN-Netzwerk.",
+    "table": {
+      "name": "Name",
+      "ip": "IP-Adresse",
+      "allowed_ips": "Erlaubte IPs",
+      "handshake": "Handshake",
+      "transfer": "Übertragung",
+      "status": "Status",
+      "actions": "Aktionen"
+    },
+    "never": "nie",
+    "connected": "Verbunden",
+    "inactive": "Inaktiv",
+    "btn_config": ".conf",
+    "btn_qr": "QR",
+    "btn_edit": "Bearbeiten",
+    "btn_delete": "Löschen",
+    "confirm_delete": "Peer {{nom}} löschen?",
+    "no_peers_alert": "Keine Peers auf Schnittstelle {{nom}}. Fügen Sie einen mit der Schaltfläche oben hinzu.",
+    "modal_edit_title": "{{nom}} bearbeiten",
+    "modal_btn_cancel": "Abbrechen",
+    "modal_btn_save": "Speichern"
+  },
+  "qrcode": {
+    "title": "QR-Code — {{nom}}",
+    "description": "Scannen Sie diesen QR-Code mit der WireGuard-App, um diesen Peer hinzuzufügen.",
+    "btn_back": "Zurück"
+  },
+  "badge": {
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "connected": "Verbunden"
+  },
+  "text": {
+    "dash": "—",
+    "never": "nie",
+    "zero_bytes": "0 B",
+    "just_now": "gerade eben",
+    "seconds_ago": "vor wenigen Sekunden",
+    "minutes_ago": "vor {{count}} Min.",
+    "hours_ago": "vor {{count}} Std.",
+    "days_ago": "vor {{count}} Tg.",
+    "download_arrow": "↓ {{bytes}}",
+    "upload_arrow": "↑ {{bytes}}",
+    "back_to_dashboard": "← Zurück zum Dashboard"
+  },
+  "strength": {
+    "strong": "Stark",
+    "medium": "Mittel",
+    "weak": "Schwach"
+  },
+  "btn": {
+    "back": "Zurück",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "back_to_dashboard": "Zurück zum Dashboard"
+  }
+}
