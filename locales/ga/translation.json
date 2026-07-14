@@ -1,0 +1,378 @@
+{
+  "brand": {
+    "name": "WireGuard-WUI"
+  },
+  "nav": {
+    "dashboard": "Painéal",
+    "interfaces": "Comhéadain",
+    "peers": "Piaraí",
+    "sudo_active": "Sudo",
+    "sudo_inactive": "Sudo",
+    "logout": "Logáil amach",
+    "login": "Logáil isteach"
+  },
+  "alert": {
+    "sudo_password": {
+      "link": "Socraigh an pasfhocal sudo",
+      "description": "chun brath comhéadain agus bainistíocht rialacha ródaithe a chumasú."
+    }
+  },
+  "footer": {
+    "copyright": "WireGuard-WUI — GPL v3 — {{year}}"
+  },
+  "auth": {
+    "login": {
+      "title": "Logáil isteach",
+      "subtitle": "Comhéadan bainistíochta WireGuard — Bainistigh do chomhéadain VPN agus a bpiaraí go héasca.",
+      "email_label": "Ríomhphost",
+      "email_placeholder": "admin@wireguard.local",
+      "password_label": "Pasfhocal",
+      "password_placeholder": "••••••••",
+      "submit": "Logáil isteach"
+    },
+    "setup": {
+      "title": "Socrú",
+      "welcome": "Fáilte",
+      "description": "Is comhéadan bainistíochta é WireGuard-WUI do do fhreastalaí VPN WireGuard.",
+      "prompt": "Cruthaigh cuntas riaracháin chun rochtain ar an uirlis a dhaingniú.",
+      "first_name_label": "Ainm",
+      "first_name_placeholder": "Seán",
+      "last_name_label": "Sloinne",
+      "last_name_placeholder": "Ó Murchú",
+      "email_label": "Ríomhphost",
+      "email_placeholder": "sean@example.com",
+      "password_label": "Pasfhocal",
+      "password_help": "Íosmhéid 8 carachtar.",
+      "submit": "Cruthaigh cuntas riaracháin"
+    },
+    "totp": {
+      "title": "Fíordheimhniú",
+      "description": "Cuir isteach an cód 6 dhigit a ghineann d'aip fíordheimhniúcháin.",
+      "code_label": "Cód fíordheimhniúcháin",
+      "code_placeholder": "000000",
+      "submit": "Fíoraigh"
+    },
+    "sudo": {
+      "title": "Pasfhocal sudo",
+      "description": "Teastaíonn an pasfhocal sudo ó WireGuard-WUI chun orduithe WireGuard a rith.",
+      "password_label": "Pasfhocal sudo",
+      "btn_update": "Nuashonraigh",
+      "btn_clear": "Glan pasfhocal",
+      "btn_validate": "Cuir isteach"
+    }
+  },
+  "dashboard": {
+    "title": "Painéal",
+    "stat": {
+      "active_interfaces": "Comhéadain ghníomhacha",
+      "connected_peers": "Piaraí ceangailte",
+      "download": "Íoslódáil",
+      "upload": "Uaslódáil",
+      "latest_handshake": "Croitheadh láimhe is déanaí"
+    },
+    "section": {
+      "interfaces": "Comhéadain",
+      "routing": "Ródú"
+    },
+    "table": {
+      "interface": "Comhéadan",
+      "status": "Stádas",
+      "port": "Port",
+      "peers": "Piaraí",
+      "latest_handshake": "Croitheadh láimhe is déanaí",
+      "actions": "Gníomhartha"
+    },
+    "unit": {
+      "byte": "B",
+      "kilobyte": "KB",
+      "megabyte": "MB",
+      "gigabyte": "GB",
+      "terabyte": "TB"
+    },
+    "badge": {
+      "active": "Gníomhach",
+      "inactive": "Neamhghníomhach"
+    },
+    "btn": {
+      "manage": "Bainistigh",
+      "peers": "Piaraí",
+      "create_interface": "Cruthaigh comhéadan"
+    },
+    "routing": {
+      "ok": "✓ {{count}} comhéadan(comhéadain) ródaithe i gceart",
+      "ko": "✗ {{count}} neamhchumraithe",
+      "na": "— {{count}} dosheiceáilte",
+      "no_info": "Níl faisnéis ródaithe ar fáil.",
+      "status_ok": "✅ Ceart go leor",
+      "status_not_configured": "❌ Neamhchumraithe",
+      "status_not_checkable": "— Dosheiceáilte"
+    },
+    "no_interfaces": "Níl aon chomhéadain WireGuard cumraithe."
+  },
+  "error": {
+    "404": {
+      "title": "404 — Leathanach gan aimsiú",
+      "message": "Níl an leathanach a iarradh ann."
+    },
+    "500": {
+      "title": "500 — Earráid fhreastalaí",
+      "message": "Tharla earráid gan choinne.",
+      "retry": "Bain triail eile as le do thoil. Má leanann an fhadhb ar aghaidh, seiceáil logaí an fhreastalaí."
+    },
+    "generic": "Earráid: {{message}}",
+    "invalid_interface_id": "ID comhéadain neamhbhailí.",
+    "interface_not_found": "Comhéadan gan aimsiú.",
+    "interface_name_format": "Caithfidh ainm an chomhéadain an fhormáid wg0, wg1, srl. a leanúint.",
+    "ip_cidr_format": "Caithfidh an seoladh IP a bheith i bhformáid CIDR (m.sh. 10.0.0.1/24).",
+    "port_range": "Caithfidh an port a bheith ina uimhir idir 1 agus 65535.",
+    "interface_exists": "Tá an comhéadan \"{{nom}}\" ann cheana féin.",
+    "key_generation_failed": "Cruthaíodh an comhéadan \"{{nom}}\" sa bhunachar sonraí ach theip ar ghiniúint eochracha (wg genkey). Seiceáil go bhfuil WireGuard suiteáilte.",
+    "wireguard_start_failed": "Cruthaíodh an comhéadan sa bhunachar sonraí ach earráid WireGuard: {{message}}. Seiceáil go bhfuil wg/wg-quick suiteáilte agus sudo cumraithe.",
+    "config_apply_failed": "Earráid agus an chumraíocht á cur i bhfeidhm: {{message}}. Cuireadh na hathruithe ar ais.",
+    "cannot_delete_interface_with_peers": "Ní féidir an comhéadan \"{{nom}}\" a scriosadh: tá piaraí fós ceangailte leis. Bain gach piara den chomhéadan seo ar dtús.",
+    "delete_failed": "Earráid agus é á scriosadh: {{message}}",
+    "invalid_peer_id": "ID piara neamhbhailí.",
+    "peer_not_found": "Piara gan aimsiú.",
+    "peer_required_fields": "Tá comhéadan, ainm agus seoladh IP riachtanach.",
+    "ipv4_format": "Caithfidh an seoladh IP a bheith i bhformáid IPv4 (m.sh. 10.0.0.2).",
+    "allowed_ips_cidr_format": "Caithfidh IPanna ceadaithe a bheith i bhformáid CIDR (m.sh. 0.0.0.0/0).",
+    "dns_ipv4": "Caithfidh an DNS a bheith ina sheoladh IPv4 bailí.",
+    "peer_ip_duplicate": "Tá piara leis an seoladh IP {{ip}} ann cheana féin ar an gcomhéadan seo.",
+    "peer_keygen_failed": "Cruthaíodh an piara \"{{nom}}\" sa bhunachar sonraí ach theip ar ghiniúint eochracha (wg genkey). Seiceáil go bhfuil WireGuard suiteáilte.",
+    "peer_wireguard_failed": "Cruthaíodh an piara sa bhunachar sonraí ach earráid WireGuard: {{message}}. Seiceáil go bhfuil an comhéadan gníomhach agus sudo cumraithe.",
+    "name_ip_required": "Tá ainm agus seoladh IP riachtanach.",
+    "ip_already_used": "Tá an seoladh IP {{ip}} in úsáid cheana féin ar an gcomhéadan seo.",
+    "peer_config_apply_failed": "Earráid agus an chumraíocht á cur i bhfeidhm: {{message}}. Cuireadh na hathruithe ar ais.",
+    "enter_email_password": "Cuir isteach do ríomhphost agus do phasfhocal le do thoil.",
+    "invalid_credentials": "Dintiúir neamhbhailí.",
+    "enter_auth_code": "Cuir isteach an cód fíordheimhniúcháin le do thoil.",
+    "invalid_2fa_config": "Cumraíocht 2FA neamhbhailí.",
+    "invalid_code": "Cód neamhbhailí. Bain triail eile as le do thoil.",
+    "first_name_last_name_required": "Tá ainm agus sloinne riachtanach.",
+    "invalid_email": "Ríomhphost neamhbhailí.",
+    "email_already_used": "Tá an ríomhphost seo in úsáid cheana féin.",
+    "new_password_min_length": "Caithfidh an pasfhocal nua a bheith 8 gcarachtar ar a laghad.",
+    "password_confirmation_mismatch": "Ní réitíonn deimhniú an phasfhocail.",
+    "password_too_weak": "Tá an pasfhocal ró-lag. Úsáid ceannlitreacha, litreacha beaga, uimhreacha agus carachtair speisialta le haghaidh pasfhocal níos faide (eantrópacht ≥ 60 giotán).",
+    "current_password_incorrect": "Tá an pasfhocal reatha mícheart.",
+    "no_pending_key": "Níl aon eochair ar feitheamh. Tosaigh arís le do thoil.",
+    "enter_current_password": "Cuir isteach do phasfhocal reatha le do thoil.",
+    "incorrect_password": "Pasfhocal mícheart.",
+    "too_many_attempts": "An iomarca iarrachtaí. Bain triail eile as i gceann 15 nóiméad.",
+    "all_fields_required": "Tá gach réimse riachtanach (pasfhocal 8 gcarachtar ar a laghad).",
+    "account_creation_failed": "Earráid agus an cuntas á chruthú.",
+    "password_required": "Tá pasfhocal riachtanach.",
+    "define_sudo_password_first": "Socraigh an pasfhocal sudo ar dtús le do thoil.",
+    "invalid_session": "Seisiún neamhbhailí. Bain triail eile as le do thoil.",
+    "sudo_password_not_set": "Níl pasfhocal sudo socraithe",
+    "sudo_command_not_allowed": "Ordú sudo neamhúdaraithe.",
+    "sudo_password_incorrect": "Pasfhocal sudo mícheart. Téigh chuig /auth/sudo-password chun é a cheartú.",
+    "import_failed": "Theip ar an iompórtáil: {{message}}",
+    "detection_failed": "Earráid braite: {{message}}",
+    "invalid_interface_name": "Ainm comhéadain neamhbhailí.",
+    "no_interface_selected": "Níor roghnaíodh aon chomhéadan.",
+    "qrcode_not_available": "Níl an Cód QR ar fáil. Suiteáil le: npm install qrcode",
+    "qrcode_generation_failed": "Earráid agus an Cód QR á ghiniúint."
+  },
+  "success": {
+    "login_welcome": "D'éirigh leis an logáil isteach. Fáilte!",
+    "profile_updated": "Próifíl nuashonraithe.",
+    "debug_mode_enabled": "Mód dífhabhtaithe cumasaithe.",
+    "debug_mode_disabled": "Mód dífhabhtaithe díchumasaithe.",
+    "2fa_enabled": "Fíordheimhniú dhá fhachtóir cumasaithe.",
+    "2fa_disabled": "Fíordheimhniú dhá fhachtóir díchumasaithe.",
+    "account_created": "Cuntas riaracháin cruthaithe. Fáilte!",
+    "sudo_password_saved": "Pasfhocal sudo sábháilte.",
+    "sudo_password_cleared": "Pasfhocal sudo glanta.",
+    "interface_initialized": "Tosaíodh agus cuireadh tús leis an gcomhéadan \"{{nom}}\" go rathúil.",
+    "interface_stopped": "Stopadh an comhéadan \"{{nom}}\".",
+    "interface_started": "Cuireadh tús leis an gcomhéadan \"{{nom}}\".",
+    "interface_updated": "Nuashonraíodh an comhéadan \"{{nom}}\".",
+    "interface_deleted": "Scriosadh an comhéadan \"{{nom}}\".",
+    "interface_imported": "Iompórtáladh an comhéadan \"{{nom}}\" go rathúil.",
+    "peers_imported_from": "Iompórtáladh {{count}} phiara ó \"{{nom}}\".",
+    "no_new_interfaces": "Níor braitheadh aon chomhéadain nó piaraí nua.",
+    "detection_complete": "Braith críochnaithe: {{details}}.",
+    "peer_created": "Cuireadh an piara \"{{nom}}\" leis go rathúil.",
+    "peer_updated": "Nuashonraíodh an piara \"{{nom}}\".",
+    "peer_deleted": "Scriosadh an piara \"{{nom}}\".",
+    "peers_detected": "Iompórtáladh {{count}} phiara ó \"{{nom}}\".",
+    "no_new_peers": "Níor braitheadh aon phiaraí nua."
+  },
+  "profile": {
+    "title": "Mo phróifíl",
+    "back_to_dashboard": "← Ar ais go dtí an painéal",
+    "personal_info": {
+      "title": "Faisnéis phearsanta",
+      "first_name": "Ainm",
+      "last_name": "Sloinne",
+      "email": "Ríomhphost",
+      "btn_save": "Sábháil"
+    },
+    "password": {
+      "title": "Pasfhocal",
+      "complexity_label": "Éiligh pasfhocal láidir",
+      "current_label": "Pasfhocal reatha",
+      "current_placeholder": "Riachtanach chun athrú",
+      "new_label": "Pasfhocal nua",
+      "new_placeholder": "8 gcarachtar ar a laghad",
+      "confirm_label": "Deimhnigh pasfhocal",
+      "confirm_placeholder": "Cuir isteach an pasfhocal nua arís",
+      "btn_change": "Athraigh pasfhocal",
+      "strength_label": "Neart",
+      "show": "Taispeáin"
+    },
+    "twofactor": {
+      "title": "Fíordheimhniú dhá fhachtóir",
+      "enabled": "Cumasaithe",
+      "disabled": "Díchumasaithe",
+      "disable_description": "Cuireann fíordheimhniú dhá fhachtóir le slándáil do chuntais. Cuir isteach do phasfhocal chun é a dhíchumasú.",
+      "enable_description": "Cuir sraith bhreise slándála leis trí fhíordheimhniú dhá fhachtóir a chumasú. Beidh ort cód 6 dhigit ó d'aip fíordheimhniúcháin a chur isteach tar éis do phasfhocail.",
+      "current_password_label": "Pasfhocal reatha",
+      "btn_disable": "Díchumasaigh 2FA",
+      "btn_setup": "Cumraigh 2FA"
+    },
+    "admin": {
+      "title": "Riarachán",
+      "debug_description": "Cumasaigh an mód dífhabhtaithe chun gach oibríocht mhionsonraithe a thaifeadadh i logs/app.log.",
+      "debug_mode": "Mód dífhabhtaithe"
+    }
+  },
+  "totp_setup": {
+    "title": "Cumraigh fíordheimhniú dhá fhachtóir",
+    "scan_description": "Scan an Cód QR seo le d'aip fíordheimhniúcháin (Google Authenticator, Authy, srl.) nó cuir isteach an eochair de láimh.",
+    "manual_label": "Nó cuir isteach an eochair seo de láimh:",
+    "code_label": "Cód bailíochtaithe",
+    "code_placeholder": "000000",
+    "btn_enable": "Cumasaigh",
+    "btn_cancel": "Cealaigh"
+  },
+  "interface": {
+    "title": "Comhéadan WireGuard",
+    "system_detected": "Comhéadain chórais braite",
+    "import_description": "Tá na comhéadain seo a leanas ann in /etc/wireguard/ ach níl siad sa bhunachar sonraí go fóill. Iompórtáil iad chun iad a bhainistiú ón gcomhéadan gréasáin.",
+    "btn_import": "Iompórtáil {{nom}}",
+    "init_header": "Tosaigh comhéadan",
+    "init_description": "Cumraigh do chomhéadan WireGuard. Gineofar eochracha go huathoibríoch.",
+    "name_label": "Ainm an chomhéadain",
+    "name_help": "Formáid: wg0, wg1, wg2…",
+    "ip_label": "Seoladh IP",
+    "port_label": "Port éisteachta",
+    "port_help": "Ná déan dearmad an port seo a oscailt ar do ródaire (dírbhealú poirt) le haghaidh naisc chianda.",
+    "endpoint_label": "Críochphointe (roghnach)",
+    "endpoint_placeholder": "do-fhearann.com",
+    "endpoint_help_full": "Seoladh poiblí (IP nó fearann) le haghaidh rochtain sheachtraí. Cuirtear an port leis go huathoibríoch. Má tá sé folamh, úsáidtear IP an tolláin.",
+    "endpoint_help_short": "Seoladh poiblí (IP nó fearann) le haghaidh rochtain sheachtraí. Cuirtear an port leis go huathoibríoch.",
+    "unit_iface": "{{count}} chomhéadan",
+    "unit_iface_plural": "{{count}} comhéadan",
+    "unit_peer": "{{count}} phiara",
+    "unit_peer_plural": "{{count}} piaraí",
+    "btn_init": "Tosaigh comhéadan",
+    "btn_new": "+ Comhéadan nua",
+    "btn_detect": "Braith",
+    "btn_initialize_short": "Tosaigh",
+    "table": {
+      "ip": "Seoladh IP",
+      "port": "Port",
+      "endpoint": "Críochphointe",
+      "public_key": "Eochair phoiblí",
+      "connected_peers": "Piaraí ceangailte",
+      "download": "Íoslódáil",
+      "upload": "Uaslódáil"
+    },
+    "routing_not_configured": "Ródú neamhchumraithe.",
+    "routing_impact": "Ní bheidh piaraí ceangailte in ann rochtain a fháil ar an líonra.",
+    "btn_view_commands": "Féach orduithe",
+    "label_iptables": "Orduithe iptables:",
+    "label_firewall_alternative": "Nó le {{type}} (rogha eile):",
+    "btn_edit": "Cuir in eagar",
+    "btn_stop": "Stop",
+    "btn_start": "Tosaigh",
+    "btn_delete": "Scrios",
+    "btn_peers": "Piaraí",
+    "confirm_delete": "An comhéadan {{nom}} a scriosadh? Ní féidir an gníomh seo a chur ar ceal.",
+    "modal_edit_title": "Cuir {{nom}} in eagar",
+    "modal_btn_cancel": "Cealaigh",
+    "modal_btn_save": "Sábháil"
+  },
+  "peers": {
+    "title": "Piaraí",
+    "no_interface_alert": "Níl aon chomhéadain WireGuard cumraithe.",
+    "create_interface_link": "Cruthaigh comhéadan",
+    "no_interface_alert_suffix": "ar dtús.",
+    "btn_add": "+ Cuir piara leis",
+    "btn_detect": "Braith",
+    "add_header": "Cuir piara leis",
+    "name_label": "Ainm",
+    "name_placeholder": "Fón Alice",
+    "ip_label": "Seoladh IP",
+    "allowed_ips_label": "IPanna ceadaithe",
+    "ip_help": "Seoladh IP an phiara ar an líonra VPN (sannta laistigh den tollán).",
+    "allowed_ips_help": "Trácht atreoraithe chuig an VPN. 0.0.0.0/0 = an trácht ar fad (tollán iomlán). Socraigh fo-líonra an fhreastalaí don tollán scoilte (m.sh. 10.0.0.0/24).",
+    "allowed_ips_help_short": "Trácht atreoraithe chuig an VPN. 0.0.0.0/0 = an trácht ar fad, nó fo-líonra ar leith.",
+    "dns_label": "DNS",
+    "dns_help": "Úsáid IP an chomhéadain VPN má fheidhmíonn an freastalaí mar réiteoir DNS.",
+    "keepalive_label": "Keepalive marthanach",
+    "btn_create": "Cruthaigh piara",
+    "ip_help_short": "Seoladh IP an phiara ar an líonra VPN.",
+    "table": {
+      "name": "Ainm",
+      "ip": "Seoladh IP",
+      "allowed_ips": "IPanna ceadaithe",
+      "handshake": "Croitheadh láimhe",
+      "transfer": "Aistriú",
+      "status": "Stádas",
+      "actions": "Gníomhartha"
+    },
+    "never": "riamh",
+    "connected": "Ceangailte",
+    "inactive": "Neamhghníomhach",
+    "btn_config": ".conf",
+    "btn_qr": "QR",
+    "btn_edit": "Cuir in eagar",
+    "btn_delete": "Scrios",
+    "confirm_delete": "An piara {{nom}} a scriosadh?",
+    "no_peers_alert": "Níl aon phiaraí ar an gcomhéadan {{nom}}. Cuir ceann leis leis an gcnaipe thuas.",
+    "modal_edit_title": "Cuir {{nom}} in eagar",
+    "modal_btn_cancel": "Cealaigh",
+    "modal_btn_save": "Sábháil"
+  },
+  "qrcode": {
+    "title": "Cód QR — {{nom}}",
+    "description": "Scan an Cód QR seo leis an aip WireGuard chun an piara seo a chur leis.",
+    "btn_back": "Ar ais"
+  },
+  "badge": {
+    "enabled": "Cumasaithe",
+    "disabled": "Díchumasaithe",
+    "active": "Gníomhach",
+    "inactive": "Neamhghníomhach",
+    "connected": "Ceangailte"
+  },
+  "text": {
+    "dash": "—",
+    "never": "riamh",
+    "zero_bytes": "0 B",
+    "just_now": "díreach anois",
+    "seconds_ago": "cúpla soicind ó shin",
+    "minutes_ago": "{{count}} nóim. ó shin",
+    "hours_ago": "{{count}} u. ó shin",
+    "days_ago": "{{count}} l. ó shin",
+    "download_arrow": "↓ {{bytes}}",
+    "upload_arrow": "↑ {{bytes}}",
+    "back_to_dashboard": "← Ar ais go dtí an painéal"
+  },
+  "strength": {
+    "strong": "Láidir",
+    "medium": "Meánach",
+    "weak": "Lag"
+  },
+  "btn": {
+    "back": "Ar ais",
+    "cancel": "Cealaigh",
+    "save": "Sábháil",
+    "edit": "Cuir in eagar",
+    "delete": "Scrios",
+    "back_to_dashboard": "Ar ais go dtí an painéal"
+  }
+}

@@ -1,0 +1,378 @@
+{
+  "brand": {
+    "name": "WireGuard-WUI"
+  },
+  "nav": {
+    "dashboard": "Painel",
+    "interfaces": "Interfaces",
+    "peers": "Pares",
+    "sudo_active": "Sudo",
+    "sudo_inactive": "Sudo",
+    "logout": "Sair",
+    "login": "Entrar"
+  },
+  "alert": {
+    "sudo_password": {
+      "link": "Definir a senha sudo",
+      "description": "para habilitar a detecção de interfaces e a gestão de regras de roteamento."
+    }
+  },
+  "footer": {
+    "copyright": "WireGuard-WUI — GPL v3 — {{year}}"
+  },
+  "auth": {
+    "login": {
+      "title": "Entrar",
+      "subtitle": "Interface de gestão do WireGuard — Gerencie suas interfaces VPN e seus pares facilmente.",
+      "email_label": "E-mail",
+      "email_placeholder": "admin@wireguard.local",
+      "password_label": "Senha",
+      "password_placeholder": "••••••••",
+      "submit": "Entrar"
+    },
+    "setup": {
+      "title": "Configuração",
+      "welcome": "Bem-vindo",
+      "description": "WireGuard-WUI é uma interface de gestão para o seu servidor VPN WireGuard.",
+      "prompt": "Crie uma conta de administrador para proteger o acesso à ferramenta.",
+      "first_name_label": "Nome",
+      "first_name_placeholder": "João",
+      "last_name_label": "Sobrenome",
+      "last_name_placeholder": "Silva",
+      "email_label": "E-mail",
+      "email_placeholder": "joao@example.com",
+      "password_label": "Senha",
+      "password_help": "Mínimo de 8 caracteres.",
+      "submit": "Criar conta de administrador"
+    },
+    "totp": {
+      "title": "Autenticação",
+      "description": "Digite o código de 6 dígitos gerado pelo seu aplicativo de autenticação.",
+      "code_label": "Código de autenticação",
+      "code_placeholder": "000000",
+      "submit": "Verificar"
+    },
+    "sudo": {
+      "title": "Senha sudo",
+      "description": "O WireGuard-WUI precisa da senha sudo para executar comandos do WireGuard.",
+      "password_label": "Senha sudo",
+      "btn_update": "Atualizar",
+      "btn_clear": "Limpar senha",
+      "btn_validate": "Enviar"
+    }
+  },
+  "dashboard": {
+    "title": "Painel",
+    "stat": {
+      "active_interfaces": "Interfaces ativas",
+      "connected_peers": "Pares conectados",
+      "download": "Download",
+      "upload": "Upload",
+      "latest_handshake": "Último handshake"
+    },
+    "section": {
+      "interfaces": "Interfaces",
+      "routing": "Roteamento"
+    },
+    "table": {
+      "interface": "Interface",
+      "status": "Status",
+      "port": "Porta",
+      "peers": "Pares",
+      "latest_handshake": "Último handshake",
+      "actions": "Ações"
+    },
+    "unit": {
+      "byte": "B",
+      "kilobyte": "KB",
+      "megabyte": "MB",
+      "gigabyte": "GB",
+      "terabyte": "TB"
+    },
+    "badge": {
+      "active": "Ativo",
+      "inactive": "Inativo"
+    },
+    "btn": {
+      "manage": "Gerenciar",
+      "peers": "Pares",
+      "create_interface": "Criar uma interface"
+    },
+    "routing": {
+      "ok": "✓ {{count}} interface(s) corretamente roteada(s)",
+      "ko": "✗ {{count}} não configurada(s)",
+      "na": "— {{count}} não verificável(is)",
+      "no_info": "Nenhuma informação de roteamento disponível.",
+      "status_ok": "✅ OK",
+      "status_not_configured": "❌ Não configurado",
+      "status_not_checkable": "— Não verificável"
+    },
+    "no_interfaces": "Nenhuma interface WireGuard configurada."
+  },
+  "error": {
+    "404": {
+      "title": "404 — Página não encontrada",
+      "message": "A página solicitada não existe."
+    },
+    "500": {
+      "title": "500 — Erro no servidor",
+      "message": "Ocorreu um erro inesperado.",
+      "retry": "Por favor, tente novamente. Se o problema persistir, verifique os logs do servidor."
+    },
+    "generic": "Erro: {{message}}",
+    "invalid_interface_id": "ID de interface inválido.",
+    "interface_not_found": "Interface não encontrada.",
+    "interface_name_format": "O nome da interface deve seguir o formato wg0, wg1, etc.",
+    "ip_cidr_format": "O endereço IP deve estar no formato CIDR (ex. 10.0.0.1/24).",
+    "port_range": "A porta deve ser um número entre 1 e 65535.",
+    "interface_exists": "A interface \"{{nom}}\" já existe.",
+    "key_generation_failed": "Interface \"{{nom}}\" criada no banco de dados, mas a geração de chaves falhou (wg genkey). Verifique se o WireGuard está instalado.",
+    "wireguard_start_failed": "Interface criada no banco de dados, mas erro do WireGuard: {{message}}. Verifique se wg/wg-quick estão instalados e o sudo está configurado.",
+    "config_apply_failed": "Erro ao aplicar a configuração: {{message}}. As alterações foram revertidas.",
+    "cannot_delete_interface_with_peers": "Não é possível excluir a interface \"{{nom}}\": ainda há pares associados a ela. Remova primeiro todos os pares desta interface.",
+    "delete_failed": "Erro ao excluir: {{message}}",
+    "invalid_peer_id": "ID de par inválido.",
+    "peer_not_found": "Par não encontrado.",
+    "peer_required_fields": "Interface, nome e endereço IP são obrigatórios.",
+    "ipv4_format": "O endereço IP deve estar no formato IPv4 (ex. 10.0.0.2).",
+    "allowed_ips_cidr_format": "Os IPs permitidos devem estar no formato CIDR (ex. 0.0.0.0/0).",
+    "dns_ipv4": "O DNS deve ser um endereço IPv4 válido.",
+    "peer_ip_duplicate": "Já existe um par com o endereço IP {{ip}} nesta interface.",
+    "peer_keygen_failed": "Par \"{{nom}}\" criado no banco de dados, mas a geração de chaves falhou (wg genkey). Verifique se o WireGuard está instalado.",
+    "peer_wireguard_failed": "Par criado no banco de dados, mas erro do WireGuard: {{message}}. Verifique se a interface está ativa e o sudo está configurado.",
+    "name_ip_required": "Nome e endereço IP são obrigatórios.",
+    "ip_already_used": "O endereço IP {{ip}} já está em uso nesta interface.",
+    "peer_config_apply_failed": "Erro ao aplicar a configuração: {{message}}. Alterações revertidas.",
+    "enter_email_password": "Por favor, insira seu e-mail e senha.",
+    "invalid_credentials": "Credenciais inválidas.",
+    "enter_auth_code": "Por favor, insira o código de autenticação.",
+    "invalid_2fa_config": "Configuração 2FA inválida.",
+    "invalid_code": "Código inválido. Tente novamente.",
+    "first_name_last_name_required": "Nome e sobrenome são obrigatórios.",
+    "invalid_email": "E-mail inválido.",
+    "email_already_used": "Este e-mail já está em uso.",
+    "new_password_min_length": "A nova senha deve ter pelo menos 8 caracteres.",
+    "password_confirmation_mismatch": "A confirmação de senha não corresponde.",
+    "password_too_weak": "A senha é muito fraca. Use maiúsculas, minúsculas, números e caracteres especiais para uma senha mais longa (entropia ≥ 60 bits).",
+    "current_password_incorrect": "A senha atual está incorreta.",
+    "no_pending_key": "Nenhuma chave pendente. Por favor, comece novamente.",
+    "enter_current_password": "Por favor, insira sua senha atual.",
+    "incorrect_password": "Senha incorreta.",
+    "too_many_attempts": "Muitas tentativas. Tente novamente em 15 minutos.",
+    "all_fields_required": "Todos os campos são obrigatórios (senha com no mínimo 8 caracteres).",
+    "account_creation_failed": "Erro ao criar a conta.",
+    "password_required": "A senha é obrigatória.",
+    "define_sudo_password_first": "Por favor, defina primeiro a senha sudo.",
+    "invalid_session": "Sessão inválida. Por favor, tente novamente.",
+    "sudo_password_not_set": "Senha sudo não definida",
+    "sudo_command_not_allowed": "Comando sudo não autorizado.",
+    "sudo_password_incorrect": "Senha sudo incorreta. Acesse /auth/sudo-password para corrigi-la.",
+    "import_failed": "Falha na importação: {{message}}",
+    "detection_failed": "Erro de detecção: {{message}}",
+    "invalid_interface_name": "Nome de interface inválido.",
+    "no_interface_selected": "Nenhuma interface selecionada.",
+    "qrcode_not_available": "QR Code não disponível. Instale com: npm install qrcode",
+    "qrcode_generation_failed": "Erro ao gerar o QR Code."
+  },
+  "success": {
+    "login_welcome": "Login realizado com sucesso. Bem-vindo!",
+    "profile_updated": "Perfil atualizado.",
+    "debug_mode_enabled": "Modo de depuração ativado.",
+    "debug_mode_disabled": "Modo de depuração desativado.",
+    "2fa_enabled": "Autenticação de dois fatores ativada.",
+    "2fa_disabled": "Autenticação de dois fatores desativada.",
+    "account_created": "Conta de administrador criada. Bem-vindo!",
+    "sudo_password_saved": "Senha sudo salva.",
+    "sudo_password_cleared": "Senha sudo limpa.",
+    "interface_initialized": "Interface \"{{nom}}\" inicializada e iniciada com sucesso.",
+    "interface_stopped": "Interface \"{{nom}}\" parada.",
+    "interface_started": "Interface \"{{nom}}\" iniciada.",
+    "interface_updated": "Interface \"{{nom}}\" atualizada.",
+    "interface_deleted": "Interface \"{{nom}}\" excluída.",
+    "interface_imported": "Interface \"{{nom}}\" importada com sucesso.",
+    "peers_imported_from": "{{count}} par(es) importado(s) de \"{{nom}}\".",
+    "no_new_interfaces": "Nenhuma nova interface ou par detectado.",
+    "detection_complete": "Detecção concluída: {{details}}.",
+    "peer_created": "Par \"{{nom}}\" adicionado com sucesso.",
+    "peer_updated": "Par \"{{nom}}\" atualizado.",
+    "peer_deleted": "Par \"{{nom}}\" excluído.",
+    "peers_detected": "{{count}} par(es) importado(s) de \"{{nom}}\".",
+    "no_new_peers": "Nenhum novo par detectado."
+  },
+  "profile": {
+    "title": "Meu perfil",
+    "back_to_dashboard": "← Voltar ao painel",
+    "personal_info": {
+      "title": "Informações pessoais",
+      "first_name": "Nome",
+      "last_name": "Sobrenome",
+      "email": "E-mail",
+      "btn_save": "Salvar"
+    },
+    "password": {
+      "title": "Senha",
+      "complexity_label": "Exigir senha forte",
+      "current_label": "Senha atual",
+      "current_placeholder": "Necessária para alterar",
+      "new_label": "Nova senha",
+      "new_placeholder": "Mínimo 8 caracteres",
+      "confirm_label": "Confirmar senha",
+      "confirm_placeholder": "Digite novamente a nova senha",
+      "btn_change": "Alterar senha",
+      "strength_label": "Força",
+      "show": "Mostrar"
+    },
+    "twofactor": {
+      "title": "Autenticação de dois fatores",
+      "enabled": "Ativada",
+      "disabled": "Desativada",
+      "disable_description": "A autenticação de dois fatores aumenta a segurança da sua conta. Digite sua senha para desativá-la.",
+      "enable_description": "Adicione uma camada extra de segurança ativando a autenticação de dois fatores. Você precisará digitar um código de 6 dígitos do seu aplicativo de autenticação após a senha.",
+      "current_password_label": "Senha atual",
+      "btn_disable": "Desativar 2FA",
+      "btn_setup": "Configurar 2FA"
+    },
+    "admin": {
+      "title": "Administração",
+      "debug_description": "Ative o modo de depuração para registrar todas as operações detalhadas em logs/app.log.",
+      "debug_mode": "Modo de depuração"
+    }
+  },
+  "totp_setup": {
+    "title": "Configurar autenticação de dois fatores",
+    "scan_description": "Escaneie este QR Code com seu aplicativo de autenticação (Google Authenticator, Authy, etc.) ou digite a chave manualmente.",
+    "manual_label": "Ou digite esta chave manualmente:",
+    "code_label": "Código de validação",
+    "code_placeholder": "000000",
+    "btn_enable": "Ativar",
+    "btn_cancel": "Cancelar"
+  },
+  "interface": {
+    "title": "Interface WireGuard",
+    "system_detected": "Interfaces do sistema detectadas",
+    "import_description": "As interfaces a seguir existem em /etc/wireguard/, mas ainda não estão no banco de dados. Importe-as para gerenciá-las pela interface web.",
+    "btn_import": "Importar {{nom}}",
+    "init_header": "Inicializar uma interface",
+    "init_description": "Configure sua interface WireGuard. As chaves serão geradas automaticamente.",
+    "name_label": "Nome da interface",
+    "name_help": "Formato: wg0, wg1, wg2…",
+    "ip_label": "Endereço IP",
+    "port_label": "Porta de escuta",
+    "port_help": "Não se esqueça de abrir esta porta no seu roteador (redirecionamento de porta) para conexões remotas.",
+    "endpoint_label": "Endpoint (opcional)",
+    "endpoint_placeholder": "seu-dominio.com",
+    "endpoint_help_full": "Endereço público (IP ou domínio) para acesso externo. A porta é adicionada automaticamente. Se vazio, o IP do túnel é usado.",
+    "endpoint_help_short": "Endereço público (IP ou domínio) para acesso externo. A porta é adicionada automaticamente.",
+    "unit_iface": "{{count}} interface",
+    "unit_iface_plural": "{{count}} interfaces",
+    "unit_peer": "{{count}} par",
+    "unit_peer_plural": "{{count}} pares",
+    "btn_init": "Inicializar interface",
+    "btn_new": "+ Nova interface",
+    "btn_detect": "Detectar",
+    "btn_initialize_short": "Inicializar",
+    "table": {
+      "ip": "Endereço IP",
+      "port": "Porta",
+      "endpoint": "Endpoint",
+      "public_key": "Chave pública",
+      "connected_peers": "Pares conectados",
+      "download": "Download",
+      "upload": "Upload"
+    },
+    "routing_not_configured": "Roteamento não configurado.",
+    "routing_impact": "Os pares conectados não conseguirão acessar a rede.",
+    "btn_view_commands": "Ver comandos",
+    "label_iptables": "Comandos iptables:",
+    "label_firewall_alternative": "Ou com {{type}} (alternativa):",
+    "btn_edit": "Editar",
+    "btn_stop": "Parar",
+    "btn_start": "Iniciar",
+    "btn_delete": "Excluir",
+    "btn_peers": "Pares",
+    "confirm_delete": "Excluir a interface {{nom}}? Esta ação é irreversível.",
+    "modal_edit_title": "Editar {{nom}}",
+    "modal_btn_cancel": "Cancelar",
+    "modal_btn_save": "Salvar"
+  },
+  "peers": {
+    "title": "Pares",
+    "no_interface_alert": "Nenhuma interface WireGuard configurada.",
+    "create_interface_link": "Criar uma interface",
+    "no_interface_alert_suffix": "primeiro.",
+    "btn_add": "+ Adicionar um par",
+    "btn_detect": "Detectar",
+    "add_header": "Adicionar um par",
+    "name_label": "Nome",
+    "name_placeholder": "Telefone da Alice",
+    "ip_label": "Endereço IP",
+    "allowed_ips_label": "IPs permitidos",
+    "ip_help": "Endereço IP do par na rede VPN (atribuído dentro do túnel).",
+    "allowed_ips_help": "Tráfego redirecionado para a VPN. 0.0.0.0/0 = todo o tráfego (túnel completo). Defina a sub-rede do servidor para túnel dividido (ex. 10.0.0.0/24).",
+    "allowed_ips_help_short": "Tráfego redirecionado para a VPN. 0.0.0.0/0 = todo o tráfego, ou uma sub-rede específica.",
+    "dns_label": "DNS",
+    "dns_help": "Use o IP da interface VPN se o servidor atuar como resolvedor DNS.",
+    "keepalive_label": "Keepalive persistente",
+    "btn_create": "Criar par",
+    "ip_help_short": "Endereço IP do par na rede VPN.",
+    "table": {
+      "name": "Nome",
+      "ip": "Endereço IP",
+      "allowed_ips": "IPs permitidos",
+      "handshake": "Handshake",
+      "transfer": "Transferência",
+      "status": "Status",
+      "actions": "Ações"
+    },
+    "never": "nunca",
+    "connected": "Conectado",
+    "inactive": "Inativo",
+    "btn_config": ".conf",
+    "btn_qr": "QR",
+    "btn_edit": "Editar",
+    "btn_delete": "Excluir",
+    "confirm_delete": "Excluir o par {{nom}}?",
+    "no_peers_alert": "Nenhum par na interface {{nom}}. Adicione um com o botão acima.",
+    "modal_edit_title": "Editar {{nom}}",
+    "modal_btn_cancel": "Cancelar",
+    "modal_btn_save": "Salvar"
+  },
+  "qrcode": {
+    "title": "QR Code — {{nom}}",
+    "description": "Escaneie este QR Code com o aplicativo WireGuard para adicionar este par.",
+    "btn_back": "Voltar"
+  },
+  "badge": {
+    "enabled": "Ativado",
+    "disabled": "Desativado",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "connected": "Conectado"
+  },
+  "text": {
+    "dash": "—",
+    "never": "nunca",
+    "zero_bytes": "0 B",
+    "just_now": "agora mesmo",
+    "seconds_ago": "há alguns segundos",
+    "minutes_ago": "há {{count}} min",
+    "hours_ago": "há {{count}} h",
+    "days_ago": "há {{count}} d",
+    "download_arrow": "↓ {{bytes}}",
+    "upload_arrow": "↑ {{bytes}}",
+    "back_to_dashboard": "← Voltar ao painel"
+  },
+  "strength": {
+    "strong": "Forte",
+    "medium": "Média",
+    "weak": "Fraca"
+  },
+  "btn": {
+    "back": "Voltar",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "back_to_dashboard": "Voltar ao painel"
+  }
+}
