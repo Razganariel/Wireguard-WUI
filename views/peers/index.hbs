@@ -12,10 +12,13 @@
 
 {{#if hasInterfaces}}
   <div class="row mb-4">
-    <div class="col">
+    <div class="col d-flex gap-2">
       <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#addPeerForm">
         + Ajouter un pair
       </button>
+      <form method="POST" action="/peers/detect" class="d-inline">
+        <button type="submit" class="btn btn-outline-info btn-sm">Détecter</button>
+      </form>
     </div>
   </div>
 

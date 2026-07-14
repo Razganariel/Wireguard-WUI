@@ -73,10 +73,13 @@
 
 {{#if hasInterfaces}}
   <div class="row mb-3">
-    <div class="col">
+    <div class="col d-flex gap-2">
       <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#newInterfaceForm">
         + Nouvelle interface
       </button>
+      <form method="POST" action="/interface/detect" class="d-inline">
+        <button type="submit" class="btn btn-outline-info">Détecter</button>
+      </form>
     </div>
   </div>
 
