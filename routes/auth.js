@@ -3,6 +3,7 @@ const router = express.Router()
 const authController = require('../controllers/auth')
 const { isAuthenticated } = require('../middlewares/auth')
 const { sanitizeRaw } = require('../helpers/sanitize')
+const { encrypt } = require('../helpers/crypto')
 
 router.get('/login', (req, res) => {
   if (req.session && req.session.userId) {
@@ -28,7 +29,7 @@ router.post('/sudo-password', isAuthenticated, (req, res) => {
     req.session.flash = { error: 'Le mot de passe est obligatoire.' }
     return res.redirect('/auth/sudo-password')
   }
-  req.session.sudoPassword = password
+  req.session.sudoPassword = encrypt(password)
   req.session.flash = { success: 'Mot de passe sudo enregistré.' }
   res.redirect('/')
 })
