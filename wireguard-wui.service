@@ -1,0 +1,23 @@
+[Unit]
+Description=WireGuard WUI — Web UI for managing a personal WireGuard VPN server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=wireguard-wui
+Group=wireguard-wui
+WorkingDirectory=/opt/wireguard-wui
+EnvironmentFile=-/opt/wireguard-wui/.env
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=10
+AmbientCapabilities=CAP_NET_ADMIN
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/wireguard-wui/db /opt/wireguard-wui/logs /opt/wireguard-wui/.env
+
+[Install]
+WantedBy=multi-user.target
