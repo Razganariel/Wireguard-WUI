@@ -1,0 +1,38 @@
+<div class="row justify-content-center mt-3">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow">
+      <div class="card-body p-4 text-center">
+        <h4 class="card-title mb-4">Configurer l'authentification à deux facteurs</h4>
+
+        <p class="text-muted mb-3">
+          Scannez ce QR code avec votre application d'authentification (Google Authenticator, Authy, etc.)
+          ou saisissez la clé manuellement.
+        </p>
+
+        {{#if qrDataUrl}}
+          <img src="{{qrDataUrl}}" alt="QR Code" class="img-fluid mb-3" style="max-width: 240px;">
+        {{/if}}
+
+        <div class="mb-3">
+          <p class="mb-1 small text-muted">Ou saisissez cette clé manuellement :</p>
+          <code class="user-select-all" style="font-size: 0.85rem; word-break: break-all;">{{secret}}</code>
+        </div>
+
+        <hr>
+
+        <form method="POST" action="/profile/totp-enable" data-validate>
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
+          <div class="mb-3">
+            <label for="totp_token" class="form-label">Code de validation</label>
+            <input type="text" class="form-control text-center" id="totp_token" name="totp_token"
+              placeholder="000000" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required autofocus>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success">Activer</button>
+            <a href="/profile" class="btn btn-outline-secondary">Annuler</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
