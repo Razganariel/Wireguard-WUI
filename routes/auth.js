@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const authController = require('../controllers/auth')
 const { isAuthenticated } = require('../middlewares/auth')
+const { sanitizeRaw } = require('../helpers/sanitize')
 
 router.get('/login', (req, res) => {
   if (req.session && req.session.userId) {
@@ -22,7 +23,7 @@ router.get('/sudo-password', isAuthenticated, (req, res) => {
 })
 
 router.post('/sudo-password', isAuthenticated, (req, res) => {
-  const { password } = req.body
+  const password = sanitizeRaw(req.body.password, 256)
   if (!password) {
     req.session.flash = { error: 'Le mot de passe est obligatoire.' }
     return res.redirect('/auth/sudo-password')

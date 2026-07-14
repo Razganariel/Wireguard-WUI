@@ -5,6 +5,7 @@ const os = require('os')
 const path = require('path')
 const execAsync = util.promisify(exec)
 const sudo = require('../helpers/sudo')
+const { sanitizeInt, sanitizeCidr, sanitizePort, sanitizeEndpoint, sanitizeInterfaceName } = require('../helpers/sanitize')
 
 const interfaceModel = require('../models/interface')
 const peerModel = require('../models/peer')
@@ -305,25 +306,22 @@ function parseAllDump(stdout) {
 }
 
 async function initInterface(req, res) {
-  const { nom, adresse_ip, port, endpoint } = req.body
+  const nom = sanitizeInterfaceName(req.body.nom)
+  const adresse_ip = sanitizeCidr(req.body.adresse_ip)
+  const portNum = sanitizePort(req.body.port)
+  const endpoint = sanitizeEndpoint(req.body.endpoint)
 
-  if (!nom || !adresse_ip || !port) {
-    req.session.flash = { error: 'Tous les champs sont obligatoires.' }
-    return res.redirect('/interface')
-  }
-
-  if (!/^wg[0-9]+$/.test(nom)) {
+  if (!nom) {
     req.session.flash = { error: 'Le nom de l\'interface doit respecter le format wg0, wg1, etc.' }
     return res.redirect('/interface')
   }
 
-  if (!/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/.test(adresse_ip)) {
+  if (!adresse_ip) {
     req.session.flash = { error: 'L\'adresse IP doit être au format CIDR (ex: 10.0.0.1/24).' }
     return res.redirect('/interface')
   }
 
-  const portNum = parseInt(port, 10)
-  if (isNaN(portNum) || portNum < 1 || portNum > 65535) {
+  if (portNum === null) {
     req.session.flash = { error: 'Le port doit être un nombre entre 1 et 65535.' }
     return res.redirect('/interface')
   }
@@ -350,8 +348,8 @@ async function initInterface(req, res) {
     private_key: privateKey,
     public_key: publicKey,
     adresse_ip,
-    port: parseInt(port, 10),
-    endpoint: endpoint?.trim() || null
+    port: portNum,
+    endpoint
   })
 
   if (!keygenOk) {
@@ -377,7 +375,11 @@ async function initInterface(req, res) {
 }
 
 async function toggleInterface(req, res) {
-  const id = req.params.id
+  const id = sanitizeInt(req.params.id)
+  if (!id) {
+    req.session.flash = { error: 'ID d\'interface invalide.' }
+    return res.redirect('/interface')
+  }
   const iface = interfaceModel.findById(id)
 
   if (!iface) {
@@ -440,7 +442,11 @@ async function syncConfig(nom) {
 }
 
 async function editInterface(req, res) {
-  const id = req.params.id
+  const id = sanitizeInt(req.params.id)
+  if (!id) {
+    req.session.flash = { error: 'ID d\'interface invalide.' }
+    return res.redirect('/interface')
+  }
   const iface = interfaceModel.findById(id)
 
   if (!iface) {
@@ -448,15 +454,16 @@ async function editInterface(req, res) {
     return res.redirect('/interface')
   }
 
-  const { adresse_ip, port, endpoint } = req.body
+  const adresse_ip = sanitizeCidr(req.body.adresse_ip)
+  const portNum = sanitizePort(req.body.port)
+  const endpoint = sanitizeEndpoint(req.body.endpoint)
 
-  if (!adresse_ip || !/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/.test(adresse_ip)) {
+  if (!adresse_ip) {
     req.session.flash = { error: 'L\'adresse IP doit être au format CIDR (ex: 10.0.0.1/24).' }
     return res.redirect('/interface')
   }
 
-  const portNum = parseInt(port, 10)
-  if (!port || isNaN(portNum) || portNum < 1 || portNum > 65535) {
+  if (portNum === null) {
     req.session.flash = { error: 'Le port doit être un nombre entre 1 et 65535.' }
     return res.redirect('/interface')
   }
@@ -466,7 +473,7 @@ async function editInterface(req, res) {
   try {
     iface.adresse_ip = adresse_ip
     iface.port = portNum
-    iface.endpoint = endpoint?.trim() || null
+    iface.endpoint = endpoint
     await writeConfigFile(iface)
 
     if (iface.active) {
@@ -504,7 +511,11 @@ async function editInterface(req, res) {
 }
 
 async function deleteInterface(req, res) {
-  const id = req.params.id
+  const id = sanitizeInt(req.params.id)
+  if (!id) {
+    req.session.flash = { error: 'ID d\'interface invalide.' }
+    return res.redirect('/interface')
+  }
   const iface = interfaceModel.findById(id)
 
   if (!iface) {

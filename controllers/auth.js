@@ -1,8 +1,10 @@
 const bcrypt = require('bcrypt')
 const userModel = require('../models/user')
+const { sanitize, sanitizeEmail } = require('../helpers/sanitize')
 
 async function login(req, res) {
-  const { email, password } = req.body
+  const email = sanitizeEmail(req.body.email)
+  const password = sanitize(req.body.password)
 
   if (!email || !password) {
     req.session.flash = { error: 'Veuillez saisir votre email et votre mot de passe.' }
