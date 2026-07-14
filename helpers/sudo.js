@@ -3,7 +3,7 @@ const util = require('util')
 const execPromise = util.promisify(exec)
 
 const ALLOWED_PREFIXES = [
-  'wg-quick ', 'wg show ', 'wg syncconf ', 'wg set ', 'wg pubkey',
+  'wg-quick ', 'wg show ', 'wg syncconf ', 'wg set ', 'wg pubkey ',
   'iptables ', 'ip link ',
   'firewall-cmd ',
   'cp ', 'chmod ', 'rm ', 'cat ', 'find '

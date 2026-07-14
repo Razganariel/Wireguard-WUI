@@ -285,6 +285,10 @@ async function downloadConfig(req, res) {
   }
 
   const iface = interfaceModel.findById(peer.interface_id)
+  if (!iface) {
+    req.session.flash = { error: 'Interface introuvable.' }
+    return res.redirect('/peers')
+  }
   const config = buildClientConfig(peer, iface)
   const filename = `${peer.nom}.conf`
 
