@@ -1,7 +1,5 @@
-<div class="row mb-4">
-  <div class="col">
-    <h1>Pairs <small class="text-muted fs-5">{{selectedInterfaceName}}</small></h1>
-  </div>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="mb-0">Pairs</h1>
 </div>
 
 {{#unless hasInterfaces}}
@@ -11,6 +9,16 @@
 {{/unless}}
 
 {{#if hasInterfaces}}
+<ul class="nav nav-pills mb-4">
+  {{#each interfaceList}}
+    <li class="nav-item">
+      <a class="nav-link {{#if (eq ../selectedInterface id)}}active{{/if}}" href="/peers?interface={{id}}">
+        {{nom}}
+        <span class="badge {{#if active}}bg-success{{else}}bg-secondary{{/if}} ms-1">{{peerCount}}</span>
+      </a>
+    </li>
+  {{/each}}
+</ul>
   <div class="row mb-4">
     <div class="col d-flex gap-2">
       <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#addPeerForm">
