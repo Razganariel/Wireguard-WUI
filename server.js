@@ -10,6 +10,7 @@ const interfaceModel = require('./models/interface')
 const peerModel = require('./models/peer')
 const interfaceController = require('./controllers/interface')
 const sudo = require('./helpers/sudo')
+const csrfMiddleware = require('./middlewares/csrf')
 const authRoutes = require('./routes/auth')
 const interfaceRoutes = require('./routes/interface')
 const peersRoutes = require('./routes/peers')
@@ -29,10 +30,12 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: { maxAge: 1000 * 60 * 60 * 24 }
   })
 )
+
+app.use(csrfMiddleware)
 
 app.use((req, res, next) => {
   res.locals.currentPath = req.path
