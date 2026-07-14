@@ -5,10 +5,10 @@
         <h4 class="card-title mb-3">{{peerName}}</h4>
         <img src="{{qrDataUrl}}" alt="QR Code {{peerName}}" class="img-fluid">
         <p class="text-muted small mt-3 mb-0">
-          Scannez ce QR code avec l'application WireGuard pour ajouter ce pair.
+          {{__ 'qrcode.description'}}
         </p>
         <div class="mt-3">
-          <a href="/peers" class="btn btn-outline-secondary">Retour</a>
+          <a href="/peers" class="btn btn-outline-secondary">{{__ 'qrcode.btn_back'}}</a>
         </div>
       </div>
     </div>

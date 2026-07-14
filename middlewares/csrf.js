@@ -14,7 +14,7 @@ function csrfMiddleware(req, res, next) {
     const csrfBody = req.body._csrf
     if (!csrfBody || !tokens.verify(req.session.csrfSecret, csrfBody)) {
       log.debug('CSRF', `Échec validation CSRF — ${req.method} ${req.path}`)
-      req.session.flash = { error: 'Session invalide. Veuillez réessayer.' }
+      req.session.flash = { error: req.t('error.invalid_session') }
       return res.redirect('/')
     }
     log.debug('CSRF', `Validation OK — ${req.method} ${req.path}`)

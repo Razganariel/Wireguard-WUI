@@ -14,7 +14,7 @@ const loginLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
-    req.session.flash = { error: 'Trop de tentatives. Réessayez dans 15 minutes.' }
+    req.session.flash = { error: req.t('error.too_many_attempts') }
     res.redirect('/auth/login')
   }
 })
@@ -25,7 +25,7 @@ const sudoLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
-    req.session.flash = { error: 'Trop de tentatives. Réessayez dans 15 minutes.' }
+    req.session.flash = { error: req.t('error.too_many_attempts') }
     res.redirect('/auth/sudo-password')
   }
 })
@@ -34,7 +34,7 @@ router.get('/setup', (req, res) => {
   if (userModel.count() > 0) {
     return res.redirect('/auth/login')
   }
-  res.render('auth/setup', { title: 'Installation', layout: 'layouts/minimal' })
+  res.render('auth/setup', { title: req.t('auth.setup.title'), layout: 'layouts/minimal' })
 })
 
 router.post('/setup', async (req, res) => {
@@ -43,7 +43,7 @@ router.post('/setup', async (req, res) => {
   }
   const { prenom, nom, email, password } = req.body
   if (!prenom || !nom || !email || !password || password.length < 8) {
-    req.session.flash = { error: 'Tous les champs sont obligatoires (mot de passe 8 caractères min).' }
+    req.session.flash = { error: req.t('error.all_fields_required') }
     return res.redirect('/auth/setup')
   }
   try {
@@ -53,13 +53,13 @@ router.post('/setup', async (req, res) => {
     req.session.userId = userModel.findByEmail(email).id
     req.session.userEmail = email
     req.session.userName = `${prenom} ${nom}`
-    req.session.flash = { success: 'Compte administrateur créé. Bienvenue !' }
+    req.session.flash = { success: req.t('success.account_created') }
     return res.redirect('/')
   } catch (err) {
     if (err.message && err.message.includes('UNIQUE')) {
-      req.session.flash = { error: 'Cet email est déjà utilisé.' }
+      req.session.flash = { error: req.t('error.email_already_used') }
     } else {
-      req.session.flash = { error: 'Erreur lors de la création du compte.' }
+      req.session.flash = { error: req.t('error.account_creation_failed') }
     }
     return res.redirect('/auth/setup')
   }
@@ -69,7 +69,7 @@ router.get('/login', (req, res) => {
   if (req.session && req.session.userId) {
     return res.redirect('/')
   }
-  res.render('auth/login', { title: 'Connexion' })
+  res.render('auth/login', { title: req.t('auth.login.title') })
 })
 
 router.post('/login', loginLimiter, authController.login)
@@ -77,7 +77,7 @@ router.post('/login', loginLimiter, authController.login)
 router.get('/totp', (req, res) => {
   if (!req.session.pendingUserId) return res.redirect('/auth/login')
   if (req.session.userId) return res.redirect('/')
-  res.render('auth/totp', { title: 'Authentification' })
+  res.render('auth/totp', { title: req.t('auth.totp.title') })
 })
 
 const totpLimiter = rateLimit({
@@ -86,7 +86,7 @@ const totpLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
-    req.session.flash = { error: 'Trop de tentatives. Réessayez dans 15 minutes.' }
+    req.session.flash = { error: req.t('error.too_many_attempts') }
     res.redirect('/auth/totp')
   }
 })
@@ -97,7 +97,7 @@ router.get('/logout', authController.logout)
 
 router.get('/sudo-password', isAuthenticated, (req, res) => {
   res.render('auth/sudo-password', {
-    title: 'Mot de passe sudo',
+    title: req.t('auth.sudo.title'),
     hasSudoPassword: !!(req.session.sudoPassword)
   })
 })
@@ -105,19 +105,19 @@ router.get('/sudo-password', isAuthenticated, (req, res) => {
 router.post('/sudo-password', isAuthenticated, sudoLimiter, (req, res) => {
   const password = sanitizeRaw(req.body.password, 256)
   if (!password) {
-    req.session.flash = { error: 'Le mot de passe est obligatoire.' }
+    req.session.flash = { error: req.t('error.password_required') }
     return res.redirect('/auth/sudo-password')
   }
   req.session.sudoPassword = encrypt(password)
   log.info('Sudo', 'Mot de passe sudo défini')
-  req.session.flash = { success: 'Mot de passe sudo enregistré.' }
+  req.session.flash = { success: req.t('success.sudo_password_saved') }
   res.redirect('/')
 })
 
 router.get('/sudo-clear', isAuthenticated, (req, res) => {
   delete req.session.sudoPassword
   log.info('Sudo', 'Mot de passe sudo effacé')
-  req.session.flash = { success: 'Mot de passe sudo effacé.' }
+  req.session.flash = { success: req.t('success.sudo_password_cleared') }
   res.redirect('/')
 })
 

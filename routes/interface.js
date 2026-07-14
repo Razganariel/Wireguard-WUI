@@ -70,7 +70,7 @@ router.get('/', async (req, res) => {
   }
 
   res.render('interface/index', {
-    title: 'Interface WireGuard',
+    title: req.t('interface.title'),
     interfaces: enrichedInterfaces2,
     hasInterfaces: interfaces.length > 0,
     systemInterfaces,
@@ -100,20 +100,19 @@ router.post('/:id/delete', requireSudoPassword, interfaceController.deleteInterf
 router.post('/import/:name', requireSudoPassword, async (req, res) => {
   const name = sanitizeInterfaceName(req.params.name)
   if (!name) {
-    req.session.flash = { error: 'Nom d\'interface invalide.' }
+    req.session.flash = { error: req.t('error.invalid_interface_name') }
     return res.redirect('/interface')
   }
   try {
     const iface = await interfaceController.importInterface(name)
-    const peerMsg = iface._importedPeerCount > 0
-      ? ` (${iface._importedPeerCount} pair${iface._importedPeerCount > 1 ? 's' : ''} importé${iface._importedPeerCount > 1 ? 's' : ''})`
-      : ''
-    const msg = iface._isNewInterface
-      ? `Interface "${name}" importée avec succès${peerMsg}.`
-      : `${iface._importedPeerCount} pair${iface._importedPeerCount > 1 ? 's' : ''} importé${iface._importedPeerCount > 1 ? 's' : ''} depuis "${name}".`
-    req.session.flash = { success: msg }
+    if (iface._isNewInterface) {
+      req.session.flash = { success: req.t('success.interface_imported', { nom: name }) }
+    }
+    if (iface._importedPeerCount > 0) {
+      req.session.flash = { success: req.t('success.peers_imported_from', { count: iface._importedPeerCount, nom: name }) }
+    }
   } catch (err) {
-    req.session.flash = { error: `Import impossible : ${err.message}` }
+    req.session.flash = { error: req.t('error.import_failed', { message: err.message }) }
   }
   res.redirect('/interface')
 })
@@ -122,15 +121,15 @@ router.post('/detect', requireSudoPassword, async (req, res) => {
   try {
     const { importedIfaces, importedPeers } = await interfaceController.detectAndImportAll()
     if (importedIfaces === 0 && importedPeers === 0) {
-      req.session.flash = { success: 'Aucune nouvelle interface ou pair détecté.' }
+      req.session.flash = { success: req.t('success.no_new_interfaces') }
     } else {
       const parts = []
-      if (importedIfaces > 0) parts.push(`${importedIfaces} interface${importedIfaces > 1 ? 's' : ''}`)
-      if (importedPeers > 0) parts.push(`${importedPeers} pair${importedPeers > 1 ? 's' : ''}`)
-      req.session.flash = { success: `Détection terminée : ${parts.join(' et ')} importé${parts.length > 1 ? 's' : ''}.` }
+      if (importedIfaces > 0) parts.push(req.t('interface.unit_iface', { count: importedIfaces }))
+      if (importedPeers > 0) parts.push(req.t('interface.unit_peer', { count: importedPeers }))
+      req.session.flash = { success: req.t('success.detection_complete', { details: parts.join(', ') }) }
     }
   } catch (err) {
-    req.session.flash = { error: `Erreur lors de la détection : ${err.message}` }
+    req.session.flash = { error: req.t('error.detection_failed', { message: err.message }) }
   }
   res.redirect('/interface')
 })

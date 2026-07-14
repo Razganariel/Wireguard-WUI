@@ -3,7 +3,7 @@ import { isAuthenticated, requireSudoPassword, verifyPassword } from '../../midd
 
 describe('isAuthenticated', () => {
   it('calls next() when session has userId', () => {
-    const req = { session: { userId: 1 } }
+    const req = { session: { userId: 1 }, t: () => '' }
     const res = {}
     const next = vi.fn()
     isAuthenticated(req, res, next)
@@ -30,7 +30,7 @@ describe('isAuthenticated', () => {
 
 describe('requireSudoPassword', () => {
   it('calls next() when sudoPassword is set', () => {
-    const req = { session: { sudoPassword: 'some-encrypted-value' } }
+    const req = { session: { sudoPassword: 'some-encrypted-value' }, t: () => '' }
     const res = {}
     const next = vi.fn()
     requireSudoPassword(req, res, next)
@@ -38,7 +38,7 @@ describe('requireSudoPassword', () => {
   })
 
   it('redirects when sudoPassword is missing', () => {
-    const req = { session: { flash: null } }
+    const req = { session: { flash: null }, t: () => '' }
     const res = { redirect: vi.fn() }
     const next = vi.fn()
     requireSudoPassword(req, res, next)

@@ -2,6 +2,7 @@ const { exec } = require('child_process')
 const util = require('util')
 const execPromise = util.promisify(exec)
 const log = require('./logger')
+const i18next = require('i18next')
 
 const ALLOWED_PREFIXES = [
   'wg-quick ', 'wg show ', 'wg syncconf ', 'wg set ', 'wg pubkey ',
@@ -41,12 +42,12 @@ function isCommandSafe(command) {
 async function execSudo(command) {
   if (!_password) {
     log.error('Sudo', `Commande rejetée (pas de mot de passe) : ${command}`)
-    throw new Error('Mot de passe sudo non défini')
+    throw new Error(i18next.t('error.sudo_password_not_set'))
   }
 
   if (!isCommandSafe(command)) {
     log.error('Sudo', `Commande rejetée (sécurité) : ${command}`)
-    throw new Error('Commande sudo non autorisée.')
+    throw new Error(i18next.t('error.sudo_command_not_allowed'))
   }
 
   const sanitizedCmd = command.replace(/echo '[^']*' \| sudo /g, 'sudo ')
@@ -64,7 +65,7 @@ async function execSudo(command) {
   } catch (err) {
     if (err.stderr && (err.stderr.includes('Sorry') || err.stderr.includes('incorrect password'))) {
       log.error('Sudo', `Mot de passe incorrect pour : sudo ${sanitizedCmd}`)
-      throw new Error('Mot de passe sudo incorrect. Rendez-vous sur /auth/sudo-password pour le corriger.')
+      throw new Error(i18next.t('error.sudo_password_incorrect'))
     }
     const sanitize = (s) => s.replace(/echo '[^']*' \| sudo /g, 'sudo ')
     if (err.message) err.message = sanitize(err.message)

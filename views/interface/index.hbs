@@ -1,6 +1,6 @@
 <div class="row mb-4">
   <div class="col">
-    <h1>Interface WireGuard</h1>
+    <h1>{{__ 'interface.title'}}</h1>
   </div>
 </div>
 
@@ -9,18 +9,17 @@
     <div class="col-12">
       <div class="card border-warning">
         <div class="card-header bg-warning bg-opacity-10">
-          <h5 class="mb-0">Interfaces système détectées</h5>
+          <h5 class="mb-0">{{__ 'interface.system_detected'}}</h5>
         </div>
         <div class="card-body">
           <p class="text-muted small mb-3">
-            Les interfaces suivantes existent dans /etc/wireguard/ mais ne sont pas encore dans la base.
-            Importez-les pour les gérer depuis l'interface web.
+            {{__ 'interface.import_description'}}
           </p>
           <div class="d-flex flex-wrap gap-2">
             {{#each systemInterfaces}}
               <form method="POST" action="/interface/import/{{this}}" class="d-inline">
                 <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
-                <button type="submit" class="btn btn-sm btn-outline-warning">Importer {{this}}</button>
+                <button type="submit" class="btn btn-sm btn-outline-warning">{{__ 'interface.btn_import' nom=this}}</button>
               </form>
             {{/each}}
           </div>
@@ -35,33 +34,33 @@
     <div class="col-md-6">
       <div class="card">
         <div class="card-header">
-          <h5 class="mb-0">Initialiser une interface</h5>
+          <h5 class="mb-0">{{__ 'interface.init_header'}}</h5>
         </div>
         <div class="card-body">
-          <p class="text-muted">Configurez votre interface WireGuard. Les clés seront générées automatiquement.</p>
+          <p class="text-muted">{{__ 'interface.init_description'}}</p>
           <form method="POST" action="/interface" data-validate>
             <input type="hidden" name="_csrf" value="{{csrfToken}}">
             <div class="mb-3">
-              <label for="nom" class="form-label">Nom de l'interface</label>
+              <label for="nom" class="form-label">{{__ 'interface.name_label'}}</label>
               <input type="text" class="form-control" id="nom" name="nom" placeholder="wg0" pattern="wg[0-9]+" required>
-              <div class="form-text">Format : wg0, wg1, wg2…</div>
+              <div class="form-text">{{__ 'interface.name_help'}}</div>
             </div>
             <div class="mb-3">
-              <label for="adresse_ip" class="form-label">Adresse IP</label>
+              <label for="adresse_ip" class="form-label">{{__ 'interface.ip_label'}}</label>
               <input type="text" class="form-control" id="adresse_ip" name="adresse_ip" placeholder="10.0.0.1/24" required>
             </div>
             <div class="mb-3">
-              <label for="port" class="form-label">Port d'écoute</label>
+              <label for="port" class="form-label">{{__ 'interface.port_label'}}</label>
               <input type="number" class="form-control" id="port" name="port" value="51820" min="1" max="65535" required>
-              <div class="form-text">N'oubliez pas d'ouvrir ce port sur votre routeur (redirection de port) pour les connexions distantes.</div>
+              <div class="form-text">{{__ 'interface.port_help'}}</div>
             </div>
             <div class="mb-3">
-              <label for="endpoint" class="form-label">Point de terminaison (optionnel)</label>
-              <input type="text" class="form-control" id="endpoint" name="endpoint" placeholder="votre-domaine.com">
-              <div class="form-text">Adresse publique (IP ou domaine) pour l'accès depuis l'extérieur. Le port est automatiquement ajouté. Si vide, l'IP du tunnel est utilisée.</div>
+              <label for="endpoint" class="form-label">{{__ 'interface.endpoint_label'}}</label>
+              <input type="text" class="form-control" id="endpoint" name="endpoint" placeholder="{{__ 'interface.endpoint_placeholder'}}">
+              <div class="form-text">{{__ 'interface.endpoint_help_full'}}</div>
             </div>
             <div class="d-grid">
-              <button type="submit" class="btn btn-primary">Initialiser l'interface</button>
+              <button type="submit" class="btn btn-primary">{{__ 'interface.btn_init'}}</button>
             </div>
           </form>
         </div>
@@ -74,11 +73,11 @@
   <div class="row mb-3">
     <div class="col d-flex gap-2">
       <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#newInterfaceForm">
-        + Nouvelle interface
+        {{__ 'interface.btn_new'}}
       </button>
       <form method="POST" action="/interface/detect" class="d-inline">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
-        <button type="submit" class="btn btn-outline-info">Détecter</button>
+        <button type="submit" class="btn btn-outline-info">{{__ 'interface.btn_detect'}}</button>
       </form>
     </div>
   </div>
@@ -88,31 +87,31 @@
       <div class="col-md-6">
         <div class="card">
           <div class="card-header">
-            <h5 class="mb-0">Initialiser une interface</h5>
+            <h5 class="mb-0">{{__ 'interface.init_header'}}</h5>
           </div>
           <div class="card-body">
           <form method="POST" action="/interface" data-validate>
               <input type="hidden" name="_csrf" value="{{csrfToken}}">
               <div class="mb-3">
-                <label for="nom" class="form-label">Nom de l'interface</label>
-                <input type="text" class="form-control" id="nom" name="nom" placeholder="wg0" pattern="wg[0-9]+" required>
+                <label for="nom_collapse" class="form-label">{{__ 'interface.name_label'}}</label>
+                <input type="text" class="form-control" id="nom_collapse" name="nom" placeholder="wg0" pattern="wg[0-9]+" required>
               </div>
               <div class="mb-3">
-                <label for="adresse_ip" class="form-label">Adresse IP</label>
-                <input type="text" class="form-control" id="adresse_ip" name="adresse_ip" placeholder="10.0.0.1/24" required>
+                <label for="adresse_ip_collapse" class="form-label">{{__ 'interface.ip_label'}}</label>
+                <input type="text" class="form-control" id="adresse_ip_collapse" name="adresse_ip" placeholder="10.0.0.1/24" required>
               </div>
               <div class="mb-3">
-                <label for="port" class="form-label">Port d'écoute</label>
-                <input type="number" class="form-control" id="port" name="port" value="51820" min="1" max="65535" required>
-                <div class="form-text">N'oubliez pas d'ouvrir ce port sur votre routeur (redirection de port) pour les connexions distantes.</div>
+                <label for="port_collapse" class="form-label">{{__ 'interface.port_label'}}</label>
+                <input type="number" class="form-control" id="port_collapse" name="port" value="51820" min="1" max="65535" required>
+                <div class="form-text">{{__ 'interface.port_help'}}</div>
               </div>
               <div class="mb-3">
-                <label for="endpoint" class="form-label">Point de terminaison (optionnel)</label>
-                <input type="text" class="form-control" id="endpoint" name="endpoint" placeholder="votre-domaine.com">
-                <div class="form-text">Adresse publique (IP ou domaine) pour l'accès depuis l'extérieur. Le port est automatiquement ajouté.</div>
+                <label for="endpoint_collapse" class="form-label">{{__ 'interface.endpoint_label'}}</label>
+                <input type="text" class="form-control" id="endpoint_collapse" name="endpoint" placeholder="{{__ 'interface.endpoint_placeholder'}}">
+                <div class="form-text">{{__ 'interface.endpoint_help_short'}}</div>
               </div>
               <div class="d-grid">
-                <button type="submit" class="btn btn-primary">Initialiser</button>
+                <button type="submit" class="btn btn-primary">{{__ 'interface.btn_initialize_short'}}</button>
               </div>
             </form>
           </div>
@@ -128,9 +127,9 @@
           <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">{{nom}}</h5>
             {{#if active}}
-              <span class="badge bg-success">Actif</span>
+              <span class="badge bg-success">{{__ 'badge.active'}}</span>
             {{else}}
-              <span class="badge bg-secondary">Inactif</span>
+              <span class="badge bg-secondary">{{__ 'badge.inactive'}}</span>
             {{/if}}
           </div>
           <div class="card-body">
@@ -138,33 +137,33 @@
             <table class="table table-sm">
               <tbody>
                 <tr>
-                  <th>Adresse IP</th>
+                  <th>{{__ 'interface.table.ip'}}</th>
                   <td>{{adresse_ip}}</td>
                 </tr>
                 <tr>
-                  <th>Port</th>
+                  <th>{{__ 'interface.table.port'}}</th>
                   <td>{{port}}</td>
                 </tr>
                 {{#if endpoint}}
                 <tr>
-                  <th>Point de terminaison</th>
+                  <th>{{__ 'interface.table.endpoint'}}</th>
                   <td><code class="text-break small">{{endpoint}}</code></td>
                 </tr>
                 {{/if}}
                 <tr>
-                  <th>Clé publique</th>
+                  <th>{{__ 'interface.table.public_key'}}</th>
                   <td><code class="text-break small">{{public_key}}</code></td>
                 </tr>
                 <tr>
-                  <th>Pairs connectés</th>
+                  <th>{{__ 'interface.table.connected_peers'}}</th>
                   <td>{{connectedPeers}} / {{peerCount}}</td>
                 </tr>
                 <tr>
-                  <th>Download</th>
+                  <th>{{__ 'interface.table.download'}}</th>
                   <td class="text-success">{{totalRx}}</td>
                 </tr>
                 <tr>
-                  <th>Upload</th>
+                  <th>{{__ 'interface.table.upload'}}</th>
                   <td class="text-primary">{{totalTx}}</td>
                 </tr>
               </tbody>
@@ -174,10 +173,10 @@
             {{#if routing}}
               {{#unless routing.allOk}}
                 <div class="alert alert-warning small py-2 my-3">
-                  <strong>Routage non configuré.</strong>
-                  Les pairs connectés ne pourront pas accéder au réseau.
+                  <strong>{{__ 'interface.routing_not_configured'}}</strong>
+                  {{__ 'interface.routing_impact'}}
                   <button class="btn btn-sm btn-outline-warning mt-1" type="button" data-bs-toggle="collapse" data-bs-target="#routingCmds{{id}}">
-                    Voir les commandes
+                    {{__ 'interface.btn_view_commands'}}
                   </button>
                   <div class="collapse mt-2" id="routingCmds{{id}}">
                     <code class="d-block text-bg-dark p-2 rounded small" style="white-space: pre-wrap;">
@@ -187,12 +186,12 @@
 {{#if routing.forwardOut}}✅ FORWARD OUT{{else}}❌ FORWARD OUT{{/if}}
                     </code>
                     <div class="mt-2">
-                      <strong>Commandes iptables :</strong>
+                      <strong>{{__ 'interface.label_iptables'}}</strong>
                       <code class="d-block text-bg-dark p-2 rounded small mt-1" style="white-space: pre-wrap;">
 {{#each routing.iptablesCmds}}{{this}}
 {{/each}}</code>
                       {{#if routing.firewallCmds.length}}
-                        <strong>Ou avec {{routing.firewallType}} (alternative) :</strong>
+                        <strong>{{__ 'interface.label_firewall_alternative' type=routing.firewallType}}</strong>
                         <code class="d-block text-bg-dark p-2 rounded small mt-1" style="white-space: pre-wrap;">
 {{#each routing.firewallCmds}}{{this}}
 {{/each}}</code>
@@ -204,20 +203,20 @@
             {{/if}}
 
             <div class="d-flex gap-2 mt-3 justify-content-center flex-wrap">
-              <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editIface{{id}}">Éditer</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editIface{{id}}">{{__ 'interface.btn_edit'}}</button>
               <form method="POST" action="/interface/{{id}}/toggle" class="d-inline">
                 <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
                 {{#if active}}
-                  <button type="submit" class="btn btn-sm btn-outline-warning">Arrêter</button>
+                  <button type="submit" class="btn btn-sm btn-outline-warning">{{__ 'interface.btn_stop'}}</button>
                 {{else}}
-                  <button type="submit" class="btn btn-sm btn-outline-success">Démarrer</button>
+                  <button type="submit" class="btn btn-sm btn-outline-success">{{__ 'interface.btn_start'}}</button>
                 {{/if}}
               </form>
-              <form method="POST" action="/interface/{{id}}/delete" class="d-inline" data-confirm="Supprimer l'interface {{nom}} ? Cette action est irréversible.">
+              <form method="POST" action="/interface/{{id}}/delete" class="d-inline" data-confirm="{{__ 'interface.confirm_delete' nom=nom}}">
                 <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
-                <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+                <button type="submit" class="btn btn-sm btn-outline-danger">{{__ 'interface.btn_delete'}}</button>
               </form>
-              <a href="/peers?interface={{id}}" class="btn btn-sm btn-outline-primary">Pairs</a>
+              <a href="/peers?interface={{id}}" class="btn btn-sm btn-outline-primary">{{__ 'interface.btn_peers'}}</a>
             </div>
 
             <div class="modal fade" id="editIface{{id}}" tabindex="-1" aria-hidden="true">
@@ -226,28 +225,28 @@
                   <form method="POST" action="/interface/{{id}}/edit">
                     <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
                     <div class="modal-header">
-                      <h5 class="modal-title">Éditer {{nom}}</h5>
+                      <h5 class="modal-title">{{__ 'interface.modal_edit_title' nom=nom}}</h5>
                       <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                       <div class="mb-3">
-                        <label for="adresse_ip{{id}}" class="form-label">Adresse IP</label>
+                        <label for="adresse_ip{{id}}" class="form-label">{{__ 'interface.ip_label'}}</label>
                         <input type="text" class="form-control" id="adresse_ip{{id}}" name="adresse_ip" value="{{adresse_ip}}" pattern="^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$" required>
                       </div>
                       <div class="mb-3">
-                        <label for="port{{id}}" class="form-label">Port d'écoute</label>
+                        <label for="port{{id}}" class="form-label">{{__ 'interface.port_label'}}</label>
                         <input type="number" class="form-control" id="port{{id}}" name="port" value="{{port}}" min="1" max="65535" required>
-                        <div class="form-text">N'oubliez pas d'ouvrir ce port sur votre routeur (redirection de port) pour les connexions distantes.</div>
+                        <div class="form-text">{{__ 'interface.port_help'}}</div>
                       </div>
                       <div class="mb-3">
-                        <label for="endpoint{{id}}" class="form-label">Point de terminaison (optionnel)</label>
-                        <input type="text" class="form-control" id="endpoint{{id}}" name="endpoint" value="{{endpoint}}" placeholder="votre-domaine.com">
-                        <div class="form-text">Adresse publique (IP ou domaine) pour l'accès depuis l'extérieur. Le port est automatiquement ajouté.</div>
+                        <label for="endpoint{{id}}" class="form-label">{{__ 'interface.endpoint_label'}}</label>
+                        <input type="text" class="form-control" id="endpoint{{id}}" name="endpoint" value="{{endpoint}}" placeholder="{{__ 'interface.endpoint_placeholder'}}">
+                        <div class="form-text">{{__ 'interface.endpoint_help_short'}}</div>
                       </div>
                     </div>
                     <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                      <button type="submit" class="btn btn-primary">Enregistrer</button>
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{__ 'interface.modal_btn_cancel'}}</button>
+                      <button type="submit" class="btn btn-primary">{{__ 'interface.modal_btn_save'}}</button>
                     </div>
                   </form>
                 </div>

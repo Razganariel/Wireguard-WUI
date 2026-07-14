@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{lang}}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +13,7 @@
     <div class="container">
       <a class="navbar-brand d-flex align-items-center gap-2" href="/">
         <img src="/wireguard-color.svg" alt="WireGuard" width="28" height="28">
-        <strong>WireGuard-WUI</strong>
+        <strong>{{__ 'brand.name'}}</strong>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
@@ -22,13 +22,13 @@
         <ul class="navbar-nav me-auto">
           {{#if user}}
             <li class="nav-item">
-              <a class="nav-link" href="/">Tableau de bord</a>
+              <a class="nav-link" href="/">{{__ 'nav.dashboard'}}</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/interface">Interfaces</a>
+              <a class="nav-link" href="/interface">{{__ 'nav.interfaces'}}</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/peers">Pairs</a>
+              <a class="nav-link" href="/peers">{{__ 'nav.peers'}}</a>
             </li>
           {{/if}}
         </ul>
@@ -38,9 +38,9 @@
             <li class="nav-item me-2">
               <a href="/auth/sudo-password" class="text-decoration-none">
                 {{#if hasSudoPassword}}
-                  <span class="badge bg-success">Sudo</span>
+                  <span class="badge bg-success">{{__ 'nav.sudo_active'}}</span>
                 {{else}}
-                  <span class="badge bg-warning text-dark">Sudo</span>
+                  <span class="badge bg-warning text-dark">{{__ 'nav.sudo_inactive'}}</span>
                 {{/if}}
               </a>
             </li>
@@ -48,11 +48,11 @@
               <a class="nav-link" href="/profile">{{userName}}</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/logout">Déconnexion</a>
+              <a class="nav-link" href="/logout">{{__ 'nav.logout'}}</a>
             </li>
           {{else}}
             <li class="nav-item">
-              <a class="nav-link" href="/auth/login">Connexion</a>
+              <a class="nav-link" href="/auth/login">{{__ 'nav.login'}}</a>
             </li>
           {{/if}}
         </ul>
@@ -64,8 +64,8 @@
     {{#if user}}
       {{#unless hasSudoPassword}}
         <div class="alert alert-info alert-dismissible fade show" role="alert">
-          <a href="/auth/sudo-password" class="alert-link">Définissez le mot de passe sudo</a>
-          pour activer la détection des interfaces et la gestion des règles de routage.
+          <a href="/auth/sudo-password" class="alert-link">{{__ 'alert.sudo_password.link'}}</a>
+          {{__ 'alert.sudo_password.description'}}
           <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
       {{/unless}}
@@ -98,7 +98,7 @@
 
   <footer class="bg-dark text-light py-3 mt-auto">
     <div class="container text-center">
-      <span class="small">WireGuard-WUI — GPL v3 — {{currentYear}}</span>
+      <span class="small">{{__ 'footer.copyright' year=currentYear}}</span>
     </div>
   </footer>
 
