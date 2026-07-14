@@ -82,4 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
       debugForm.submit()
     })
   }
+
+  document.querySelectorAll('select[data-auto-submit]').forEach((select) => {
+    select.addEventListener('change', function () {
+      this.form.submit()
+    })
+  })
 })

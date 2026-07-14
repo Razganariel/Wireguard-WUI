@@ -44,6 +44,14 @@
                 {{/if}}
               </a>
             </li>
+            <li class="nav-item me-2">
+              <form method="GET" action="/profile/language" class="d-inline">
+                <select name="lang" class="form-select form-select-sm bg-dark text-light border-secondary" style="cursor:pointer" data-auto-submit>
+                  <option value="fr" {{#if (eq lang 'fr')}}selected{{/if}}>FR</option>
+                  <option value="en" {{#if (eq lang 'en')}}selected{{/if}}>EN</option>
+                </select>
+              </form>
+            </li>
             <li class="nav-item">
               <a class="nav-link" href="/profile">{{userName}}</a>
             </li>
