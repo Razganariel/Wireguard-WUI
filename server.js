@@ -116,6 +116,63 @@ app.use('/auth', authRoutes)
 app.use('/interface', interfaceRoutes)
 app.use('/peers', peersRoutes)
 
+app.get('/profile', (req, res) => {
+  if (!req.session || !req.session.userId) return res.redirect('/auth/login')
+  const user = userModel.findById(req.session.userId)
+  if (!user) return res.redirect('/logout')
+  res.render('profile/index', { title: 'Mon profil', user })
+})
+
+app.post('/profile', async (req, res) => {
+  if (!req.session || !req.session.userId) return res.redirect('/auth/login')
+  const bcrypt = require('bcrypt')
+  const { sanitize, sanitizeEmail } = require('./helpers/sanitize')
+  const user = userModel.findById(req.session.userId)
+  if (!user) return res.redirect('/logout')
+
+  const prenom = sanitize(req.body.prenom)
+  const nom = sanitize(req.body.nom)
+  let email = sanitizeEmail(req.body.email)
+
+  if (!prenom || !nom) {
+    req.session.flash = { error: 'Le prénom et le nom sont obligatoires.' }
+    return res.redirect('/profile')
+  }
+  if (!email) {
+    req.session.flash = { error: 'Email invalide.' }
+    return res.redirect('/profile')
+  }
+
+  if (email !== user.email) {
+    const existing = userModel.findByEmail(email)
+    if (existing && existing.id !== user.id) {
+      req.session.flash = { error: 'Cet email est déjà utilisé.' }
+      return res.redirect('/profile')
+    }
+  }
+
+  const updates = { prenom, nom, email }
+
+  if (req.body.current_password && req.body.new_password) {
+    if (req.body.new_password.length < 8) {
+      req.session.flash = { error: 'Le nouveau mot de passe doit faire au moins 8 caractères.' }
+      return res.redirect('/profile')
+    }
+    const valid = await bcrypt.compare(req.body.current_password, user.password)
+    if (!valid) {
+      req.session.flash = { error: 'Le mot de passe actuel est incorrect.' }
+      return res.redirect('/profile')
+    }
+    updates.password = await bcrypt.hash(req.body.new_password, 10)
+  }
+
+  userModel.update(user.id, updates)
+  req.session.userName = `${prenom} ${nom}`
+  req.session.userEmail = email
+  req.session.flash = { success: 'Profil mis à jour.' }
+  res.redirect('/profile')
+})
+
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
     res.redirect('/auth/login')

@@ -20,9 +20,25 @@ function create(user) {
   return info.lastInsertRowid
 }
 
+function update(id, data) {
+  const fields = []
+  const values = []
+  for (const key of ['prenom', 'nom', 'email', 'password']) {
+    if (data[key] !== undefined) {
+      fields.push(`${key} = ?`)
+      values.push(data[key])
+    }
+  }
+  if (fields.length === 0) return false
+  values.push(id)
+  db.prepare(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`).run(...values)
+  return true
+}
+
 module.exports = {
   findByEmail,
   findById,
   count,
-  create
+  create,
+  update
 }
