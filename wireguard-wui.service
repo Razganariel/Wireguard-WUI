@@ -13,7 +13,6 @@ ExecStart=/usr/bin/node server.js
 Restart=on-failure
 RestartSec=10
 AmbientCapabilities=CAP_NET_ADMIN
-NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=full
 ProtectHome=true
