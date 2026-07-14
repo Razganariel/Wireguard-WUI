@@ -295,7 +295,7 @@ function parseAllDump(stdout) {
 }
 
 async function initInterface(req, res) {
-  const { nom, adresse_ip, port } = req.body
+  const { nom, adresse_ip, port, endpoint } = req.body
 
   if (!nom || !adresse_ip || !port) {
     req.session.flash = { error: 'Tous les champs sont obligatoires.' }
@@ -340,7 +340,8 @@ async function initInterface(req, res) {
     private_key: privateKey,
     public_key: publicKey,
     adresse_ip,
-    port: parseInt(port, 10)
+    port: parseInt(port, 10),
+    endpoint: endpoint?.trim() || null
   })
 
   if (!keygenOk) {
@@ -437,7 +438,7 @@ async function editInterface(req, res) {
     return res.redirect('/interface')
   }
 
-  const { adresse_ip, port } = req.body
+  const { adresse_ip, port, endpoint } = req.body
 
   if (!adresse_ip || !/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/.test(adresse_ip)) {
     req.session.flash = { error: 'L\'adresse IP doit être au format CIDR (ex: 10.0.0.1/24).' }
@@ -450,11 +451,12 @@ async function editInterface(req, res) {
     return res.redirect('/interface')
   }
 
-  const oldConfig = { adresse_ip: iface.adresse_ip, port: iface.port }
+  const oldConfig = { adresse_ip: iface.adresse_ip, port: iface.port, endpoint: iface.endpoint }
 
   try {
     iface.adresse_ip = adresse_ip
     iface.port = portNum
+    iface.endpoint = endpoint?.trim() || null
     await writeConfigFile(iface)
 
     if (iface.active) {
@@ -470,6 +472,7 @@ async function editInterface(req, res) {
       } catch (syncErr) {
         iface.adresse_ip = oldConfig.adresse_ip
         iface.port = oldConfig.port
+        iface.endpoint = oldConfig.endpoint
         await writeConfigFile(iface)
         if (subnetChanged) {
           try { await addRoutingRules(iface.nom, oldConfig.adresse_ip) } catch (e) {}
@@ -480,7 +483,7 @@ async function editInterface(req, res) {
     }
 
     const db = require('../db')
-    db.prepare('UPDATE interfaces SET adresse_ip = ?, port = ? WHERE id = ?').run(adresse_ip, portNum, id)
+    db.prepare('UPDATE interfaces SET adresse_ip = ?, port = ?, endpoint = ? WHERE id = ?').run(adresse_ip, portNum, iface.endpoint, id)
 
     req.session.flash = { success: `Interface "${iface.nom}" mise à jour.` }
   } catch (err) {

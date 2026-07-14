@@ -37,16 +37,18 @@
             </div>
             <div class="col-md-4">
               <label for="adresse_ip" class="form-label">Adresse IP</label>
-              <input type="text" class="form-control" id="adresse_ip" name="adresse_ip" placeholder="10.0.0.2" required>
-              <div class="form-text">Sans le /32 (ajouté automatiquement)</div>
+              <input type="text" class="form-control" id="adresse_ip" name="adresse_ip" placeholder="{{suggestedPeerIp}}" value="{{suggestedPeerIp}}" required>
+              <div class="form-text">IP du pair sur le réseau VPN (attribuée dans le tunnel).</div>
             </div>
             <div class="col-md-4">
               <label for="allowed_ips" class="form-label">Allowed IPs</label>
               <input type="text" class="form-control" id="allowed_ips" name="allowed_ips" value="0.0.0.0/0">
+              <div class="form-text">Trafic redirigé vers le VPN. <code>0.0.0.0/0</code> = tout le trafic (full tunnel). Mettez le sous-réseau du serveur pour un split tunnel (ex: <code>10.0.0.0/24</code>).</div>
             </div>
             <div class="col-md-4">
               <label for="dns" class="form-label">DNS</label>
               <input type="text" class="form-control" id="dns" name="dns" placeholder="1.1.1.1">
+              <div class="form-text">Utilisez l'IP de l'interface VPN si le serveur fait office de résolveur DNS.</div>
             </div>
             <div class="col-md-4">
               <label for="persistent_keepalive" class="form-label">Persistent Keepalive</label>
@@ -126,14 +128,17 @@
                       <div class="mb-3">
                         <label for="adresse_ip{{id}}" class="form-label">Adresse IP</label>
                         <input type="text" class="form-control" id="adresse_ip{{id}}" name="adresse_ip" value="{{adresse_ip}}" pattern="^(\d{1,3}\.){3}\d{1,3}$" required>
+                        <div class="form-text">IP du pair sur le réseau VPN.</div>
                       </div>
                       <div class="mb-3">
                         <label for="allowed_ips{{id}}" class="form-label">Allowed IPs</label>
                         <input type="text" class="form-control" id="allowed_ips{{id}}" name="allowed_ips" value="{{allowed_ips}}">
+                        <div class="form-text">Trafic redirigé vers le VPN. <code>0.0.0.0/0</code> = tout le trafic, ou un sous-réseau spécifique.</div>
                       </div>
                       <div class="mb-3">
                         <label for="dns{{id}}" class="form-label">DNS</label>
                         <input type="text" class="form-control" id="dns{{id}}" name="dns" value="{{dns}}">
+                        <div class="form-text">Utilisez l'IP de l'interface VPN si le serveur fait office de résolveur DNS.</div>
                       </div>
                       <div class="mb-3">
                         <label for="persistent_keepalive{{id}}" class="form-label">Persistent Keepalive</label>
