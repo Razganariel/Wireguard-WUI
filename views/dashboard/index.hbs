@@ -1,40 +1,144 @@
 <div class="row mb-4">
   <div class="col">
     <h1>Tableau de bord</h1>
-    <p class="text-muted">Gérez vos interfaces et pairs WireGuard depuis ici.</p>
   </div>
 </div>
 
-{{#if selectedInterfaceName}}
-<div class="row mb-4">
-  <div class="col">
-    <div class="alert alert-info">
-      Interface active : <strong>{{selectedInterfaceName}}</strong>
-      {{#if hasInterfaces}}
-        — <a href="/peers">Voir les pairs</a>
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card text-center h-100">
+      <div class="card-body">
+        <h3 class="mb-1">{{stats.activeInterfaces}}<small class="text-muted fs-5">/{{stats.totalInterfaces}}</small></h3>
+        <p class="text-muted small mb-0">Interfaces actives</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center h-100">
+      <div class="card-body">
+        <h3 class="mb-1">{{stats.connectedPeers}}<small class="text-muted fs-5">/{{stats.totalPeers}}</small></h3>
+        <p class="text-muted small mb-0">Pairs connectés</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="card text-center h-100">
+      <div class="card-body">
+        <h3 class="mb-1 text-success">{{stats.totalTransferRx}}</h3>
+        <p class="text-muted small mb-0">Download</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="card text-center h-100">
+      <div class="card-body">
+        <h3 class="mb-1 text-primary">{{stats.totalTransferTx}}</h3>
+        <p class="text-muted small mb-0">Upload</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="card text-center h-100">
+      <div class="card-body">
+        {{#if stats.latestHandshake}}
+          <h3 class="mb-1">{{stats.latestHandshake}}</h3>
+        {{else}}
+          <h3 class="mb-1 text-muted">—</h3>
+        {{/if}}
+        <p class="text-muted small mb-0">Dernier handshake</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{#if hasInterfaces}}
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Interfaces</h5>
+      <a href="/interface" class="btn btn-sm btn-outline-primary">Gérer</a>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Interface</th>
+            <th>Statut</th>
+            <th>Port</th>
+            <th>Pairs</th>
+            <th>Dernier handshake</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each interfaces}}
+            <tr>
+              <td><strong>{{nom}}</strong>{{#if endpoint}} <code class="small text-muted">{{endpoint}}</code>{{/if}}</td>
+              <td>
+                {{#if active}}
+                  <span class="badge bg-success">Actif</span>
+                {{else}}
+                  <span class="badge bg-secondary">Inactif</span>
+                {{/if}}
+              </td>
+              <td>{{port}}</td>
+              <td>{{connectedPeers}}/{{peerCount}}</td>
+              <td>
+                {{#if lastHandshake}}
+                  {{lastHandshake}}
+                {{else}}
+                  <span class="text-muted">—</span>
+                {{/if}}
+              </td>
+              <td class="text-end">
+                <a href="/peers?interface={{id}}" class="btn btn-sm btn-outline-primary">Pairs</a>
+              </td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">Routage</h5>
+    </div>
+    <div class="card-body">
+      {{#if routingSummary.ok}}
+        <p>
+          <span class="text-success">✓ {{routingSummary.ok}} interface(s) correctement routée(s)</span>
+          {{#if routingSummary.ko}}<span class="text-danger ms-3">✗ {{routingSummary.ko}} non configurée(s)</span>{{/if}}
+          {{#if routingSummary.na}}<span class="text-muted ms-3">— {{routingSummary.na}} non vérifiable(s)</span>{{/if}}
+        </p>
+      {{else}}
+        <p class="text-muted">Aucune information de routage disponible.</p>
       {{/if}}
-    </div>
-  </div>
-</div>
-{{/if}}
 
-<div class="row g-3">
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Interface WireGuard</h5>
-        <p class="card-text text-muted">Configurer et gérer votre interface VPN.</p>
-        <a href="/interface" class="btn btn-outline-primary">Gérer les interfaces</a>
+      <div class="row g-2 mt-2">
+        {{#each interfaces}}
+          {{#if active}}
+            <div class="col-md-6">
+              <div class="d-flex align-items-center small">
+                <span class="me-2">{{nom}} :</span>
+                {{#if (eq routingOk true)}}
+                  <span class="text-success">✅ OK</span>
+                {{else}}
+                  {{#if (eq routingOk false)}}
+                    <span class="text-danger">❌ Non configuré</span>
+                  {{else}}
+                    <span class="text-muted">— Non vérifiable</span>
+                  {{/if}}
+                {{/if}}
+              </div>
+            </div>
+          {{/if}}
+        {{/each}}
       </div>
     </div>
   </div>
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Pairs (Peers)</h5>
-        <p class="card-text text-muted">Ajouter, supprimer et télécharger les configurations clients.</p>
-        <a href="/peers" class="btn btn-outline-primary">Gérer les pairs</a>
-      </div>
-    </div>
+{{else}}
+  <div class="text-center py-5">
+    <p class="text-muted">Aucune interface WireGuard configurée.</p>
+    <a href="/interface" class="btn btn-primary">Créer une interface</a>
   </div>
-</div>
+{{/if}}
