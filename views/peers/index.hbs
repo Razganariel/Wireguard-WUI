@@ -80,27 +80,27 @@
           <tr>
             <th>Nom</th>
             <th>Adresse IP</th>
-            <th>Allowed IPs</th>
-            <th>Handshake</th>
-            <th>Transfert</th>
+            <th class="d-none d-md-table-cell">Allowed IPs</th>
+            <th class="d-none d-lg-table-cell">Handshake</th>
+            <th class="d-none d-md-table-cell">Transfert</th>
             <th>Statut</th>
-            <th class="text-end">Actions</th>
+            <th class="text-center d-none d-md-table-cell">Actions</th>
           </tr>
         </thead>
         <tbody>
           {{#each peers}}
             <tr class="{{#unless isConnected}}table-danger{{/unless}}">
-              <td>{{nom}}</td>
+              <td><strong>{{nom}}</strong></td>
               <td>{{adresse_ip}}</td>
-              <td><code class="small">{{allowed_ips}}</code></td>
-              <td>
+              <td class="d-none d-md-table-cell"><code class="small">{{allowed_ips}}</code></td>
+              <td class="d-none d-lg-table-cell">
                 {{#if handshake}}
                   {{handshake}}
                 {{else}}
                   <span class="text-muted">jamais</span>
                 {{/if}}
               </td>
-              <td>
+              <td class="d-none d-md-table-cell">
                 <span class="text-success">↓ {{transferRx}}</span>
                 <span class="text-primary">↑ {{transferTx}}</span>
               </td>
@@ -111,7 +111,7 @@
                   <span class="badge bg-danger">Inactif</span>
                 {{/if}}
               </td>
-              <td class="text-end">
+              <td class="text-center d-none d-md-table-cell">
                 <a href="/peers/{{id}}/config" class="btn btn-sm btn-outline-secondary">.conf</a>
                 {{#if ../qrcodeAvailable}}
                   <a href="/peers/{{id}}/qrcode" class="btn btn-sm btn-outline-info">QR</a>
@@ -121,6 +121,21 @@
                   <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
                   <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
                 </form>
+              </td>
+            </tr>
+            <tr class="d-md-none">
+              <td colspan="7" class="border-0 pt-0">
+                <div class="d-flex gap-1 flex-wrap justify-content-center">
+                  <a href="/peers/{{id}}/config" class="btn btn-sm btn-outline-secondary">.conf</a>
+                  {{#if ../qrcodeAvailable}}
+                    <a href="/peers/{{id}}/qrcode" class="btn btn-sm btn-outline-info">QR</a>
+                  {{/if}}
+                  <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editPeer{{id}}">Éditer</button>
+                  <form method="POST" action="/peers/{{id}}/delete" class="d-inline" onsubmit="return confirm('Supprimer le pair {{nom}} ?')">
+                    <input type="hidden" name="_csrf" value="{{@root.csrfToken}}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+                  </form>
+                </div>
               </td>
             </tr>
             <div class="modal fade" id="editPeer{{id}}" tabindex="-1" aria-hidden="true">
