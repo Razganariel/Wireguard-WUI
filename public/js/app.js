@@ -1,3 +1,14 @@
+function calcEntropy(pwd) {
+  if (!pwd) return 0
+  let pool = 0
+  if (/[a-z]/.test(pwd)) pool += 26
+  if (/[A-Z]/.test(pwd)) pool += 26
+  if (/[0-9]/.test(pwd)) pool += 10
+  if (/[^a-zA-Z0-9]/.test(pwd)) pool += 33
+  if (pool === 0) return 0
+  return Math.round(pwd.length * Math.log2(pool) * 10) / 10
+}
+
 function togglePassword(inputId, btn) {
   const input = document.getElementById(inputId)
   if (!input) return
@@ -29,6 +40,25 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-toggle-password]').forEach((btn) => {
     btn.addEventListener('click', () => togglePassword(btn.getAttribute('data-toggle-password'), btn))
   })
+
+  const newPwd = document.getElementById('new_password')
+  const meter = document.getElementById('entropy-meter')
+  const bar = document.getElementById('entropy-bar')
+  const label = document.getElementById('entropy-label')
+  const val = document.getElementById('entropy-value')
+  if (newPwd && meter) {
+    newPwd.addEventListener('input', () => {
+      const entropy = calcEntropy(newPwd.value)
+      if (newPwd.value.length === 0) { meter.style.display = 'none'; return }
+      meter.style.display = 'block'
+      const pct = Math.min(100, Math.round(entropy / 80 * 100))
+      bar.style.width = pct + '%'
+      val.textContent = entropy
+      if (entropy >= 60) { bar.className = 'progress-bar bg-success'; label.textContent = 'Fort' }
+      else if (entropy >= 40) { bar.className = 'progress-bar bg-warning'; label.textContent = 'Moyen' }
+      else { bar.className = 'progress-bar bg-danger'; label.textContent = 'Faible' }
+    })
+  }
 
   document.querySelectorAll('.toast.show').forEach((toast) => {
     setTimeout(() => {
