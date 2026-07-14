@@ -59,6 +59,15 @@
   </nav>
 
   <main class="container mt-4 flex-grow-1">
+    {{#if user}}
+      {{#unless hasSudoPassword}}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+          <a href="/auth/sudo-password" class="alert-link">Définissez le mot de passe sudo</a>
+          pour activer la détection des interfaces et la gestion des règles de routage.
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {{/unless}}
+    {{/if}}
     {{#if flash}}
       {{#if flash.success}}
         <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
