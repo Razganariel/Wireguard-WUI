@@ -3,16 +3,14 @@ const router = express.Router()
 const peerController = require('../controllers/peers')
 const peerModel = require('../models/peer')
 const interfaceModel = require('../models/interface')
-const { isAuthenticated } = require('../middlewares/auth')
-const { exec } = require('child_process')
-const util = require('util')
-const execAsync = util.promisify(exec)
+const { isAuthenticated, requireSudoPassword } = require('../middlewares/auth')
+const sudo = require('../helpers/sudo')
 
 router.use(isAuthenticated)
 
 async function getPeerStatuses(nom) {
   try {
-    const { stdout } = await execAsync(`sudo wg show ${nom} dump`)
+    const { stdout } = await sudo.exec(`wg show ${nom} dump`)
     const lines = stdout.trim().split('\n')
     const statuses = {}
     for (let i = 1; i < lines.length; i++) {
@@ -104,9 +102,9 @@ router.get('/', async (req, res) => {
   })
 })
 
-router.post('/', peerController.createPeer)
+router.post('/', requireSudoPassword, peerController.createPeer)
 
-router.post('/:id/delete', peerController.deletePeer)
+router.post('/:id/delete', requireSudoPassword, peerController.deletePeer)
 
 router.get('/:id/config', peerController.downloadConfig)
 
