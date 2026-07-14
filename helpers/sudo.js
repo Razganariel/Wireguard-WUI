@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 const { exec } = require('child_process')
 const util = require('util')
 const execPromise = util.promisify(exec)

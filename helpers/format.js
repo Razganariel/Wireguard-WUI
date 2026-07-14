@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 function formatBytes(bytes, t) {
   if (!bytes || bytes === 0) return t ? t('text.zero_bytes') : '0 B'
   const units = ['B', 'KB', 'MB', 'GB', 'TB']

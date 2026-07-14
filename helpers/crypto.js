@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 const crypto = require('crypto')
 
 const ALGORITHM = 'aes-256-gcm'

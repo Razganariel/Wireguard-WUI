@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import path from 'node:path'
 import fs from 'node:fs'
 import os from 'node:os'

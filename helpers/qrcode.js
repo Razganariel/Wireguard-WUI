@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 let qrInstance = null
 try {
   qrInstance = require('qrcode')

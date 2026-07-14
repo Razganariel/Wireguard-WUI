@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 const express = require('express')
 const session = require('express-session')
 const helmet = require('helmet')

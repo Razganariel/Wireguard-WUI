@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 const i18next = require('i18next')
 const FsBackend = require('i18next-fs-backend')
 const path = require('path')

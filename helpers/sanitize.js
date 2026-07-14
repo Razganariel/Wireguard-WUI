@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 const validator = require('validator')
 
 const MAX_STR_LEN = 255

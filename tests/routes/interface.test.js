@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import bcrypt from 'bcrypt'
 import userModel from '../../models/user.js'

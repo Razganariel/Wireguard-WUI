@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 const Tokens = require('csrf')
 const log = require('../helpers/logger')
 

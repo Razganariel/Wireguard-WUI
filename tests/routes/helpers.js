@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import http from 'node:http'
 import app from '../../server.js'
 

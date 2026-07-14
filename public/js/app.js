@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 function calcEntropy(pwd) {
   if (!pwd) return 0
   let pool = 0

@@ -1,3 +1,5 @@
+-- SPDX-License-Identifier: AGPL-3.0-only
+
 -- WireGuard-WUI database schema
 
 CREATE TABLE IF NOT EXISTS users (

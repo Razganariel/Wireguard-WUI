@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
 const bcrypt = require('bcrypt')
 const sudo = require('../helpers/sudo')
 const { decrypt } = require('../helpers/crypto')
