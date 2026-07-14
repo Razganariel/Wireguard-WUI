@@ -144,3 +144,4 @@ db/*.db-wal
 .yarn/install-state.gz
 .pnp.*
 
+:memory:

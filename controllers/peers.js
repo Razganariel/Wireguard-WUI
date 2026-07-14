@@ -5,6 +5,7 @@ const os = require('os')
 const path = require('path')
 const execAsync = util.promisify(exec)
 const sudo = require('../helpers/sudo')
+const log = require('../helpers/logger')
 const { sanitizeInt, sanitizePeerName, sanitizeIp, sanitizeAllowedIps, sanitizeDns } = require('../helpers/sanitize')
 
 const peerModel = require('../models/peer')
@@ -12,6 +13,7 @@ const interfaceModel = require('../models/interface')
 const interfaceController = require('./interface')
 
 async function generateKeys() {
+  log.debug('Peers', 'Génération de clés WireGuard pour un pair')
   const { stdout: privkey } = await execAsync('wg genkey')
   const privateKey = privkey.trim()
   const tmpFile = path.join(os.tmpdir(), `wgpriv_${Date.now()}`)
@@ -36,6 +38,7 @@ async function generatePresharedKey() {
 }
 
 async function addPeerToInterface(iface, peer) {
+  log.debug('Peers', `Ajout du pair ${peer.public_key.slice(0, 8)}... à l'interface ${iface.nom}`)
   let cmd = `wg set ${iface.nom} peer ${peer.public_key} allowed-ips ${peer.adresse_ip}/32`
   let tmpFile = null
   if (peer.preshared_key) {
@@ -142,6 +145,7 @@ async function createPeer(req, res) {
     return res.redirect(`/peers?interface=${interface_id}`)
   }
 
+  log.info('Peers', `Peer "${nom}" créé sur interface ${iface.nom} (ip=${adresse_ip})`)
   req.session.flash = { success: `Peer "${nom}" ajouté avec succès.` }
   return res.redirect(`/peers?interface=${interface_id}`)
 }
@@ -216,8 +220,10 @@ async function editPeer(req, res) {
       }
     }
 
+    log.info('Peers', `Peer "${nom}" (id=${id}) mis à jour sur interface ${iface.nom}`)
     req.session.flash = { success: `Pair "${nom}" mis à jour.` }
   } catch (err) {
+    log.error('Peers', `Édition peer id=${id} : ${err.message}`)
     req.session.flash = { error: `Erreur : ${err.message}` }
   }
 
@@ -248,6 +254,7 @@ async function deletePeer(req, res) {
   }
 
   peerModel.remove(id)
+  log.info('Peers', `Peer "${peer.nom}" (id=${id}) supprimé`)
   req.session.flash = { success: `Peer "${peer.nom}" supprimé.` }
   return res.redirect(`/peers?interface=${peer.interface_id}`)
 }

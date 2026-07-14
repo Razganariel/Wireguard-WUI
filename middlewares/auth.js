@@ -1,11 +1,14 @@
 const bcrypt = require('bcrypt')
 const sudo = require('../helpers/sudo')
 const { decrypt } = require('../helpers/crypto')
+const log = require('../helpers/logger')
 
 async function isAuthenticated(req, res, next) {
   if (req.session && req.session.userId) {
+    log.debug('Auth', `Authentifié : ${req.session.userEmail} — ${req.method} ${req.path}`)
     return next()
   }
+  log.debug('Auth', `Non authentifié — ${req.method} ${req.path}`)
   return res.redirect('/auth/login')
 }
 
@@ -15,6 +18,7 @@ async function requireSudoPassword(req, res, next) {
     if (decrypted) sudo.setPassword(decrypted)
     return next()
   }
+  log.debug('Auth', `Mot de passe sudo requis — ${req.method} ${req.path}`)
   req.session.flash = { error: 'Veuillez d\'abord définir le mot de passe sudo.' }
   return res.redirect('/auth/sudo-password')
 }

@@ -20,7 +20,7 @@ function initSchema() {
   db.exec(schema)
 
   try { db.exec('ALTER TABLE interfaces ADD COLUMN endpoint TEXT') } catch (e) {}
-  try { db.exec('ALTER TABLE users ADD COLUMN password_complexity INTEGER NOT NULL DEFAULT 0') } catch (e) {}
+  try { db.exec('CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)') } catch (e) {}
 }
 
 initSchema()

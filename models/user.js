@@ -13,17 +13,17 @@ function count() {
 }
 
 function create(user) {
-  const { nom, prenom, email, password, groupe = 'admin', password_complexity = 0 } = user
+  const { nom, prenom, email, password, groupe = 'admin' } = user
   const info = db.prepare(
-    'INSERT INTO users (nom, prenom, email, password, groupe, password_complexity) VALUES (?, ?, ?, ?, ?, ?)'
-  ).run(nom, prenom, email, password, groupe, password_complexity)
+    'INSERT INTO users (nom, prenom, email, password, groupe) VALUES (?, ?, ?, ?, ?)'
+  ).run(nom, prenom, email, password, groupe)
   return info.lastInsertRowid
 }
 
 function update(id, data) {
   const fields = []
   const values = []
-  const cols = { prenom: 'prenom', nom: 'nom', email: 'email', password: 'password', password_complexity: 'password_complexity', '2fa_enabled': '"2fa_enabled"', totp_secret: 'totp_secret' }
+  const cols = { prenom: 'prenom', nom: 'nom', email: 'email', password: 'password' }
   for (const [key, col] of Object.entries(cols)) {
     if (data[key] !== undefined) {
       fields.push(`${col} = ?`)
