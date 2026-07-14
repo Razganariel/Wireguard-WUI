@@ -1,5 +1,6 @@
 const express = require('express')
 const session = require('express-session')
+const helmet = require('helmet')
 const path = require('path')
 const hbs = require('hbs')
 require('dotenv').config()
@@ -25,6 +26,18 @@ hbs.registerHelper('currentYear', () => new Date().getFullYear())
 app.set('view engine', 'hbs')
 app.set('views', path.join(__dirname, 'views'))
 app.set('view options', { layout: 'layouts/layout' })
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://cdn.jsdelivr.net"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+      imgSrc: ["'self'", "data:"],
+      fontSrc: ["'self'", "https://cdn.jsdelivr.net"],
+      connectSrc: ["'self'"]
+    }
+  }
+}))
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.urlencoded({ extended: false }))
 app.use(
