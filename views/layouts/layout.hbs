@@ -47,8 +47,13 @@
             <li class="nav-item me-2">
               <form method="GET" action="/profile/language" class="d-inline">
                 <select name="lang" class="form-select form-select-sm bg-dark text-light border-secondary" style="cursor:pointer" data-auto-submit>
+                  <option value="de" {{#if (eq lang 'de')}}selected{{/if}}>DE</option>
                   <option value="en" {{#if (eq lang 'en')}}selected{{/if}}>EN</option>
+                  <option value="es" {{#if (eq lang 'es')}}selected{{/if}}>ES</option>
                   <option value="fr" {{#if (eq lang 'fr')}}selected{{/if}}>FR</option>
+                  <option value="ga" {{#if (eq lang 'ga')}}selected{{/if}}>GA</option>
+                  <option value="it" {{#if (eq lang 'it')}}selected{{/if}}>IT</option>
+                  <option value="pt" {{#if (eq lang 'pt')}}selected{{/if}}>PT</option>
                 </select>
               </form>
             </li>
