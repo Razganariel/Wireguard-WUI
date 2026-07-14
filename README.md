@@ -7,7 +7,7 @@ WireGuard-WUI est une interface web (Web User Interface) permettant de gérer so
 - **Configuration du serveur** — initialisation et gestion des interfaces WireGuard
 - **Gestion des pairs** — créer, lister, supprimer des peers avec génération automatique des clés
 - **Configuration client** — téléchargement du fichier `.conf` prêt à l'emploi pour chaque peer
-- **Multi-interfaces** — support de plusieurs interfaces WireGuard (wg0, wg1, etc.)
+- **Multi-interfaces** — support de plusieurs interfaces WireGuard (wg0, wg1, etc.) avec sélecteur global
 - **Authentification** — session-based avec bcrypt
 - **Déploiement en service** — installation bare-metal uniquement
 - **Interface responsive** — construite avec Express + Handlebars + Bootstrap 5
@@ -16,11 +16,12 @@ WireGuard-WUI est une interface web (Web User Interface) permettant de gérer so
 
 | Couche | Technologie |
 |---|---|
-| **Backend** | Node.js + Express |
-| **Template** | Handlebars (hbs) + Bootstrap 5 |
-| **Base de données** | SQLite (better-sqlite3) |
+| **Backend** | Node.js 18+ / Express 4 |
+| **Template** | Handlebars (hbs) + Bootstrap 5 (CDN) |
+| **Base de données** | SQLite (better-sqlite3, sans ORM) |
 | **Session** | express-session |
 | **Authentification** | bcrypt |
+| **VPN** | WireGuard (`wg`, `wg-quick`) via `child_process.exec` + `sudo` |
 
 ## Architecture
 
@@ -38,9 +39,13 @@ WireGuard-WUI est une interface web (Web User Interface) permettant de gérer so
                    └──────────┘
 ```
 
+- **Pas d'ORM** — SQL brut avec better-sqlite3
+- **Pas d'API REST** — rendu serveur Handlebars (MVC)
+- **WireGuard** — exécution de commandes shell via `child_process.exec()` avec `sudo`
+
 ## Prérequis
 
-- **Node.js** 16+ et npm
+- **Node.js** 18+ et npm
 - **WireGuard** installé sur le système (`wg`, `wg-quick`)
 - **sudo** configuré pour exécuter `wg` et `wg-quick` sans mot de passe
 
@@ -54,15 +59,15 @@ sudo visudo -f /etc/sudoers.d/wireguard-wui
 www-data ALL=(root) NOPASSWD: /usr/bin/wg, /usr/bin/wg-quick
 ```
 
-## Démarrage rapide
+> Adapter l'utilisateur (`www-data`) selon l'utilisateur qui fait tourner l'app.
 
-### Bare-metal
+## Démarrage rapide
 
 ```bash
 git clone https://github.com/Razganariel/Wireguard-WUI.git
 cd Wireguard-WUI
 cp .env.example .env
-# Éditer .env avec vos valeurs
+# Éditer .env avec vos valeurs (notamment SESSION_SECRET)
 npm install
 npm start
 ```
@@ -81,12 +86,10 @@ Variables d'environnement (fichier `.env`) :
 ## Utilisation
 
 1. Accéder à l'interface sur `http://<ip>:<port>`
-2. Se connecter avec les identifiants par défaut :
-   - Email : `admin@wireguard.local`
-   - Mot de passe : `admin`
-3. **Changer le mot de passe immédiatement** après la première connexion
-4. Accéder à la page de configuration pour initialiser une interface WireGuard
-5. Ajouter des pairs et télécharger leurs configurations clients
+2. Se connecter avec les identifiants par défaut
+3. Aller sur la page **Interfaces** pour initialiser une interface WireGuard (nom, adresse IP, port)
+4. Aller sur la page **Pairs** pour ajouter des peers et télécharger leurs configurations clients `.conf`
+5. Utiliser le sélecteur d'interface dans la navbar pour basculer entre plusieurs interfaces
 
 
 ## Licence & Utilisation

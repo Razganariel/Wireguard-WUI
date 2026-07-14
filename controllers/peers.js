@@ -1,5 +1,8 @@
 const { exec } = require('child_process')
 const util = require('util')
+const fs = require('fs')
+const os = require('os')
+const path = require('path')
 const execAsync = util.promisify(exec)
 
 const peerModel = require('../models/peer')
@@ -8,9 +11,16 @@ const interfaceModel = require('../models/interface')
 async function generateKeys() {
   const { stdout: privkey } = await execAsync('wg genkey')
   const privateKey = privkey.trim()
-  const { stdout: pubkey } = await execAsync(`echo "${privateKey}" | wg pubkey`)
-  const publicKey = pubkey.trim()
-  return { privateKey, publicKey }
+  const tmpFile = path.join(os.tmpdir(), `wgpriv_${Date.now()}`)
+  fs.writeFileSync(tmpFile, privateKey)
+  try {
+    const { stdout: pubkey } = await execAsync(`wg pubkey < ${tmpFile}`)
+    return { privateKey, publicKey: pubkey.trim() }
+  } finally {
+    if (fs.existsSync(tmpFile)) {
+      fs.unlinkSync(tmpFile)
+    }
+  }
 }
 
 async function generatePresharedKey() {
@@ -24,11 +34,20 @@ async function generatePresharedKey() {
 
 async function addPeerToInterface(iface, peer) {
   let cmd = `sudo wg set ${iface.nom} peer ${peer.public_key} allowed-ips ${peer.adresse_ip}/32`
+  let tmpFile = null
   if (peer.preshared_key) {
-    cmd += ` preshared-key <(echo "${peer.preshared_key}")`
+    tmpFile = path.join(os.tmpdir(), `wgpsk_${Date.now()}`)
+    fs.writeFileSync(tmpFile, peer.preshared_key)
+    cmd += ` preshared-key ${tmpFile}`
   }
-  await execAsync(cmd)
-  await execAsync(`sudo wg-quick save ${iface.nom}`)
+  try {
+    await execAsync(cmd)
+    await execAsync(`sudo wg-quick save ${iface.nom}`)
+  } finally {
+    if (tmpFile && fs.existsSync(tmpFile)) {
+      fs.unlinkSync(tmpFile)
+    }
+  }
 }
 
 async function removePeerFromInterface(iface, publicKey) {
@@ -42,6 +61,21 @@ async function createPeer(req, res) {
   if (!interface_id || !nom || !adresse_ip) {
     req.session.flash = { error: 'Interface, nom et adresse IP sont obligatoires.' }
     return res.redirect(`/peers?interface=${interface_id || ''}`)
+  }
+
+  if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(adresse_ip)) {
+    req.session.flash = { error: 'L\'adresse IP doit être au format IPv4 (ex: 10.0.0.2).' }
+    return res.redirect(`/peers?interface=${interface_id}`)
+  }
+
+  if (allowed_ips && !/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}(,\s*(\d{1,3}\.){3}\d{1,3}\/\d{1,2})*$/.test(allowed_ips)) {
+    req.session.flash = { error: 'Allowed IPs doit être au format CIDR (ex: 0.0.0.0/0).' }
+    return res.redirect(`/peers?interface=${interface_id}`)
+  }
+
+  if (dns && !/^(\d{1,3}\.){3}\d{1,3}$/.test(dns)) {
+    req.session.flash = { error: 'Le DNS doit être une adresse IPv4 valide.' }
+    return res.redirect(`/peers?interface=${interface_id}`)
   }
 
   const iface = interfaceModel.findById(interface_id)

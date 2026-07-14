@@ -13,7 +13,7 @@
         </div>
         <div class="card-body">
           <p class="text-muted">Configurez votre interface WireGuard. Les clés seront générées automatiquement.</p>
-          <form method="POST" action="/interface">
+          <form method="POST" action="/interface" data-validate>
             <div class="mb-3">
               <label for="nom" class="form-label">Nom de l'interface</label>
               <input type="text" class="form-control" id="nom" name="nom" placeholder="wg0" pattern="wg[0-9]+" required>
@@ -54,7 +54,7 @@
             <h5 class="mb-0">Initialiser une interface</h5>
           </div>
           <div class="card-body">
-            <form method="POST" action="/interface">
+          <form method="POST" action="/interface" data-validate>
               <div class="mb-3">
                 <label for="nom" class="form-label">Nom de l'interface</label>
                 <input type="text" class="form-control" id="nom" name="nom" placeholder="wg0" pattern="wg[0-9]+" required>

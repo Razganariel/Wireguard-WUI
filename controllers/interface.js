@@ -1,6 +1,7 @@
 const { exec } = require('child_process')
 const util = require('util')
 const fs = require('fs')
+const os = require('os')
 const path = require('path')
 const execAsync = util.promisify(exec)
 
@@ -10,9 +11,16 @@ const peerModel = require('../models/peer')
 async function generateKeys() {
   const { stdout: privkey } = await execAsync('wg genkey')
   const privateKey = privkey.trim()
-  const { stdout: pubkey } = await execAsync(`echo "${privateKey}" | wg pubkey`)
-  const publicKey = pubkey.trim()
-  return { privateKey, publicKey }
+  const tmpFile = path.join(os.tmpdir(), `wgpriv_${Date.now()}`)
+  fs.writeFileSync(tmpFile, privateKey)
+  try {
+    const { stdout: pubkey } = await execAsync(`wg pubkey < ${tmpFile}`)
+    return { privateKey, publicKey: pubkey.trim() }
+  } finally {
+    if (fs.existsSync(tmpFile)) {
+      fs.unlinkSync(tmpFile)
+    }
+  }
 }
 
 function buildConfig(iface) {
@@ -40,7 +48,16 @@ function buildConfig(iface) {
 async function writeConfigFile(iface) {
   const configPath = `/etc/wireguard/${iface.nom}.conf`
   const configContent = buildConfig(iface)
-  await execAsync(`echo '${configContent.replace(/'/g, "'\\''")}' | sudo tee ${configPath}`)
+  const tmpFile = path.join(os.tmpdir(), `wgconf_${iface.nom}_${Date.now()}.conf`)
+  fs.writeFileSync(tmpFile, configContent)
+  try {
+    await execAsync(`sudo cp ${tmpFile} ${configPath}`)
+    await execAsync(`sudo chmod 600 ${configPath}`)
+  } finally {
+    if (fs.existsSync(tmpFile)) {
+      fs.unlinkSync(tmpFile)
+    }
+  }
   return configPath
 }
 
@@ -134,6 +151,22 @@ async function initInterface(req, res) {
 
   if (!nom || !adresse_ip || !port) {
     req.session.flash = { error: 'Tous les champs sont obligatoires.' }
+    return res.redirect('/interface')
+  }
+
+  if (!/^wg[0-9]+$/.test(nom)) {
+    req.session.flash = { error: 'Le nom de l\'interface doit respecter le format wg0, wg1, etc.' }
+    return res.redirect('/interface')
+  }
+
+  if (!/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/.test(adresse_ip)) {
+    req.session.flash = { error: 'L\'adresse IP doit être au format CIDR (ex: 10.0.0.1/24).' }
+    return res.redirect('/interface')
+  }
+
+  const portNum = parseInt(port, 10)
+  if (isNaN(portNum) || portNum < 1 || portNum > 65535) {
+    req.session.flash = { error: 'Le port doit être un nombre entre 1 et 65535.' }
     return res.redirect('/interface')
   }
 
