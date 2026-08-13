@@ -1,5 +1,7 @@
 # WireGuard-WUI
 
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](./LICENSE)
+
 WireGuard-WUI is a web interface to manage your WireGuard VPN server from your browser.
 
 ## Features
