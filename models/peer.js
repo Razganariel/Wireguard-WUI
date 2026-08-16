@@ -10,14 +10,6 @@ function findById(id) {
   return db.prepare('SELECT * FROM peers WHERE id = ?').get(id)
 }
 
-function findAll() {
-  return db.prepare('SELECT * FROM peers ORDER BY id ASC').all()
-}
-
-function count() {
-  return db.prepare('SELECT COUNT(*) as count FROM peers').get().count
-}
-
 function create(data) {
   const {
     interface_id,
@@ -57,8 +49,6 @@ function remove(id) {
 module.exports = {
   findByInterfaceId,
   findById,
-  findAll,
-  count,
   create,
   update,
   remove

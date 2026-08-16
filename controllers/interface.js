@@ -236,15 +236,6 @@ async function getStatus(nom) {
   }
 }
 
-async function getAllStatus() {
-  try {
-    const { stdout } = await sudo.exec('wg show all dump')
-    return parseAllDump(stdout)
-  } catch (err) {
-    return {}
-  }
-}
-
 function parseDump(stdout) {
   const lines = stdout.trim().split('\n')
   if (lines.length === 0 || !lines[0]) return null
@@ -264,41 +255,6 @@ function parseDump(stdout) {
     const parts = lines[i].split('\t')
     if (parts.length >= 8) {
       result.peers.push({
-        publicKey: parts[0],
-        presharedKey: parts[1],
-        endpoint: parts[2],
-        allowedIps: parts[3],
-        latestHandshake: parseInt(parts[4], 10),
-        transferRx: parseInt(parts[5], 10),
-        transferTx: parseInt(parts[6], 10),
-        persistentKeepalive: parseInt(parts[7], 10)
-      })
-    }
-  }
-
-  return result
-}
-
-function parseAllDump(stdout) {
-  const lines = stdout.trim().split('\n').filter(Boolean)
-  const result = {}
-  let currentIface = null
-
-  for (const line of lines) {
-    const parts = line.split('\t')
-    if (parts.length >= 4 && parts[0].length < 20) {
-      currentIface = parts[0]
-      result[currentIface] = {
-        interface: {
-          publicKey: parts[2],
-          listenPort: parseInt(parts[3], 10),
-          privateKey: parts[1],
-          fwmark: parts[4] || ''
-        },
-        peers: []
-      }
-    } else if (parts.length >= 8 && currentIface) {
-      result[currentIface].peers.push({
         publicKey: parts[0],
         presharedKey: parts[1],
         endpoint: parts[2],
@@ -768,7 +724,6 @@ module.exports = {
   editInterface,
   deleteInterface,
   getStatus,
-  getAllStatus,
   getSystemInterfaceNames,
   importInterface,
   detectAndImportAll,
