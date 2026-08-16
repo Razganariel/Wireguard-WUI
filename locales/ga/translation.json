@@ -97,7 +97,8 @@
     "btn": {
       "manage": "Bainistigh",
       "peers": "Piaraí",
-      "create_interface": "Cruthaigh comhéadan"
+      "create_interface": "Cruthaigh comhéadan",
+      "detect_interfaces": "Braith comhéadain"
     },
     "routing": {
       "ok": "✓ {{count}} comhéadan(comhéadain) ródaithe i gceart",
