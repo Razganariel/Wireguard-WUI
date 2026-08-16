@@ -7,12 +7,13 @@ const interfaceController = require('../controllers/interface')
 const peerModel = require('../models/peer')
 const interfaceModel = require('../models/interface')
 const { isAuthenticated, requireSudoPassword } = require('../middlewares/auth')
+const asyncHandler = require('../helpers/asyncHandler')
 const sudo = require('../helpers/sudo')
 const qrcode = require('../helpers/qrcode')
 const { sanitizeInt } = require('../helpers/sanitize')
 const { formatHandshake, formatBytes } = require('../helpers/format')
 
-router.use(isAuthenticated)
+router.use(asyncHandler(isAuthenticated))
 
 async function getPeerStatuses(nom) {
   try {
@@ -36,7 +37,7 @@ async function getPeerStatuses(nom) {
   }
 }
 
-router.get('/', async (req, res) => {
+router.get('/', asyncHandler(async (req, res) => {
   const interfaceId = sanitizeInt(req.query.interface)
   let interfaces = interfaceModel.findAll()
 
@@ -115,9 +116,9 @@ router.get('/', async (req, res) => {
     qrcodeAvailable: qrcode.isAvailable(),
     suggestedPeerIp
   })
-})
+}))
 
-router.post('/detect', requireSudoPassword, async (req, res) => {
+router.post('/detect', requireSudoPassword, asyncHandler(async (req, res) => {
   const ifaceId = req.session.selectedInterfaceId
   if (!ifaceId) {
     req.session.flash = { error: req.t('error.no_interface_selected') }
@@ -139,17 +140,17 @@ router.post('/detect', requireSudoPassword, async (req, res) => {
     req.session.flash = { error: req.t('error.generic', { message: err.message }) }
   }
   res.redirect('/peers')
-})
+}))
 
-router.post('/', requireSudoPassword, peerController.createPeer)
+router.post('/', requireSudoPassword, asyncHandler(peerController.createPeer))
 
-router.post('/:id/edit', requireSudoPassword, peerController.editPeer)
+router.post('/:id/edit', requireSudoPassword, asyncHandler(peerController.editPeer))
 
-router.post('/:id/delete', requireSudoPassword, peerController.deletePeer)
+router.post('/:id/delete', requireSudoPassword, asyncHandler(peerController.deletePeer))
 
-router.get('/:id/config', peerController.downloadConfig)
+router.get('/:id/config', asyncHandler(peerController.downloadConfig))
 
-router.get('/:id/qrcode', isAuthenticated, async (req, res) => {
+router.get('/:id/qrcode', isAuthenticated, asyncHandler(async (req, res) => {
   if (!qrcode.isAvailable()) {
     req.session.flash = { error: req.t('error.qrcode_not_available') }
     return res.redirect('/peers')
@@ -177,6 +178,6 @@ router.get('/:id/qrcode', isAuthenticated, async (req, res) => {
     req.session.flash = { error: req.t('error.qrcode_generation_failed') }
     res.redirect('/peers')
   }
-})
+}))
 
 module.exports = router

@@ -31,7 +31,7 @@ function isCommandSafe(command) {
   const allowed = ALLOWED_PREFIXES.some((p) => command.startsWith(p))
   if (!allowed) return false
 
-  if (/[$()`\`|]/.test(command)) return false
+  if (/[$()`\`|&<>]/.test(command)) return false
 
   const clean = command.replace(/\\;/g, '')
   const semicolons = (clean.match(/;/g) || []).length
@@ -52,7 +52,13 @@ async function execSudo(command) {
     throw new Error(i18next.t('error.sudo_command_not_allowed'))
   }
 
-  const sanitizedCmd = command.replace(/echo '[^']*' \| sudo /g, 'sudo ')
+  const redact = (s) => {
+    let r = s.replace(/echo '[^']*' \| sudo /g, 'sudo ')
+    if (_password) r = r.split(_password).join('[REDACTED]')
+    return r
+  }
+
+  const sanitizedCmd = redact(command)
   log.info('Sudo', `Exécution : sudo ${sanitizedCmd}`)
 
   const escapedPwd = _password.replace(/'/g, "'\\''")
@@ -69,10 +75,9 @@ async function execSudo(command) {
       log.error('Sudo', `Mot de passe incorrect pour : sudo ${sanitizedCmd}`)
       throw new Error(i18next.t('error.sudo_password_incorrect'))
     }
-    const sanitize = (s) => s.replace(/echo '[^']*' \| sudo /g, 'sudo ')
-    if (err.message) err.message = sanitize(err.message)
-    if (err.cmd) err.cmd = sanitize(err.cmd)
-    log.error('Sudo', `Échec : sudo ${sanitizedCmd} — ${err.message}`)
+    if (err.message) err.message = redact(err.message)
+    if (err.cmd) err.cmd = redact(err.cmd)
+    log.error('Sudo', `Échec : sudo ${sanitizedCmd} — ${redact(err.message)}`)
     throw err
   }
 }

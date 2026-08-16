@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import { describe, it, expect, vi } from 'vitest'
-import { isAuthenticated, requireSudoPassword, verifyPassword } from '../../middlewares/auth.js'
+import { isAuthenticated, requireSudoPassword } from '../../middlewares/auth.js'
 
 describe('isAuthenticated', () => {
   it('calls next() when session has userId', () => {
@@ -46,21 +46,5 @@ describe('requireSudoPassword', () => {
     requireSudoPassword(req, res, next)
     expect(res.redirect).toHaveBeenCalledWith('/auth/sudo-password')
     expect(next).not.toHaveBeenCalled()
-  })
-})
-
-describe('verifyPassword', () => {
-  it('returns true for matching password', async () => {
-    const bcrypt = await import('bcrypt')
-    const hash = await bcrypt.hash('correct-password', 4)
-    const result = await verifyPassword('correct-password', hash)
-    expect(result).toBe(true)
-  })
-
-  it('returns false for wrong password', async () => {
-    const bcrypt = await import('bcrypt')
-    const hash = await bcrypt.hash('correct-password', 4)
-    const result = await verifyPassword('wrong-password', hash)
-    expect(result).toBe(false)
   })
 })

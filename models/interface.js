@@ -10,14 +10,6 @@ function findById(id) {
   return db.prepare('SELECT * FROM interfaces WHERE id = ?').get(id)
 }
 
-function findFirst() {
-  return db.prepare('SELECT * FROM interfaces ORDER BY id ASC LIMIT 1').get()
-}
-
-function count() {
-  return db.prepare('SELECT COUNT(*) as count FROM interfaces').get().count
-}
-
 function create(data) {
   const { nom, private_key, public_key, adresse_ip, port = 51820, endpoint = null } = data
   const info = db.prepare(
@@ -42,8 +34,6 @@ function remove(id) {
 module.exports = {
   findAll,
   findById,
-  findFirst,
-  count,
   create,
   updateActive,
   update,

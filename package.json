@@ -1,12 +1,11 @@
 {
   "name": "wireguard-wui",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Web UI for managing a personal WireGuard VPN server",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "seed": "node scripts/seed.js",
     "test": "vitest run",
     "test:watch": "vitest"
   },
@@ -17,9 +16,12 @@
     "express"
   ],
   "author": "dvergar",
-  "license": "GPL-3.0",
+  "license": "AGPL-3.0-only",
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
-    "bcrypt": "^5.1.1",
+    "bcrypt": "^6.0.0",
     "better-sqlite3": "^11.8.1",
     "csrf": "^3.1.0",
     "dotenv": "^16.4.7",
@@ -37,7 +39,6 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.9",
-    "supertest": "^7.2.2",
     "vitest": "^4.1.10"
   }
 }

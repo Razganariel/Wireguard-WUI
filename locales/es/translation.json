@@ -9,7 +9,8 @@
     "sudo_active": "Sudo",
     "sudo_inactive": "Sudo",
     "logout": "Cerrar sesión",
-    "login": "Iniciar sesión"
+    "login": "Iniciar sesión",
+    "logs": "Registros"
   },
   "alert": {
     "sudo_password": {
@@ -18,7 +19,7 @@
     }
   },
   "footer": {
-    "copyright": "WireGuard-WUI — GPL v3 — {{year}}",
+    "copyright": "WireGuard-WUI — AGPL v3 — {{year}}",
     "support": "Apóyame en Ko-fi"
   },
   "auth": {
@@ -97,7 +98,8 @@
     "btn": {
       "manage": "Gestionar",
       "peers": "Pares",
-      "create_interface": "Crear una interfaz"
+      "create_interface": "Crear una interfaz",
+      "detect_interfaces": "Detectar interfaces"
     },
     "routing": {
       "ok": "✓ {{count}} interfaz(es) correctamente enrutada(s)",
@@ -198,7 +200,8 @@
     "peer_updated": "Par \"{{nom}}\" actualizado.",
     "peer_deleted": "Par \"{{nom}}\" eliminado.",
     "peers_detected": "{{count}} par(es) importado(s) desde \"{{nom}}\".",
-    "no_new_peers": "No se detectaron nuevos pares."
+    "no_new_peers": "No se detectaron nuevos pares.",
+    "settings_updated": "Ajustes actualizados."
   },
   "profile": {
     "title": "Mi perfil",
@@ -236,7 +239,12 @@
     "admin": {
       "title": "Administración",
       "debug_description": "Activa el modo depuración para registrar todas las operaciones detalladas en logs/app.log.",
-      "debug_mode": "Modo depuración"
+      "debug_mode": "Modo depuración",
+      "rotation_title": "Rotación de registros",
+      "rotation_description": "Rotar registros automáticamente al alcanzar el tamaño máximo (0 = desactivado). Los archivos antiguos se guardan como .1.log, .2.log, etc.",
+      "rotate_size": "Tamaño máximo (KB)",
+      "rotate_backups": "Copias guardadas",
+      "rotation_save": "Guardar"
     }
   },
   "totp_setup": {
@@ -375,5 +383,42 @@
     "edit": "Editar",
     "delete": "Eliminar",
     "back_to_dashboard": "Volver al panel"
+  },
+  "unit": {
+    "byte": "B",
+    "kilobyte": "KB",
+    "megabyte": "MB",
+    "gigabyte": "GB",
+    "terabyte": "TB"
+  },
+  "modal": {
+    "confirm_title": "Confirmar",
+    "btn_cancel": "Cancelar",
+    "btn_confirm": "Eliminar"
+  },
+  "logs": {
+    "title": "Registros",
+    "filter": {
+      "level": "Nivel",
+      "module": "Módulo",
+      "search": "Buscar",
+      "search_placeholder": "Buscar mensajes…",
+      "limit": "Mostrar",
+      "apply": "Aplicar",
+      "reset": "Restablecer",
+      "all_levels": "Todos los niveles",
+      "all_modules": "Todos los módulos"
+    },
+    "table": {
+      "timestamp": "Marca de tiempo",
+      "level": "Nivel",
+      "module": "Módulo",
+      "message": "Mensaje"
+    },
+    "empty": "No se encontraron entradas de registro.",
+    "count": "{{count}} de {{total}} entradas",
+    "clear": "Vaciar registros",
+    "clear_confirm": "¿Borrar todos los registros? Esta acción no se puede deshacer.",
+    "cleared": "Registros vaciados."
   }
 }

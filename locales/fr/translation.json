@@ -9,7 +9,8 @@
     "sudo_active": "Sudo",
     "sudo_inactive": "Sudo",
     "logout": "Déconnexion",
-    "login": "Connexion"
+    "login": "Connexion",
+    "logs": "Journaux"
   },
   "alert": {
     "sudo_password": {
@@ -18,7 +19,7 @@
     }
   },
   "footer": {
-    "copyright": "WireGuard-WUI — GPL v3 — {{year}}",
+    "copyright": "WireGuard-WUI — AGPL v3 — {{year}}",
     "support": "Soutenez-moi sur Ko-fi"
   },
   "auth": {
@@ -90,7 +91,8 @@
     "btn": {
       "manage": "Gérer",
       "peers": "Pairs",
-      "create_interface": "Créer une interface"
+      "create_interface": "Créer une interface",
+      "detect_interfaces": "Détecter les interfaces"
     },
     "routing": {
       "ok": "✓ {{count}} interface(s) correctement routée(s)",
@@ -191,7 +193,8 @@
     "peer_updated": "Pair \"{{nom}}\" mis à jour.",
     "peer_deleted": "Peer \"{{nom}}\" supprimé.",
     "peers_detected": "{{count}} pair(s) importé(s) depuis \"{{nom}}\".",
-    "no_new_peers": "Aucun nouveau pair détecté."
+    "no_new_peers": "Aucun nouveau pair détecté.",
+    "settings_updated": "Paramètres mis à jour."
   },
   "profile": {
     "title": "Mon profil",
@@ -229,7 +232,12 @@
     "admin": {
       "title": "Administration",
       "debug_description": "Activez le mode debug pour journaliser toutes les opérations détaillées dans logs/app.log.",
-      "debug_mode": "Mode debug"
+      "debug_mode": "Mode debug",
+      "rotation_title": "Rotation des journaux",
+      "rotation_description": "Faire pivoter automatiquement les journaux lorsqu'ils atteignent leur taille maximale (0 = désactivé). Les anciens fichiers sont conservés en .1.log, .2.log, etc.",
+      "rotate_size": "Taille maximale (Ko)",
+      "rotate_backups": "Fichiers conservés",
+      "rotation_save": "Enregistrer"
     }
   },
   "totp_setup": {
@@ -380,5 +388,30 @@
     "edit": "Éditer",
     "delete": "Supprimer",
     "back_to_dashboard": "Retour au tableau de bord"
+  },
+  "logs": {
+    "title": "Journaux",
+    "filter": {
+      "level": "Niveau",
+      "module": "Module",
+      "search": "Recherche",
+      "search_placeholder": "Rechercher dans les messages…",
+      "limit": "Afficher",
+      "apply": "Appliquer",
+      "reset": "Réinitialiser",
+      "all_levels": "Tous les niveaux",
+      "all_modules": "Tous les modules"
+    },
+    "table": {
+      "timestamp": "Horodatage",
+      "level": "Niveau",
+      "module": "Module",
+      "message": "Message"
+    },
+    "empty": "Aucun journal trouvé.",
+    "count": "{{count}} sur {{total}} entrées",
+    "clear": "Vider les journaux",
+    "clear_confirm": "Supprimer tous les journaux ? Cette action est irréversible.",
+    "cleared": "Journaux vidés."
   }
 }

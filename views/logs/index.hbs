@@ -1,0 +1,93 @@
+{{! SPDX-License-Identifier: AGPL-3.0-only }}
+<div class="row mb-4">
+  <div class="col">
+    <h1>{{__ 'logs.title'}}</h1>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="GET" action="/logs" class="row g-2 align-items-end">
+      <div class="col-md-2 col-sm-6">
+        <label class="form-label" for="level">{{__ 'logs.filter.level'}}</label>
+        <select name="level" id="level" class="form-select form-select-sm">
+          <option value="">{{__ 'logs.filter.all_levels'}}</option>
+          <option value="DEBUG" {{#if (eq filters.level 'DEBUG')}}selected{{/if}}>DEBUG</option>
+          <option value="INFO" {{#if (eq filters.level 'INFO')}}selected{{/if}}>INFO</option>
+          <option value="ERROR" {{#if (eq filters.level 'ERROR')}}selected{{/if}}>ERROR</option>
+        </select>
+      </div>
+      <div class="col-md-2 col-sm-6">
+        <label class="form-label" for="module">{{__ 'logs.filter.module'}}</label>
+        <select name="module" id="module" class="form-select form-select-sm">
+          <option value="">{{__ 'logs.filter.all_modules'}}</option>
+          {{#each modules}}
+            <option value="{{this}}" {{#if (eq ../filters.module this)}}selected{{/if}}>{{this}}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <label class="form-label" for="search">{{__ 'logs.filter.search'}}</label>
+        <input type="text" name="search" id="search" class="form-control form-control-sm" value="{{filters.search}}" placeholder="{{__ 'logs.filter.search_placeholder'}}">
+      </div>
+      <div class="col-md-2 col-sm-6">
+        <label class="form-label" for="limit">{{__ 'logs.filter.limit'}}</label>
+        <select name="limit" id="limit" class="form-select form-select-sm">
+          <option value="50" {{#if (eq filters.limit 50)}}selected{{/if}}>50</option>
+          <option value="100" {{#if (eq filters.limit 100)}}selected{{/if}}>100</option>
+          <option value="200" {{#if (eq filters.limit 200)}}selected{{/if}}>200</option>
+          <option value="500" {{#if (eq filters.limit 500)}}selected{{/if}}>500</option>
+          <option value="1000" {{#if (eq filters.limit 1000)}}selected{{/if}}>1000</option>
+        </select>
+      </div>
+      <div class="col-md-2 col-sm-6 d-flex gap-2">
+        <button type="submit" class="btn btn-sm btn-primary">{{__ 'logs.filter.apply'}}</button>
+        <a href="/logs" class="btn btn-sm btn-outline-secondary">{{__ 'logs.filter.reset'}}</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">{{__ 'logs.title'}}</h5>
+    <div class="d-flex align-items-center gap-3">
+      <span class="text-muted small">{{__ 'logs.count' count=entries.length total=total}}</span>
+      <form method="POST" action="/logs/clear" class="d-inline" data-confirm="{{__ 'logs.clear_confirm'}}">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <button type="submit" class="btn btn-sm btn-outline-danger">{{__ 'logs.clear'}}</button>
+      </form>
+    </div>
+  </div>
+  <div class="logs-table">
+    <table class="table table-sm table-hover mb-0">
+      <thead>
+        <tr>
+          <th class="text-nowrap">{{__ 'logs.table.timestamp'}}</th>
+          <th>{{__ 'logs.table.level'}}</th>
+          <th>{{__ 'logs.table.module'}}</th>
+          <th>{{__ 'logs.table.message'}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each entries}}
+          <tr>
+            <td class="text-nowrap text-muted small">{{timestamp}}</td>
+            <td>
+              {{#if (eq level 'ERROR')}}<span class="badge bg-danger">ERROR</span>{{/if}}
+              {{#if (eq level 'INFO')}}<span class="badge bg-primary">INFO</span>{{/if}}
+              {{#if (eq level 'DEBUG')}}<span class="badge bg-secondary">DEBUG</span>{{/if}}
+            </td>
+            <td><span class="badge bg-light text-dark border">{{module}}</span></td>
+            <td class="small" style="word-break: break-word;">{{message}}</td>
+          </tr>
+        {{/each}}
+        {{#unless entries.length}}
+          <tr>
+            <td colspan="4" class="text-center text-muted py-4">{{__ 'logs.empty'}}</td>
+          </tr>
+        {{/unless}}
+      </tbody>
+    </table>
+  </div>
+</div>

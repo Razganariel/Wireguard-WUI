@@ -38,8 +38,16 @@
   </main>
 
   <footer class="bg-dark text-light py-3 mt-auto">
-    <div class="container text-center">
+    <div class="container text-center d-flex flex-column flex-sm-row align-items-center justify-content-center gap-2">
       <span class="small">{{__ 'footer.copyright' year=currentYear}}</span>
+      <a href="https://ko-fi.com/razganariel" target="_blank" rel="noopener"
+         class="btn btn-sm rounded-pill px-3 py-1 text-white d-inline-flex align-items-center gap-1"
+         style="background-color:#FF5E5B; font-weight:600;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M7.06 12.5c-1.06-.88-4.06-3.29-4.06-5.64C3 5.13 4 4.5 5 4.5c1.13 0 2.5.63 2.5 2.06h1C8.5 5.13 9.87 4.5 11 4.5c1 0 2 .63 2 2.36 0 2.35-3 4.76-4.06 5.64a1.4 1.4 0 0 1-1.88 0"/>
+        </svg>
+        {{__ 'footer.support'}}
+      </a>
     </div>
   </footer>
 

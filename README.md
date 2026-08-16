@@ -1,5 +1,7 @@
 # WireGuard-WUI
 
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](./LICENSE)
+
 WireGuard-WUI is a web interface to manage your WireGuard VPN server from your browser.
 
 ## Features
@@ -36,6 +38,7 @@ WireGuard-WUI is a web interface to manage your WireGuard VPN server from your b
 - **Node.js** 20+ and npm
 - **WireGuard** installed on the system (`wg`, `wg-quick`)
 - **sudo** to execute WireGuard commands
+- **rsync** (required by `install.sh`)
 
 ## Quick start
 
@@ -92,10 +95,10 @@ visudo -f /etc/sudoers.d/wireguard-wui
 ```
 
 ```
-wireguard-wui ALL=(root) NOPASSWD: /usr/bin/wg-quick *, /usr/bin/wg show *, /usr/bin/wg syncconf *, /usr/bin/wg set *, /usr/bin/wg pubkey, /usr/bin/iptables *, /usr/bin/ip link *, /usr/bin/firewall-cmd *, /usr/bin/cp, /usr/bin/chmod, /usr/bin/rm, /usr/bin/cat, /usr/bin/find
+wireguard-wui ALL=(root) NOPASSWD: /usr/bin/wg-quick *, /usr/bin/wg show *, /usr/bin/wg syncconf *, /usr/bin/wg set *, /usr/bin/wg pubkey *, /usr/sbin/iptables *, /usr/sbin/ip link *, /usr/bin/firewall-cmd *, /usr/bin/cp *, /usr/bin/chmod *, /usr/bin/rm *, /usr/bin/cat *, /usr/bin/find *
 ```
 
-> Adjust the user (`wireguard-wui`) to match your setup.
+> Adjust the user (`wireguard-wui`) and the absolute paths (`/usr/sbin` vs `/usr/bin`) to match your distribution.
 
 ## Tests
 

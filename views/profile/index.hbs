@@ -144,6 +144,25 @@
             <label class="form-check-label" for="debug_mode">{{__ 'profile.admin.debug_mode'}}</label>
           </div>
         </form>
+        <hr class="my-3">
+        <h6 class="mb-2">{{__ 'profile.admin.rotation_title'}}</h6>
+        <p class="text-muted small mb-3">
+          {{__ 'profile.admin.rotation_description'}}
+        </p>
+        <form method="POST" action="/profile/rotation" class="row g-2">
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
+          <div class="col-md-6">
+            <label class="form-label" for="log_rotate_size">{{__ 'profile.admin.rotate_size'}}</label>
+            <input type="number" name="log_rotate_size" id="log_rotate_size" class="form-control form-control-sm" min="0" step="1" value="{{rotation.maxSizeKb}}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="log_rotate_backups">{{__ 'profile.admin.rotate_backups'}}</label>
+            <input type="number" name="log_rotate_backups" id="log_rotate_backups" class="form-control form-control-sm" min="0" step="1" value="{{rotation.backups}}">
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-sm btn-primary">{{__ 'profile.admin.rotation_save'}}</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
