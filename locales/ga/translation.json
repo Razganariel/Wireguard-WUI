@@ -375,5 +375,17 @@
     "edit": "Cuir in eagar",
     "delete": "Scrios",
     "back_to_dashboard": "Ar ais go dtí an painéal"
+  },
+  "unit": {
+    "byte": "B",
+    "kilobyte": "KB",
+    "megabyte": "MB",
+    "gigabyte": "GB",
+    "terabyte": "TB"
+  },
+  "modal": {
+    "confirm_title": "Deimhnigh",
+    "btn_cancel": "Cealaigh",
+    "btn_confirm": "Scrios"
   }
 }

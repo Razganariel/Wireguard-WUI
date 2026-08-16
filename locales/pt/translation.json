@@ -375,5 +375,17 @@
     "edit": "Editar",
     "delete": "Excluir",
     "back_to_dashboard": "Voltar ao painel"
+  },
+  "unit": {
+    "byte": "B",
+    "kilobyte": "KB",
+    "megabyte": "MB",
+    "gigabyte": "GB",
+    "terabyte": "TB"
+  },
+  "modal": {
+    "confirm_title": "Confirmar",
+    "btn_cancel": "Cancelar",
+    "btn_confirm": "Excluir"
   }
 }

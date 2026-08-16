@@ -375,5 +375,17 @@
     "edit": "Modifica",
     "delete": "Elimina",
     "back_to_dashboard": "Torna alla dashboard"
+  },
+  "unit": {
+    "byte": "B",
+    "kilobyte": "KB",
+    "megabyte": "MB",
+    "gigabyte": "GB",
+    "terabyte": "TB"
+  },
+  "modal": {
+    "confirm_title": "Conferma",
+    "btn_cancel": "Annulla",
+    "btn_confirm": "Elimina"
   }
 }

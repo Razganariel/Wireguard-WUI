@@ -38,6 +38,7 @@ WireGuard-WUI is a web interface to manage your WireGuard VPN server from your b
 - **Node.js** 20+ and npm
 - **WireGuard** installed on the system (`wg`, `wg-quick`)
 - **sudo** to execute WireGuard commands
+- **rsync** (required by `install.sh`)
 
 ## Quick start
 

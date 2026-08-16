@@ -80,8 +80,10 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
+      httpOnly: true,
+      sameSite: 'Lax',
       maxAge: 1000 * 60 * 60 * 24,
       secure: process.env.SESSION_SECURE === 'true'
     }
@@ -329,15 +331,25 @@ app.post('/profile/totp-disable', async (req, res) => {
 
 const AVAILABLE_LANGS = ['de', 'en', 'es', 'fr', 'ga', 'it', 'pt']
 
+function safeReferer(req) {
+  const ref = req.get('Referer')
+  if (!ref) return '/'
+  try {
+    const u = new URL(ref)
+    if (u.host === req.headers.host) return ref
+  } catch (e) {}
+  return '/'
+}
+
 app.get('/profile/language', (req, res) => {
   const lang = req.query.lang
-  if (!AVAILABLE_LANGS.includes(lang)) return res.redirect(req.get('Referer') || '/')
+  if (!AVAILABLE_LANGS.includes(lang)) return res.redirect(safeReferer(req))
   if (req.i18n) req.i18n.changeLanguage(lang)
   res.cookie('i18next', lang, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: false })
   if (req.session && req.session.userId) {
     settingsModel.setUserSetting(req.session.userId, 'language', lang)
   }
-  res.redirect(req.get('Referer') || '/')
+  res.redirect(safeReferer(req))
 })
 
 app.get('/logout', (req, res) => {

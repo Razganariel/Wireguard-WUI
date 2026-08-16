@@ -17,7 +17,7 @@ describe('sudo.isCommandSafe', () => {
   })
 
   it('allows wg pubkey with trailing content', () => {
-    expect(sudo.isCommandSafe('wg pubkey < /tmp/key')).toBe(true)
+    expect(sudo.isCommandSafe('wg pubkey /tmp/key')).toBe(true)
   })
 
   it('allows iptables commands', () => {
@@ -45,7 +45,7 @@ describe('sudo.isCommandSafe', () => {
   })
 
   it('allows find with exit 0', () => {
-    expect(sudo.isCommandSafe('find /etc/wireguard -maxdepth 1 -name "*.conf" -exec basename {} .conf \\; 2>/dev/null; exit 0')).toBe(true)
+    expect(sudo.isCommandSafe('find /etc/wireguard -maxdepth 1 -name "*.conf" -exec basename {} .conf \\; ; exit 0')).toBe(true)
   })
 
   it('rejects arbitrary commands', () => {
@@ -59,6 +59,11 @@ describe('sudo.isCommandSafe', () => {
     expect(sudo.isCommandSafe('wg show $(whoami)')).toBe(false)
     expect(sudo.isCommandSafe('wg show `whoami`')).toBe(false)
     expect(sudo.isCommandSafe('wg show | whoami')).toBe(false)
+    expect(sudo.isCommandSafe('wg show wg0 & rm -rf /')).toBe(false)
+    expect(sudo.isCommandSafe('wg show wg0 && rm -rf /')).toBe(false)
+    expect(sudo.isCommandSafe('wg show wg0 > /etc/passwd')).toBe(false)
+    expect(sudo.isCommandSafe('wg show wg0 2>&1')).toBe(false)
+    expect(sudo.isCommandSafe('wg pubkey < /tmp/key')).toBe(false)
   })
 
   it('rejects more than one semicolon', () => {

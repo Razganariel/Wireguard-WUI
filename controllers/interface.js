@@ -83,7 +83,7 @@ async function getFirewallType() {
 
 async function checkRuleExists(args) {
   try {
-    await sudo.exec(`iptables ${args} 2>/dev/null`)
+    await sudo.exec(`iptables ${args}`)
     return true
   } catch (e) {
     return false
@@ -178,9 +178,9 @@ async function addRoutingRules(nom, adresse_ip) {
     await sudo.exec(`firewall-cmd --permanent --direct --add-rule ipv4 filter FORWARD 0 -i ${phy} -o ${nom} -m state --state RELATED,ESTABLISHED -j ACCEPT`)
     await sudo.exec('firewall-cmd --reload')
   } else {
-    try { await sudo.exec(`iptables -t nat -D POSTROUTING -s ${subnet} -o ${phy} -j MASQUERADE 2>/dev/null`) } catch (e) {}
-    try { await sudo.exec(`iptables -D FORWARD -i ${nom} -o ${phy} -j ACCEPT 2>/dev/null`) } catch (e) {}
-    try { await sudo.exec(`iptables -D FORWARD -i ${phy} -o ${nom} -m state --state RELATED,ESTABLISHED -j ACCEPT 2>/dev/null`) } catch (e) {}
+    try { await sudo.exec(`iptables -t nat -D POSTROUTING -s ${subnet} -o ${phy} -j MASQUERADE`) } catch (e) {}
+    try { await sudo.exec(`iptables -D FORWARD -i ${nom} -o ${phy} -j ACCEPT`) } catch (e) {}
+    try { await sudo.exec(`iptables -D FORWARD -i ${phy} -o ${nom} -m state --state RELATED,ESTABLISHED -j ACCEPT`) } catch (e) {}
     await sudo.exec(`iptables -t nat -A POSTROUTING -s ${subnet} -o ${phy} -j MASQUERADE`)
     await sudo.exec(`iptables -A FORWARD -i ${nom} -o ${phy} -j ACCEPT`)
     await sudo.exec(`iptables -A FORWARD -i ${phy} -o ${nom} -m state --state RELATED,ESTABLISHED -j ACCEPT`)
@@ -213,8 +213,10 @@ async function bringUp(nom) {
   try { await addRoutingRules(nom, iface.adresse_ip) } catch (e) {}
 }
 
-async function bringDown(nom) {
-  const iface = interfaceModel.findAll().find((i) => i.nom === nom)
+async function bringDown(nom, iface = null) {
+  if (!iface) {
+    iface = interfaceModel.findAll().find((i) => i.nom === nom)
+  }
   if (iface) {
     try { await removeRoutingRules(nom, iface.adresse_ip) } catch (e) {}
   }
@@ -223,7 +225,8 @@ async function bringDown(nom) {
     await sudo.exec(`wg-quick down ${nom}`)
   } catch (e) {
     log.debug('Interface', `wg-quick down échoué pour ${nom}, tentative ip link delete`)
-    try { await sudo.exec(`wg show ${nom} >/dev/null 2>&1 && ip link delete ${nom}`) } catch (e2) {}
+    try { await sudo.exec(`wg show ${nom} dump`) } catch (e) {}
+    try { await sudo.exec(`ip link delete ${nom}`) } catch (e2) {}
   }
 }
 
@@ -500,16 +503,16 @@ async function deleteInterface(req, res) {
     peerModel.remove(peer.id)
   }
 
-  interfaceModel.remove(id)
-
   try {
     if (iface.active) {
-      await bringDown(iface.nom)
+      await bringDown(iface.nom, iface)
     }
     await sudo.exec(`rm -f /etc/wireguard/${iface.nom}.conf`)
   } catch (err) {
     log.error('Interface', `Nettoyage WireGuard pour ${iface.nom} : ${err.message}`)
   }
+
+  interfaceModel.remove(id)
 
   const peerCount = peers.length
   log.info('Interface', `Interface ${iface.nom} supprimée (id=${id}) avec ${peerCount} pair(s)`)
@@ -520,7 +523,7 @@ async function deleteInterface(req, res) {
 async function getSystemInterfaceNames() {
   try {
     if (!sudo.hasPassword()) return []
-    const { stdout } = await sudo.exec('find /etc/wireguard -maxdepth 1 -name "*.conf" -exec basename {} .conf \\; 2>/dev/null; exit 0')
+    const { stdout } = await sudo.exec('find /etc/wireguard -maxdepth 1 -name "*.conf" -exec basename {} .conf \\; ; exit 0')
     return stdout.trim().split('\n').filter(Boolean)
   } catch (err) {
     return []

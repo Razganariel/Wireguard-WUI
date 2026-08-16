@@ -64,7 +64,7 @@ async function createPeer(req, res) {
   const adresse_ip = sanitizeIp(req.body.adresse_ip)
   const allowed_ips = req.body.allowed_ips ? sanitizeAllowedIps(req.body.allowed_ips) : '0.0.0.0/0'
   const dns = req.body.dns ? sanitizeDns(req.body.dns) : null
-  const persistent_keepalive = sanitizeInt(req.body.persistent_keepalive) || 25
+  const persistent_keepalive = sanitizeInt(req.body.persistent_keepalive) ?? 25
 
   if (!interface_id || !nom || !adresse_ip) {
     req.session.flash = { error: req.t('error.peer_required_fields') }
@@ -163,7 +163,7 @@ async function editPeer(req, res) {
   const adresse_ip = sanitizeIp(req.body.adresse_ip)
   const allowed_ips = req.body.allowed_ips ? sanitizeAllowedIps(req.body.allowed_ips) : '0.0.0.0/0'
   const dns = req.body.dns ? sanitizeDns(req.body.dns) : null
-  const persistent_keepalive = sanitizeInt(req.body.persistent_keepalive) || 25
+  const persistent_keepalive = sanitizeInt(req.body.persistent_keepalive) ?? 25
 
   if (!nom || !adresse_ip) {
     req.session.flash = { error: req.t('error.name_ip_required') }
