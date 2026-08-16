@@ -2,6 +2,7 @@
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import bcrypt from 'bcrypt'
+import fs from 'node:fs'
 import userModel from '../../models/user.js'
 import { startServer, stopServer, fetchUrl, cookieHeader, extractCsrf } from './helpers.js'
 
@@ -58,5 +59,39 @@ describe('Logs routes', () => {
     const res = await fetchUrl('/logs?level=ERROR', { headers: { Cookie: cookieHeader(jar) } })
     expect(res.status).toBe(200)
     expect(res.text).toMatch(/value="ERROR" selected/)
+  })
+
+  it('escapes HTML in the reflected search filter', async () => {
+    const jar = await login()
+    const res = await fetchUrl('/logs?search=<script>alert(1)</script>', { headers: { Cookie: cookieHeader(jar) } })
+    expect(res.status).toBe(200)
+    expect(res.text).not.toContain('<script>alert(1)</script>')
+    expect(res.text).toContain('&lt;script&gt;alert(1)&lt;/script&gt;')
+  })
+
+  it('escapes HTML in log message content', async () => {
+    fs.appendFileSync(process.env.LOG_FILE, '[2026-08-16 12:00:00.000] [INFO] [Peers] <img src=x onerror=alert(1)>\n', 'utf8')
+    const jar = await login()
+    const res = await fetchUrl('/logs', { headers: { Cookie: cookieHeader(jar) } })
+    expect(res.text).not.toContain('<img src=x onerror=alert(1)>')
+    expect(res.text).toContain('&lt;img src&#x3D;x onerror&#x3D;alert(1)&gt;')
+  })
+
+  it('escapes HTML in log module names', async () => {
+    fs.appendFileSync(process.env.LOG_FILE, '[2026-08-16 12:00:01.000] [INFO] [""><script>alert(2)</script>] payload\n', 'utf8')
+    const jar = await login()
+    const res = await fetchUrl('/logs', { headers: { Cookie: cookieHeader(jar) } })
+    expect(res.text).not.toContain('<script>alert(2)</script>')
+    expect(res.text).toContain('&quot;&gt;&lt;script&gt;alert(2)&lt;/script&gt;')
+  })
+
+  it('rejects non-whitelisted levels and does not reflect shell/SQL metacharacters', async () => {
+    const jar = await login()
+    const res = await fetchUrl('/logs?level=ERROR%3B%20DROP%20TABLE%20users&module=%3B%20rm%20-rf%20%2F&search=%27%20OR%20%271%27%3D%271', {
+      headers: { Cookie: cookieHeader(jar) }
+    })
+    expect(res.status).toBe(200)
+    expect(res.text).not.toContain('DROP TABLE')
+    expect(res.text).not.toContain('rm -rf')
   })
 })
