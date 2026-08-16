@@ -1,6 +1,6 @@
 {
   "name": "wireguard-wui",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Web UI for managing a personal WireGuard VPN server",
   "main": "server.js",
   "scripts": {
