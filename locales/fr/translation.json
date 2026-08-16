@@ -10,7 +10,8 @@
     "sudo_inactive": "Sudo",
     "logout": "Déconnexion",
     "login": "Connexion",
-    "logs": "Journaux"
+    "logs": "Journaux",
+    "profile": "Profil et paramètres"
   },
   "alert": {
     "sudo_password": {
