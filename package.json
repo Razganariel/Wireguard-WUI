@@ -1,6 +1,6 @@
 {
   "name": "wireguard-wui",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Web UI for managing a personal WireGuard VPN server",
   "main": "server.js",
   "scripts": {
@@ -22,7 +22,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "bcrypt": "^5.1.1",
+    "bcrypt": "^6.0.0",
     "better-sqlite3": "^11.8.1",
     "csrf": "^3.1.0",
     "dotenv": "^16.4.7",
