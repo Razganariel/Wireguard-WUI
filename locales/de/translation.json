@@ -9,7 +9,8 @@
     "sudo_active": "Sudo",
     "sudo_inactive": "Sudo",
     "logout": "Abmelden",
-    "login": "Anmelden"
+    "login": "Anmelden",
+    "logs": "Logs"
   },
   "alert": {
     "sudo_password": {
@@ -199,7 +200,8 @@
     "peer_updated": "Peer \"{{nom}}\" aktualisiert.",
     "peer_deleted": "Peer \"{{nom}}\" gelöscht.",
     "peers_detected": "{{count}} Peer(s) von \"{{nom}}\" importiert.",
-    "no_new_peers": "Keine neuen Peers erkannt."
+    "no_new_peers": "Keine neuen Peers erkannt.",
+    "settings_updated": "Einstellungen aktualisiert."
   },
   "profile": {
     "title": "Mein Profil",
@@ -237,7 +239,12 @@
     "admin": {
       "title": "Verwaltung",
       "debug_description": "Aktivieren Sie den Debug-Modus, um alle detaillierten Vorgänge in logs/app.log zu protokollieren.",
-      "debug_mode": "Debug-Modus"
+      "debug_mode": "Debug-Modus",
+      "rotation_title": "Protokollrotation",
+      "rotation_description": "Logs automatisch rotieren, wenn sie ihre Maximalgröße erreichen (0 = deaktiviert). Ältere Dateien werden als .1.log, .2.log usw. gespeichert.",
+      "rotate_size": "Maximale Größe (KB)",
+      "rotate_backups": "Aufbewahrte Dateien",
+      "rotation_save": "Speichern"
     }
   },
   "totp_setup": {
@@ -388,5 +395,30 @@
     "confirm_title": "Bestätigen",
     "btn_cancel": "Abbrechen",
     "btn_confirm": "Löschen"
+  },
+  "logs": {
+    "title": "Logs",
+    "filter": {
+      "level": "Stufe",
+      "module": "Modul",
+      "search": "Suche",
+      "search_placeholder": "Nachrichten durchsuchen…",
+      "limit": "Anzeigen",
+      "apply": "Anwenden",
+      "reset": "Zurücksetzen",
+      "all_levels": "Alle Stufen",
+      "all_modules": "Alle Module"
+    },
+    "table": {
+      "timestamp": "Zeitstempel",
+      "level": "Stufe",
+      "module": "Modul",
+      "message": "Nachricht"
+    },
+    "empty": "Keine Log-Einträge gefunden.",
+    "count": "{{count}} von {{total}} Einträgen",
+    "clear": "Logs leeren",
+    "clear_confirm": "Alle Logs wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "cleared": "Logs gelöscht."
   }
 }

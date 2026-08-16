@@ -9,7 +9,8 @@
     "sudo_active": "Sudo",
     "sudo_inactive": "Sudo",
     "logout": "Sair",
-    "login": "Entrar"
+    "login": "Entrar",
+    "logs": "Registos"
   },
   "alert": {
     "sudo_password": {
@@ -199,7 +200,8 @@
     "peer_updated": "Par \"{{nom}}\" atualizado.",
     "peer_deleted": "Par \"{{nom}}\" excluído.",
     "peers_detected": "{{count}} par(es) importado(s) de \"{{nom}}\".",
-    "no_new_peers": "Nenhum novo par detectado."
+    "no_new_peers": "Nenhum novo par detectado.",
+    "settings_updated": "Definições atualizadas."
   },
   "profile": {
     "title": "Meu perfil",
@@ -237,7 +239,12 @@
     "admin": {
       "title": "Administração",
       "debug_description": "Ative o modo de depuração para registrar todas as operações detalhadas em logs/app.log.",
-      "debug_mode": "Modo de depuração"
+      "debug_mode": "Modo de depuração",
+      "rotation_title": "Rotação de registos",
+      "rotation_description": "Rotacionar automaticamente os registos ao atingirem o tamanho máximo (0 = desativado). Os ficheiros antigos são guardados como .1.log, .2.log, etc.",
+      "rotate_size": "Tamanho máximo (KB)",
+      "rotate_backups": "Cópias guardadas",
+      "rotation_save": "Guardar"
     }
   },
   "totp_setup": {
@@ -388,5 +395,30 @@
     "confirm_title": "Confirmar",
     "btn_cancel": "Cancelar",
     "btn_confirm": "Excluir"
+  },
+  "logs": {
+    "title": "Registos",
+    "filter": {
+      "level": "Nível",
+      "module": "Módulo",
+      "search": "Pesquisar",
+      "search_placeholder": "Pesquisar mensagens…",
+      "limit": "Mostrar",
+      "apply": "Aplicar",
+      "reset": "Redefinir",
+      "all_levels": "Todos os níveis",
+      "all_modules": "Todos os módulos"
+    },
+    "table": {
+      "timestamp": "Carimbo de data/hora",
+      "level": "Nível",
+      "module": "Módulo",
+      "message": "Mensagem"
+    },
+    "empty": "Nenhuma entrada de registro encontrada.",
+    "count": "{{count}} de {{total}} entradas",
+    "clear": "Limpar registos",
+    "clear_confirm": "Apagar todos os registos? Esta ação não pode ser desfeita.",
+    "cleared": "Registos limpos."
   }
 }

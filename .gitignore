@@ -1,6 +1,6 @@
 # ---> Node
-# Logs
-logs
+# Logs (dossier des journaux de l'application, à la racine)
+/logs/
 *.log
 npm-debug.log*
 yarn-debug.log*

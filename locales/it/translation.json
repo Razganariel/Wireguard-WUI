@@ -9,7 +9,8 @@
     "sudo_active": "Sudo",
     "sudo_inactive": "Sudo",
     "logout": "Disconnetti",
-    "login": "Accedi"
+    "login": "Accedi",
+    "logs": "Registri"
   },
   "alert": {
     "sudo_password": {
@@ -199,7 +200,8 @@
     "peer_updated": "Peer \"{{nom}}\" aggiornato.",
     "peer_deleted": "Peer \"{{nom}}\" eliminato.",
     "peers_detected": "{{count}} peer importato/i da \"{{nom}}\".",
-    "no_new_peers": "Nessun nuovo peer rilevato."
+    "no_new_peers": "Nessun nuovo peer rilevato.",
+    "settings_updated": "Impostazioni aggiornate."
   },
   "profile": {
     "title": "Il mio profilo",
@@ -237,7 +239,12 @@
     "admin": {
       "title": "Amministrazione",
       "debug_description": "Attiva la modalità debug per registrare tutte le operazioni dettagliate in logs/app.log.",
-      "debug_mode": "Modalità debug"
+      "debug_mode": "Modalità debug",
+      "rotation_title": "Rotazione dei log",
+      "rotation_description": "Ruota automaticamente i log quando raggiungono la dimensione massima (0 = disattivato). I file precedenti vengono conservati come .1.log, .2.log, ecc.",
+      "rotate_size": "Dimensione max (KB)",
+      "rotate_backups": "Backup conservati",
+      "rotation_save": "Salva"
     }
   },
   "totp_setup": {
@@ -388,5 +395,30 @@
     "confirm_title": "Conferma",
     "btn_cancel": "Annulla",
     "btn_confirm": "Elimina"
+  },
+  "logs": {
+    "title": "Registri",
+    "filter": {
+      "level": "Livello",
+      "module": "Modulo",
+      "search": "Cerca",
+      "search_placeholder": "Cerca nei messaggi…",
+      "limit": "Mostra",
+      "apply": "Applica",
+      "reset": "Azzera",
+      "all_levels": "Tutti i livelli",
+      "all_modules": "Tutti i moduli"
+    },
+    "table": {
+      "timestamp": "Timestamp",
+      "level": "Livello",
+      "module": "Modulo",
+      "message": "Messaggio"
+    },
+    "empty": "Nessuna voce di log trovata.",
+    "count": "{{count}} di {{total}} voci",
+    "clear": "Svuota registri",
+    "clear_confirm": "Eliminare tutti i log? Questa azione non può essere annullata.",
+    "cleared": "Registri svuotati."
   }
 }
