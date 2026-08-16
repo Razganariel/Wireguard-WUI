@@ -200,7 +200,8 @@
     "peer_updated": "Peer \"{{nom}}\" updated.",
     "peer_deleted": "Peer \"{{nom}}\" deleted.",
     "peers_detected": "{{count}} peer(s) imported from \"{{nom}}\".",
-    "no_new_peers": "No new peers detected."
+    "no_new_peers": "No new peers detected.",
+    "settings_updated": "Settings updated."
   },
   "profile": {
     "title": "My profile",
@@ -238,7 +239,12 @@
     "admin": {
       "title": "Administration",
       "debug_description": "Enable debug mode to log all detailed operations in logs/app.log.",
-      "debug_mode": "Debug mode"
+      "debug_mode": "Debug mode",
+      "rotation_title": "Log rotation",
+      "rotation_description": "Automatically rotate logs when they reach their maximum size (0 = disabled). Older files are kept as .1.log, .2.log, etc.",
+      "rotate_size": "Max size (KB)",
+      "rotate_backups": "Backups kept",
+      "rotation_save": "Save"
     }
   },
   "totp_setup": {
@@ -410,6 +416,9 @@
       "message": "Message"
     },
     "empty": "No log entries found.",
-    "count": "{{count}} of {{total}} entries"
+    "count": "{{count}} of {{total}} entries",
+    "clear": "Clear logs",
+    "clear_confirm": "Delete all logs? This action cannot be undone.",
+    "cleared": "Logs cleared."
   }
 }

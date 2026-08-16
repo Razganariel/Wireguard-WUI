@@ -43,6 +43,8 @@ describe('Logs routes', () => {
     expect(res.text).toContain('name="search"')
     expect(res.text).toContain('name="limit"')
     expect(res.text).toContain('action="/logs"')
+    expect(res.text).toContain('action="/logs/clear"')
+    expect(res.text).toContain('data-confirm')
   })
 
   it('always lists all known modules in the filter', async () => {
@@ -93,5 +95,55 @@ describe('Logs routes', () => {
     expect(res.status).toBe(200)
     expect(res.text).not.toContain('DROP TABLE')
     expect(res.text).not.toContain('rm -rf')
+  })
+
+  it('rejects POST /logs/clear without a valid CSRF token', async () => {
+    const jar = await login()
+    const res = await fetchUrl('/logs/clear', {
+      method: 'POST',
+      headers: { Cookie: cookieHeader(jar) },
+      formBody: { _csrf: 'invalid-token' }
+    })
+    expect(res.status).toBe(302)
+    expect(res.location).toBe('/')
+  })
+
+  it('clears the logs via POST /logs/clear', async () => {
+    fs.appendFileSync(process.env.LOG_FILE, '[2026-08-16 12:00:00.000] [INFO] [Peers] ligne a supprimer\n', 'utf8')
+    const jar = await login()
+    const page = await fetchUrl('/logs', { headers: { Cookie: cookieHeader(jar) } })
+    const token = extractCsrf(page.text)
+
+    const res = await fetchUrl('/logs/clear', {
+      method: 'POST',
+      headers: { Cookie: cookieHeader(jar) },
+      formBody: { _csrf: token }
+    })
+    expect(res.status).toBe(302)
+    expect(res.location).toBe('/logs')
+
+    const after = await fetchUrl('/logs', { headers: { Cookie: cookieHeader(jar) } })
+    expect(after.status).toBe(200)
+    expect(after.text).not.toContain('ligne a supprimer')
+  })
+
+  it('saves log rotation settings via POST /profile/rotation', async () => {
+    const jar = await login()
+    const page = await fetchUrl('/profile', { headers: { Cookie: cookieHeader(jar) } })
+    const token = extractCsrf(page.text)
+
+    const res = await fetchUrl('/profile/rotation', {
+      method: 'POST',
+      headers: { Cookie: cookieHeader(jar) },
+      formBody: { log_rotate_size: '512', log_rotate_backups: '5', _csrf: token }
+    })
+    expect(res.status).toBe(302)
+    expect(res.location).toBe('/profile')
+
+    const profile = await fetchUrl('/profile', { headers: { Cookie: cookieHeader(jar) } })
+    expect(profile.text).toContain('name="log_rotate_size"')
+    expect(profile.text).toContain('name="log_rotate_backups"')
+    expect(profile.text).toContain('value="512"')
+    expect(profile.text).toContain('value="5"')
   })
 })

@@ -11,6 +11,8 @@ const LEVELS = { DEBUG: 0, INFO: 1, ERROR: 2 }
 const LEVEL_NAMES = ['DEBUG', 'INFO', 'ERROR']
 
 let _cachedLevel = null
+let _cachedRotateSize = null
+let _cachedRotateBackups = null
 
 function getLogFile() {
   return process.env.LOG_FILE || path.join(LOG_DIR, 'app.log')
@@ -40,6 +42,53 @@ function getLevel() {
 
 function invalidateCache() {
   _cachedLevel = null
+  _cachedRotateSize = null
+  _cachedRotateBackups = null
+}
+
+function getRotateSizeKb() {
+  if (_cachedRotateSize === null) {
+    const stored = settingsModel.get('log_rotate_size')
+    const n = stored === null ? 1024 : parseInt(stored, 10)
+    _cachedRotateSize = isNaN(n) || n < 0 ? 1024 : n
+  }
+  return _cachedRotateSize
+}
+
+function getRotateBackups() {
+  if (_cachedRotateBackups === null) {
+    const stored = settingsModel.get('log_rotate_backups')
+    const n = stored === null ? 3 : parseInt(stored, 10)
+    _cachedRotateBackups = isNaN(n) || n < 0 ? 3 : n
+  }
+  return _cachedRotateBackups
+}
+
+function getRotationConfig() {
+  return { maxSizeKb: getRotateSizeKb(), backups: getRotateBackups() }
+}
+
+function rotateLogs() {
+  const logFile = getLogFile()
+  if (!fs.existsSync(logFile)) return
+  const maxBytes = getRotateSizeKb() * 1024
+  if (maxBytes <= 0) return
+  const stat = fs.statSync(logFile)
+  if (stat.size < maxBytes) return
+
+  const backups = getRotateBackups()
+  const base = logFile.replace(/\.log$/, '')
+  if (backups > 0) {
+    const oldest = `${base}.${backups}.log`
+    if (fs.existsSync(oldest)) fs.unlinkSync(oldest)
+    for (let i = backups - 1; i >= 1; i -= 1) {
+      const from = `${base}.${i}.log`
+      const to = `${base}.${i + 1}.log`
+      if (fs.existsSync(from)) fs.renameSync(from, to)
+    }
+    fs.renameSync(logFile, `${base}.1.log`)
+  }
+  fs.writeFileSync(logFile, '', 'utf8')
 }
 
 function write(level, module, message) {
@@ -47,6 +96,7 @@ function write(level, module, message) {
   if (LEVELS[level] < LEVELS[currentLevel]) return
 
   ensureLogDir()
+  rotateLogs()
   const timestamp = new Date().toISOString().replace('T', ' ').replace('Z', '')
   const line = `[${timestamp}] [${level}] [${module}] ${message}\n`
   try {
@@ -98,4 +148,9 @@ function readLogs({ level = '', module = '', search = '', limit = 200 } = {}) {
   }
 }
 
-module.exports = { info, debug, error, getLevel, invalidateCache, readLogs }
+function clearLogs() {
+  ensureLogDir()
+  fs.writeFileSync(getLogFile(), '', 'utf8')
+}
+
+module.exports = { info, debug, error, getLevel, getRotationConfig, invalidateCache, readLogs, clearLogs, rotateLogs }

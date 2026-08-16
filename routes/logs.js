@@ -4,7 +4,7 @@ const express = require('express')
 const router = express.Router()
 const { isAuthenticated } = require('../middlewares/auth')
 const asyncHandler = require('../helpers/asyncHandler')
-const { readLogs } = require('../helpers/logger')
+const { readLogs, clearLogs, info } = require('../helpers/logger')
 const { sanitizeInt } = require('../helpers/sanitize')
 
 const LEVELS = ['DEBUG', 'INFO', 'ERROR']
@@ -30,6 +30,13 @@ router.get('/', asyncHandler(async (req, res) => {
     total,
     filters: { level, module, search, limit }
   })
+}))
+
+router.post('/clear', asyncHandler(async (req, res) => {
+  clearLogs()
+  info('Serveur', `Journaux vidés par ${req.session.userEmail}`)
+  req.session.flash = { success: req.t('logs.cleared') }
+  res.redirect('/logs')
 }))
 
 module.exports = router

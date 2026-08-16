@@ -13,5 +13,9 @@ afterAll(() => {
   for (const suffix of ['', '-wal', '-shm']) {
     try { fs.unlinkSync(testDbPath + suffix) } catch (e) {}
   }
+  const logBase = process.env.LOG_FILE.replace(/\.log$/, '')
+  for (let i = 1; i <= 20; i += 1) {
+    try { fs.unlinkSync(`${logBase}.${i}.log`) } catch (e) {}
+  }
   try { fs.unlinkSync(process.env.LOG_FILE) } catch (e) {}
 })

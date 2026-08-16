@@ -27,7 +27,7 @@ const sudo = require('./helpers/sudo')
 const asyncHandler = require('./helpers/asyncHandler')
 const csrfMiddleware = require('./middlewares/csrf')
 const { decrypt } = require('./helpers/crypto')
-const { sanitize, sanitizeEmail } = require('./helpers/sanitize')
+const { sanitize, sanitizeEmail, sanitizeInt } = require('./helpers/sanitize')
 const { getStrength } = require('./helpers/entropy')
 const { generateSecret, getOtpauthUrl, verifyToken } = require('./helpers/totp')
 const { toDataURL } = require('./helpers/qrcode')
@@ -191,7 +191,8 @@ app.get('/profile', (req, res) => {
     user,
     passwordComplexity,
     totpEnabled,
-    debugMode: logLevel === 'DEBUG'
+    debugMode: logLevel === 'DEBUG',
+    rotation: logger.getRotationConfig()
   })
 })
 
@@ -270,6 +271,24 @@ app.post('/profile/settings', (req, res) => {
   logger.invalidateCache()
   log.info('Settings', `Mode debug ${debugMode ? 'activé' : 'désactivé'} par ${user.email}`)
   req.session.flash = { success: debugMode ? req.t('success.debug_mode_enabled') : req.t('success.debug_mode_disabled') }
+  res.redirect('/profile')
+})
+
+app.post('/profile/rotation', (req, res) => {
+  if (!req.session || !req.session.userId) return res.redirect('/auth/login')
+  const user = userModel.findById(req.session.userId)
+  if (!user) return res.redirect('/logout')
+
+  const rotateSize = sanitizeInt(req.body.log_rotate_size)
+  const rotateBackups = sanitizeInt(req.body.log_rotate_backups)
+  const sizeKb = rotateSize === null ? 0 : Math.min(Math.max(rotateSize, 0), 10000000)
+  const backups = rotateBackups === null ? 0 : Math.min(Math.max(rotateBackups, 0), 50)
+
+  settingsModel.set('log_rotate_size', String(sizeKb))
+  settingsModel.set('log_rotate_backups', String(backups))
+  logger.invalidateCache()
+  log.info('Settings', `Rotation des logs : max=${sizeKb} Ko, sauvegardes=${backups} (par ${user.email})`)
+  req.session.flash = { success: req.t('success.settings_updated') }
   res.redirect('/profile')
 })
 

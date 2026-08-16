@@ -200,7 +200,8 @@
     "peer_updated": "Nuashonraíodh an piara \"{{nom}}\".",
     "peer_deleted": "Scriosadh an piara \"{{nom}}\".",
     "peers_detected": "Iompórtáladh {{count}} phiara ó \"{{nom}}\".",
-    "no_new_peers": "Níor braitheadh aon phiaraí nua."
+    "no_new_peers": "Níor braitheadh aon phiaraí nua.",
+    "settings_updated": "Socruithe nuashonraithe."
   },
   "profile": {
     "title": "Mo phróifíl",
@@ -238,7 +239,12 @@
     "admin": {
       "title": "Riarachán",
       "debug_description": "Cumasaigh an mód dífhabhtaithe chun gach oibríocht mhionsonraithe a thaifeadadh i logs/app.log.",
-      "debug_mode": "Mód dífhabhtaithe"
+      "debug_mode": "Mód dífhabhtaithe",
+      "rotation_title": "Rothlú logaí",
+      "rotation_description": "Rothlaigh logaí go huathoibríoch nuair a shroicheann siad an t-uasmhéid (0 = díchumasaithe). Coinnítear seanchomhaid mar .1.log, .2.log, srl.",
+      "rotate_size": "Uasmhéid (KB)",
+      "rotate_backups": "Cúltacaí coinneáilte",
+      "rotation_save": "Sábháil"
     }
   },
   "totp_setup": {
@@ -410,6 +416,9 @@
       "message": "Teachtaireacht"
     },
     "empty": "Níor aimsíodh aon iontrálacha logála.",
-    "count": "{{count}} as {{total}} iontrála"
+    "count": "{{count}} as {{total}} iontrála",
+    "clear": "Glan logaí",
+    "clear_confirm": "Na logaí go léir a scriosadh? Ní féidir é seo a chur ar ceal.",
+    "cleared": "Logaí glanta."
   }
 }
