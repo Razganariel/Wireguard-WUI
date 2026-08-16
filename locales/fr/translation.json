@@ -18,7 +18,7 @@
     }
   },
   "footer": {
-    "copyright": "WireGuard-WUI — GPL v3 — {{year}}",
+    "copyright": "WireGuard-WUI — AGPL v3 — {{year}}",
     "support": "Soutenez-moi sur Ko-fi"
   },
   "auth": {
