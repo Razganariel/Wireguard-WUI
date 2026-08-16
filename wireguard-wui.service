@@ -16,7 +16,7 @@ AmbientCapabilities=CAP_NET_ADMIN
 PrivateTmp=true
 ProtectSystem=full
 ProtectHome=true
-ReadWritePaths=/opt/wireguard-wui/db /opt/wireguard-wui/logs /opt/wireguard-wui/.env
+ReadWritePaths=/opt/wireguard-wui/db /opt/wireguard-wui/logs /opt/wireguard-wui/.env /etc/wireguard
 
 [Install]
 WantedBy=multi-user.target
