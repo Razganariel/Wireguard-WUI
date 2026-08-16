@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
-const bcrypt = require('bcrypt')
 const sudo = require('../helpers/sudo')
 const { decrypt } = require('../helpers/crypto')
 const log = require('../helpers/logger')
@@ -25,12 +24,7 @@ async function requireSudoPassword(req, res, next) {
   return res.redirect('/auth/sudo-password')
 }
 
-async function verifyPassword(plainPassword, hashedPassword) {
-  return bcrypt.compare(plainPassword, hashedPassword)
-}
-
 module.exports = {
   isAuthenticated,
-  requireSudoPassword,
-  verifyPassword
+  requireSudoPassword
 }

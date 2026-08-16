@@ -63,8 +63,4 @@ function error(module, message) {
   write('ERROR', module, message)
 }
 
-function getLogPath() {
-  return LOG_FILE
-}
-
-module.exports = { info, debug, error, getLogPath, getLevel, invalidateCache }
+module.exports = { info, debug, error, getLevel, invalidateCache }

@@ -3,13 +3,13 @@
 const bcrypt = require('bcrypt')
 const userModel = require('../models/user')
 const settingsModel = require('../models/settings')
-const { sanitize, sanitizeEmail } = require('../helpers/sanitize')
+const { sanitizeRaw, sanitizeEmail } = require('../helpers/sanitize')
 const { verifyToken } = require('../helpers/totp')
 const log = require('../helpers/logger')
 
 async function login(req, res) {
   const email = sanitizeEmail(req.body.email)
-  const password = sanitize(req.body.password)
+  const password = sanitizeRaw(req.body.password)
 
   if (!email || !password) {
     req.session.flash = { error: req.t('error.enter_email_password') }
@@ -39,13 +39,15 @@ async function login(req, res) {
     return res.redirect('/auth/totp')
   }
 
-  req.session.userId = user.id
-  req.session.userEmail = user.email
-  req.session.userName = `${user.prenom} ${user.nom}`
-  req.session.flash = { success: req.t('success.login_welcome') }
-  log.info('Auth', `Connexion réussie : ${user.email} (${user.prenom} ${user.nom})`)
+  req.session.regenerate(() => {
+    req.session.userId = user.id
+    req.session.userEmail = user.email
+    req.session.userName = `${user.prenom} ${user.nom}`
+    req.session.flash = { success: req.t('success.login_welcome') }
+    log.info('Auth', `Connexion réussie : ${user.email} (${user.prenom} ${user.nom})`)
 
-  return res.redirect('/')
+    return res.redirect('/')
+  })
 }
 
 async function verifyTotp(req, res) {
@@ -73,16 +75,15 @@ async function verifyTotp(req, res) {
     return res.redirect('/auth/totp')
   }
 
-  req.session.userId = user.id
-  req.session.userEmail = user.email
-  req.session.userName = `${user.prenom} ${user.nom}`
-  delete req.session.pendingUserId
-  delete req.session.pendingUserEmail
-  delete req.session.pendingUserName
-  req.session.flash = { success: req.t('success.login_welcome') }
-  log.info('Auth', `Connexion TOTP réussie : ${user.email}`)
+  req.session.regenerate(() => {
+    req.session.userId = user.id
+    req.session.userEmail = user.email
+    req.session.userName = `${user.prenom} ${user.nom}`
+    req.session.flash = { success: req.t('success.login_welcome') }
+    log.info('Auth', `Connexion TOTP réussie : ${user.email}`)
 
-  return res.redirect('/')
+    return res.redirect('/')
+  })
 }
 
 function logout(req, res) {

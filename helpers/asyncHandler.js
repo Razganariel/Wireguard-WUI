@@ -1,0 +1,9 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
+function asyncHandler(fn) {
+  return (req, res, next) => {
+    Promise.resolve(fn(req, res, next)).catch(next)
+  }
+}
+
+module.exports = asyncHandler

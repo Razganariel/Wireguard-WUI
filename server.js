@@ -24,6 +24,7 @@ const interfaceModel = require('./models/interface')
 const peerModel = require('./models/peer')
 const interfaceController = require('./controllers/interface')
 const sudo = require('./helpers/sudo')
+const asyncHandler = require('./helpers/asyncHandler')
 const csrfMiddleware = require('./middlewares/csrf')
 const { decrypt } = require('./helpers/crypto')
 const { sanitize, sanitizeEmail } = require('./helpers/sanitize')
@@ -80,8 +81,10 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
+      httpOnly: true,
+      sameSite: 'Lax',
       maxAge: 1000 * 60 * 60 * 24,
       secure: process.env.SESSION_SECURE === 'true'
     }
@@ -190,7 +193,7 @@ app.get('/profile', (req, res) => {
   })
 })
 
-app.post('/profile', async (req, res) => {
+app.post('/profile', asyncHandler(async (req, res) => {
   if (!req.session || !req.session.userId) return res.redirect('/auth/login')
   const user = userModel.findById(req.session.userId)
   if (!user) return res.redirect('/logout')
@@ -253,7 +256,7 @@ app.post('/profile', async (req, res) => {
   }
   req.session.flash = { success: req.t('success.profile_updated') }
   res.redirect('/profile')
-})
+}))
 
 app.post('/profile/settings', (req, res) => {
   if (!req.session || !req.session.userId) return res.redirect('/auth/login')
@@ -268,7 +271,7 @@ app.post('/profile/settings', (req, res) => {
   res.redirect('/profile')
 })
 
-app.post('/profile/totp-generate', async (req, res) => {
+app.post('/profile/totp-generate', asyncHandler(async (req, res) => {
   if (!req.session || !req.session.userId) return res.redirect('/auth/login')
   const user = userModel.findById(req.session.userId)
   if (!user) return res.redirect('/logout')
@@ -283,9 +286,9 @@ app.post('/profile/totp-generate', async (req, res) => {
     qrDataUrl,
     email: user.email
   })
-})
+}))
 
-app.post('/profile/totp-enable', async (req, res) => {
+app.post('/profile/totp-enable', asyncHandler(async (req, res) => {
   if (!req.session || !req.session.userId) return res.redirect('/auth/login')
   if (!req.session.pendingTotpSecret) {
     req.session.flash = { error: req.t('error.no_pending_key') }
@@ -304,9 +307,9 @@ app.post('/profile/totp-enable', async (req, res) => {
   log.info('Profile', `2FA activée pour ${user.email}`)
   req.session.flash = { success: req.t('success.2fa_enabled') }
   res.redirect('/profile')
-})
+}))
 
-app.post('/profile/totp-disable', async (req, res) => {
+app.post('/profile/totp-disable', asyncHandler(async (req, res) => {
   if (!req.session || !req.session.userId) return res.redirect('/auth/login')
   const user = userModel.findById(req.session.userId)
   if (!user) return res.redirect('/logout')
@@ -325,19 +328,29 @@ app.post('/profile/totp-disable', async (req, res) => {
   log.info('Profile', `2FA désactivée pour ${user.email}`)
   req.session.flash = { success: req.t('success.2fa_disabled') }
   res.redirect('/profile')
-})
+}))
 
 const AVAILABLE_LANGS = ['de', 'en', 'es', 'fr', 'ga', 'it', 'pt']
 
+function safeReferer(req) {
+  const ref = req.get('Referer')
+  if (!ref) return '/'
+  try {
+    const u = new URL(ref)
+    if (u.host === req.headers.host) return ref
+  } catch (e) {}
+  return '/'
+}
+
 app.get('/profile/language', (req, res) => {
   const lang = req.query.lang
-  if (!AVAILABLE_LANGS.includes(lang)) return res.redirect(req.get('Referer') || '/')
+  if (!AVAILABLE_LANGS.includes(lang)) return res.redirect(safeReferer(req))
   if (req.i18n) req.i18n.changeLanguage(lang)
   res.cookie('i18next', lang, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: false })
   if (req.session && req.session.userId) {
     settingsModel.setUserSetting(req.session.userId, 'language', lang)
   }
-  res.redirect(req.get('Referer') || '/')
+  res.redirect(safeReferer(req))
 })
 
 app.get('/logout', (req, res) => {
@@ -346,7 +359,7 @@ app.get('/logout', (req, res) => {
   })
 })
 
-app.get('/', async (req, res) => {
+app.get('/', asyncHandler(async (req, res) => {
   if (!req.session || !req.session.userId) {
     return res.redirect('/auth/login')
   }
@@ -435,7 +448,7 @@ app.get('/', async (req, res) => {
       na: routingNa
     }
   })
-})
+}))
 
 app.use((req, res) => {
   res.status(404).render('errors/404', { title: req.t('error.404.title') })

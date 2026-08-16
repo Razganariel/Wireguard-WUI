@@ -5,12 +5,13 @@ const router = express.Router()
 const interfaceController = require('../controllers/interface')
 const interfaceModel = require('../models/interface')
 const { isAuthenticated, requireSudoPassword } = require('../middlewares/auth')
+const asyncHandler = require('../helpers/asyncHandler')
 const { formatBytes } = require('../helpers/format')
 const { sanitizeInt, sanitizeInterfaceName } = require('../helpers/sanitize')
 
-router.use(isAuthenticated)
+router.use(asyncHandler(isAuthenticated))
 
-router.get('/', async (req, res) => {
+router.get('/', asyncHandler(async (req, res) => {
   const interfaces = interfaceModel.findAll()
 
   const enrichedInterfaces = []
@@ -72,9 +73,9 @@ router.get('/', async (req, res) => {
     systemInterfaces,
     sudoNotSet
   })
-})
+}))
 
-router.post('/', requireSudoPassword, interfaceController.initInterface)
+router.post('/', requireSudoPassword, asyncHandler(interfaceController.initInterface))
 
 router.post('/select', (req, res) => {
   const id = sanitizeInt(req.body.interface_id)
@@ -87,13 +88,13 @@ router.post('/select', (req, res) => {
   res.redirect(redirectUrl)
 })
 
-router.post('/:id/toggle', requireSudoPassword, interfaceController.toggleInterface)
+router.post('/:id/toggle', requireSudoPassword, asyncHandler(interfaceController.toggleInterface))
 
-router.post('/:id/edit', requireSudoPassword, interfaceController.editInterface)
+router.post('/:id/edit', requireSudoPassword, asyncHandler(interfaceController.editInterface))
 
-router.post('/:id/delete', requireSudoPassword, interfaceController.deleteInterface)
+router.post('/:id/delete', requireSudoPassword, asyncHandler(interfaceController.deleteInterface))
 
-router.post('/import/:name', requireSudoPassword, async (req, res) => {
+router.post('/import/:name', requireSudoPassword, asyncHandler(async (req, res) => {
   const name = sanitizeInterfaceName(req.params.name)
   if (!name) {
     req.session.flash = { error: req.t('error.invalid_interface_name') }
@@ -111,9 +112,9 @@ router.post('/import/:name', requireSudoPassword, async (req, res) => {
     req.session.flash = { error: req.t('error.import_failed', { message: err.message }) }
   }
   res.redirect('/interface')
-})
+}))
 
-router.post('/detect', requireSudoPassword, async (req, res) => {
+router.post('/detect', requireSudoPassword, asyncHandler(async (req, res) => {
   try {
     const { importedIfaces, importedPeers } = await interfaceController.detectAndImportAll()
     if (importedIfaces === 0 && importedPeers === 0) {
@@ -128,6 +129,6 @@ router.post('/detect', requireSudoPassword, async (req, res) => {
     req.session.flash = { error: req.t('error.detection_failed', { message: err.message }) }
   }
   res.redirect('/interface')
-})
+}))
 
 module.exports = router

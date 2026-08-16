@@ -91,7 +91,8 @@ echo "[created] systemd service: $SERVICE_FILE"
 # ---- sudoers ----
 cat > "$SUDOERS_FILE" <<EOF
 # WireGuard WUI — allow specific WireGuard and system commands
-$USER ALL=(root) NOPASSWD: /usr/bin/wg-quick *, /usr/bin/wg show *, /usr/bin/wg syncconf *, /usr/bin/wg set *, /usr/bin/wg pubkey, /usr/bin/iptables *, /usr/bin/ip link *, /usr/bin/firewall-cmd *, /usr/bin/cp, /usr/bin/chmod, /usr/bin/rm, /usr/bin/cat, /usr/bin/find
+# Note: adjust the absolute paths (/usr/sbin vs /usr/bin) to match your distribution
+$USER ALL=(root) NOPASSWD: /usr/bin/wg-quick *, /usr/bin/wg show *, /usr/bin/wg syncconf *, /usr/bin/wg set *, /usr/bin/wg pubkey *, /usr/sbin/iptables *, /usr/sbin/ip link *, /usr/bin/firewall-cmd *, /usr/bin/cp *, /usr/bin/chmod *, /usr/bin/rm *, /usr/bin/cat *, /usr/bin/find *
 EOF
 
 chmod 440 "$SUDOERS_FILE"
