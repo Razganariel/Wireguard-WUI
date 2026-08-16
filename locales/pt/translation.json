@@ -410,6 +410,6 @@
       "message": "Mensagem"
     },
     "empty": "Nenhuma entrada de registro encontrada.",
-    "count": "{{count}} entrada(s)"
+    "count": "{{count}} de {{total}} entradas"
   }
 }

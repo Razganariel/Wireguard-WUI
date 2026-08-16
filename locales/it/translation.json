@@ -410,6 +410,6 @@
       "message": "Messaggio"
     },
     "empty": "Nessuna voce di log trovata.",
-    "count": "{{count}} voce/voci"
+    "count": "{{count}} di {{total}} voci"
   }
 }

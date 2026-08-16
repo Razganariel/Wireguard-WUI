@@ -44,6 +44,15 @@ describe('Logs routes', () => {
     expect(res.text).toContain('action="/logs"')
   })
 
+  it('always lists all known modules in the filter', async () => {
+    const jar = await login()
+    const res = await fetchUrl('/logs', { headers: { Cookie: cookieHeader(jar) } })
+    expect(res.status).toBe(200)
+    for (const module of ['Auth', 'CSRF', 'HTTP', 'Interface', 'Peers', 'Profile', 'Serveur', 'Settings', 'Sudo']) {
+      expect(res.text).toContain(`value="${module}"`)
+    }
+  })
+
   it('persists the level filter in the select', async () => {
     const jar = await login()
     const res = await fetchUrl('/logs?level=ERROR', { headers: { Cookie: cookieHeader(jar) } })

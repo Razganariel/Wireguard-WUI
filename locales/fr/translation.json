@@ -403,6 +403,6 @@
       "message": "Message"
     },
     "empty": "Aucun journal trouvé.",
-    "count": "{{count}} entrée(s)"
+    "count": "{{count}} sur {{total}} entrées"
   }
 }

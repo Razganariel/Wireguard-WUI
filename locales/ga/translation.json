@@ -410,6 +410,6 @@
       "message": "Teachtaireacht"
     },
     "empty": "Níor aimsíodh aon iontrálacha logála.",
-    "count": "{{count}} iontráil(í)"
+    "count": "{{count}} as {{total}} iontrála"
   }
 }

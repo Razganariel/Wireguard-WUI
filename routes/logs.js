@@ -9,6 +9,8 @@ const { sanitizeInt } = require('../helpers/sanitize')
 
 const LEVELS = ['DEBUG', 'INFO', 'ERROR']
 
+const KNOWN_MODULES = ['Auth', 'CSRF', 'HTTP', 'Interface', 'Peers', 'Profile', 'Serveur', 'Settings', 'Sudo']
+
 router.use(asyncHandler(isAuthenticated))
 
 router.get('/', asyncHandler(async (req, res) => {
@@ -18,12 +20,14 @@ router.get('/', asyncHandler(async (req, res) => {
   const limitRaw = sanitizeInt(req.query.limit)
   const limit = limitRaw && limitRaw >= 1 && limitRaw <= 1000 ? limitRaw : 200
 
-  const { entries, modules } = readLogs({ level, module, search, limit })
+  const { entries, modules, total } = readLogs({ level, module, search, limit })
+  const allModules = Array.from(new Set([...KNOWN_MODULES, ...modules])).sort()
 
   res.render('logs/index', {
     title: req.t('logs.title'),
     entries,
-    modules,
+    modules: allModules,
+    total,
     filters: { level, module, search, limit }
   })
 }))

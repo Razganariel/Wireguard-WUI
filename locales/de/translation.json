@@ -410,6 +410,6 @@
       "message": "Nachricht"
     },
     "empty": "Keine Log-Einträge gefunden.",
-    "count": "{{count}} Eintrag/Einträge"
+    "count": "{{count}} von {{total}} Einträgen"
   }
 }

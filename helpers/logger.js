@@ -12,9 +12,14 @@ const LEVEL_NAMES = ['DEBUG', 'INFO', 'ERROR']
 
 let _cachedLevel = null
 
+function getLogFile() {
+  return process.env.LOG_FILE || path.join(LOG_DIR, 'app.log')
+}
+
 function ensureLogDir() {
-  if (!fs.existsSync(LOG_DIR)) {
-    fs.mkdirSync(LOG_DIR, { recursive: true })
+  const dir = path.dirname(getLogFile())
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true })
   }
 }
 
@@ -45,7 +50,7 @@ function write(level, module, message) {
   const timestamp = new Date().toISOString().replace('T', ' ').replace('Z', '')
   const line = `[${timestamp}] [${level}] [${module}] ${message}\n`
   try {
-    fs.appendFileSync(LOG_FILE, line, 'utf8')
+    fs.appendFileSync(getLogFile(), line, 'utf8')
   } catch (err) {
     console.error('Logger write failed:', err.message)
   }
@@ -66,26 +71,16 @@ function error(module, message) {
 const LOG_LINE_RE = /^\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})\] \[(DEBUG|INFO|ERROR)\] \[([^\]]+)\] (.*)$/
 
 function readLogs({ level = '', module = '', search = '', limit = 200 } = {}) {
-  if (!fs.existsSync(LOG_FILE)) {
-    return { entries: [], modules: [] }
+  const logFile = getLogFile()
+  if (!fs.existsSync(logFile)) {
+    return { entries: [], modules: [], total: 0 }
   }
-  const stat = fs.statSync(LOG_FILE)
-  if (stat.size === 0) {
-    return { entries: [], modules: [] }
-  }
-
-  const MAX_BYTES = 1024 * 1024
-  const start = Math.max(0, stat.size - MAX_BYTES)
-  const fd = fs.openSync(LOG_FILE, 'r')
-  const buf = Buffer.alloc(stat.size - start)
-  fs.readSync(fd, buf, 0, buf.length, start)
-  fs.closeSync(fd)
 
   const needle = search ? search.toLowerCase() : ''
   const moduleSet = new Set()
   const entries = []
 
-  for (const line of buf.toString('utf8').split('\n')) {
+  for (const line of fs.readFileSync(logFile, 'utf8').split('\n')) {
     const m = LOG_LINE_RE.exec(line)
     if (!m) continue
     const [, timestamp, lvl, mod, message] = m
@@ -98,7 +93,8 @@ function readLogs({ level = '', module = '', search = '', limit = 200 } = {}) {
 
   return {
     entries: entries.slice(-limit),
-    modules: Array.from(moduleSet).sort()
+    modules: Array.from(moduleSet).sort(),
+    total: entries.length
   }
 }
 

@@ -410,6 +410,6 @@
       "message": "Message"
     },
     "empty": "No log entries found.",
-    "count": "{{count}} entr(ies)"
+    "count": "{{count}} of {{total}} entries"
   }
 }
