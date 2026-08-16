@@ -10,7 +10,8 @@
     "sudo_inactive": "Sudo",
     "logout": "Cerrar sesión",
     "login": "Iniciar sesión",
-    "logs": "Registros"
+    "logs": "Registros",
+    "profile": "Perfil y ajustes"
   },
   "alert": {
     "sudo_password": {

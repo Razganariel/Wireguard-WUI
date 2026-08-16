@@ -10,7 +10,8 @@
     "sudo_inactive": "Sudo",
     "logout": "Disconnetti",
     "login": "Accedi",
-    "logs": "Registri"
+    "logs": "Registri",
+    "profile": "Profilo e impostazioni"
   },
   "alert": {
     "sudo_password": {

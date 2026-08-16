@@ -10,7 +10,8 @@
     "sudo_inactive": "Sudo",
     "logout": "Logáil amach",
     "login": "Logáil isteach",
-    "logs": "Logaí"
+    "logs": "Logaí",
+    "profile": "Próifíl agus socruithe"
   },
   "alert": {
     "sudo_password": {
