@@ -18,6 +18,9 @@
   ],
   "author": "dvergar",
   "license": "AGPL-3.0-only",
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "bcrypt": "^5.1.1",
     "better-sqlite3": "^11.8.1",
