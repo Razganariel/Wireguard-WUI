@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit')
 const router = express.Router()
 const authController = require('../controllers/auth')
 const { isAuthenticated } = require('../middlewares/auth')
+const asyncHandler = require('../helpers/asyncHandler')
 const { sanitizeRaw } = require('../helpers/sanitize')
 const { encrypt } = require('../helpers/crypto')
 const log = require('../helpers/logger')
@@ -39,7 +40,7 @@ router.get('/setup', (req, res) => {
   res.render('auth/setup', { title: req.t('auth.setup.title'), layout: 'layouts/minimal' })
 })
 
-router.post('/setup', async (req, res) => {
+router.post('/setup', asyncHandler(async (req, res) => {
   if (userModel.count() > 0) {
     return res.redirect('/auth/login')
   }
@@ -65,7 +66,7 @@ router.post('/setup', async (req, res) => {
     }
     return res.redirect('/auth/setup')
   }
-})
+}))
 
 router.get('/login', (req, res) => {
   if (req.session && req.session.userId) {
@@ -74,7 +75,7 @@ router.get('/login', (req, res) => {
   res.render('auth/login', { title: req.t('auth.login.title') })
 })
 
-router.post('/login', loginLimiter, authController.login)
+router.post('/login', loginLimiter, asyncHandler(authController.login))
 
 router.get('/totp', (req, res) => {
   if (!req.session.pendingUserId) return res.redirect('/auth/login')
@@ -93,18 +94,18 @@ const totpLimiter = rateLimit({
   }
 })
 
-router.post('/totp', totpLimiter, authController.verifyTotp)
+router.post('/totp', totpLimiter, asyncHandler(authController.verifyTotp))
 
 router.get('/logout', authController.logout)
 
-router.get('/sudo-password', isAuthenticated, (req, res) => {
+router.get('/sudo-password', asyncHandler(isAuthenticated), (req, res) => {
   res.render('auth/sudo-password', {
     title: req.t('auth.sudo.title'),
     hasSudoPassword: !!(req.session.sudoPassword)
   })
 })
 
-router.post('/sudo-password', isAuthenticated, sudoLimiter, (req, res) => {
+router.post('/sudo-password', asyncHandler(isAuthenticated), sudoLimiter, (req, res) => {
   const password = sanitizeRaw(req.body.password, 256)
   if (!password) {
     req.session.flash = { error: req.t('error.password_required') }
@@ -116,7 +117,7 @@ router.post('/sudo-password', isAuthenticated, sudoLimiter, (req, res) => {
   res.redirect('/')
 })
 
-router.get('/sudo-clear', isAuthenticated, (req, res) => {
+router.get('/sudo-clear', asyncHandler(isAuthenticated), (req, res) => {
   delete req.session.sudoPassword
   log.info('Sudo', 'Mot de passe sudo effacé')
   req.session.flash = { success: req.t('success.sudo_password_cleared') }
