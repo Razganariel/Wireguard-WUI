@@ -97,7 +97,8 @@
     "btn": {
       "manage": "Manage",
       "peers": "Peers",
-      "create_interface": "Create an interface"
+      "create_interface": "Create an interface",
+      "detect_interfaces": "Detect interfaces"
     },
     "routing": {
       "ok": "✓ {{count}} interface(s) correctly routed",

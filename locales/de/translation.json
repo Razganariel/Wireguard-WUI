@@ -97,7 +97,8 @@
     "btn": {
       "manage": "Verwalten",
       "peers": "Peers",
-      "create_interface": "Schnittstelle erstellen"
+      "create_interface": "Schnittstelle erstellen",
+      "detect_interfaces": "Schnittstellen erkennen"
     },
     "routing": {
       "ok": "✓ {{count}} Schnittstelle(n) korrekt geroutet",
