@@ -9,7 +9,8 @@
     "sudo_active": "Sudo",
     "sudo_inactive": "Sudo",
     "logout": "Sair",
-    "login": "Entrar"
+    "login": "Entrar",
+    "logs": "Registos"
   },
   "alert": {
     "sudo_password": {
@@ -388,5 +389,27 @@
     "confirm_title": "Confirmar",
     "btn_cancel": "Cancelar",
     "btn_confirm": "Excluir"
+  },
+  "logs": {
+    "title": "Registos",
+    "filter": {
+      "level": "Nível",
+      "module": "Módulo",
+      "search": "Pesquisar",
+      "search_placeholder": "Pesquisar mensagens…",
+      "limit": "Mostrar",
+      "apply": "Aplicar",
+      "reset": "Redefinir",
+      "all_levels": "Todos os níveis",
+      "all_modules": "Todos os módulos"
+    },
+    "table": {
+      "timestamp": "Carimbo de data/hora",
+      "level": "Nível",
+      "module": "Módulo",
+      "message": "Mensagem"
+    },
+    "empty": "Nenhuma entrada de registro encontrada.",
+    "count": "{{count}} entrada(s)"
   }
 }

@@ -63,4 +63,43 @@ function error(module, message) {
   write('ERROR', module, message)
 }
 
-module.exports = { info, debug, error, getLevel, invalidateCache }
+const LOG_LINE_RE = /^\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})\] \[(DEBUG|INFO|ERROR)\] \[([^\]]+)\] (.*)$/
+
+function readLogs({ level = '', module = '', search = '', limit = 200 } = {}) {
+  if (!fs.existsSync(LOG_FILE)) {
+    return { entries: [], modules: [] }
+  }
+  const stat = fs.statSync(LOG_FILE)
+  if (stat.size === 0) {
+    return { entries: [], modules: [] }
+  }
+
+  const MAX_BYTES = 1024 * 1024
+  const start = Math.max(0, stat.size - MAX_BYTES)
+  const fd = fs.openSync(LOG_FILE, 'r')
+  const buf = Buffer.alloc(stat.size - start)
+  fs.readSync(fd, buf, 0, buf.length, start)
+  fs.closeSync(fd)
+
+  const needle = search ? search.toLowerCase() : ''
+  const moduleSet = new Set()
+  const entries = []
+
+  for (const line of buf.toString('utf8').split('\n')) {
+    const m = LOG_LINE_RE.exec(line)
+    if (!m) continue
+    const [, timestamp, lvl, mod, message] = m
+    moduleSet.add(mod)
+    if (level && lvl !== level) continue
+    if (module && mod !== module) continue
+    if (needle && !message.toLowerCase().includes(needle)) continue
+    entries.push({ timestamp, level: lvl, module: mod, message })
+  }
+
+  return {
+    entries: entries.slice(-limit),
+    modules: Array.from(moduleSet).sort()
+  }
+}
+
+module.exports = { info, debug, error, getLevel, invalidateCache, readLogs }

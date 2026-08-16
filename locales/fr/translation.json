@@ -9,7 +9,8 @@
     "sudo_active": "Sudo",
     "sudo_inactive": "Sudo",
     "logout": "Déconnexion",
-    "login": "Connexion"
+    "login": "Connexion",
+    "logs": "Journaux"
   },
   "alert": {
     "sudo_password": {
@@ -381,5 +382,27 @@
     "edit": "Éditer",
     "delete": "Supprimer",
     "back_to_dashboard": "Retour au tableau de bord"
+  },
+  "logs": {
+    "title": "Journaux",
+    "filter": {
+      "level": "Niveau",
+      "module": "Module",
+      "search": "Recherche",
+      "search_placeholder": "Rechercher dans les messages…",
+      "limit": "Afficher",
+      "apply": "Appliquer",
+      "reset": "Réinitialiser",
+      "all_levels": "Tous les niveaux",
+      "all_modules": "Tous les modules"
+    },
+    "table": {
+      "timestamp": "Horodatage",
+      "level": "Niveau",
+      "module": "Module",
+      "message": "Message"
+    },
+    "empty": "Aucun journal trouvé.",
+    "count": "{{count}} entrée(s)"
   }
 }

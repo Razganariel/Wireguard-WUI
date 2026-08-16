@@ -38,6 +38,7 @@ const settingsModel = require('./models/settings')
 const authRoutes = require('./routes/auth')
 const interfaceRoutes = require('./routes/interface')
 const peersRoutes = require('./routes/peers')
+const logsRoutes = require('./routes/logs')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -176,6 +177,7 @@ app.use((req, res, next) => {
 app.use('/auth', authRoutes)
 app.use('/interface', interfaceRoutes)
 app.use('/peers', peersRoutes)
+app.use('/logs', logsRoutes)
 
 app.get('/profile', (req, res) => {
   if (!req.session || !req.session.userId) return res.redirect('/auth/login')

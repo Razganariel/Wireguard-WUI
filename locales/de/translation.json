@@ -9,7 +9,8 @@
     "sudo_active": "Sudo",
     "sudo_inactive": "Sudo",
     "logout": "Abmelden",
-    "login": "Anmelden"
+    "login": "Anmelden",
+    "logs": "Logs"
   },
   "alert": {
     "sudo_password": {
@@ -388,5 +389,27 @@
     "confirm_title": "Bestätigen",
     "btn_cancel": "Abbrechen",
     "btn_confirm": "Löschen"
+  },
+  "logs": {
+    "title": "Logs",
+    "filter": {
+      "level": "Stufe",
+      "module": "Modul",
+      "search": "Suche",
+      "search_placeholder": "Nachrichten durchsuchen…",
+      "limit": "Anzeigen",
+      "apply": "Anwenden",
+      "reset": "Zurücksetzen",
+      "all_levels": "Alle Stufen",
+      "all_modules": "Alle Module"
+    },
+    "table": {
+      "timestamp": "Zeitstempel",
+      "level": "Stufe",
+      "module": "Modul",
+      "message": "Nachricht"
+    },
+    "empty": "Keine Log-Einträge gefunden.",
+    "count": "{{count}} Eintrag/Einträge"
   }
 }

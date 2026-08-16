@@ -9,7 +9,8 @@
     "sudo_active": "Sudo",
     "sudo_inactive": "Sudo",
     "logout": "Log out",
-    "login": "Log in"
+    "login": "Log in",
+    "logs": "Logs"
   },
   "alert": {
     "sudo_password": {
@@ -388,5 +389,27 @@
     "edit": "Edit",
     "delete": "Delete",
     "back_to_dashboard": "Back to dashboard"
+  },
+  "logs": {
+    "title": "Logs",
+    "filter": {
+      "level": "Level",
+      "module": "Module",
+      "search": "Search",
+      "search_placeholder": "Search messages…",
+      "limit": "Show",
+      "apply": "Apply",
+      "reset": "Reset",
+      "all_levels": "All levels",
+      "all_modules": "All modules"
+    },
+    "table": {
+      "timestamp": "Timestamp",
+      "level": "Level",
+      "module": "Module",
+      "message": "Message"
+    },
+    "empty": "No log entries found.",
+    "count": "{{count}} entr(ies)"
   }
 }

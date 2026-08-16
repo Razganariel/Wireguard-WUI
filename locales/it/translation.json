@@ -9,7 +9,8 @@
     "sudo_active": "Sudo",
     "sudo_inactive": "Sudo",
     "logout": "Disconnetti",
-    "login": "Accedi"
+    "login": "Accedi",
+    "logs": "Registri"
   },
   "alert": {
     "sudo_password": {
@@ -388,5 +389,27 @@
     "confirm_title": "Conferma",
     "btn_cancel": "Annulla",
     "btn_confirm": "Elimina"
+  },
+  "logs": {
+    "title": "Registri",
+    "filter": {
+      "level": "Livello",
+      "module": "Modulo",
+      "search": "Cerca",
+      "search_placeholder": "Cerca nei messaggi…",
+      "limit": "Mostra",
+      "apply": "Applica",
+      "reset": "Azzera",
+      "all_levels": "Tutti i livelli",
+      "all_modules": "Tutti i moduli"
+    },
+    "table": {
+      "timestamp": "Timestamp",
+      "level": "Livello",
+      "module": "Modulo",
+      "message": "Messaggio"
+    },
+    "empty": "Nessuna voce di log trovata.",
+    "count": "{{count}} voce/voci"
   }
 }
