@@ -218,6 +218,9 @@
     "password": {
       "title": "Password",
       "complexity_label": "Richiedi password sicura",
+      "complexity_on": "Richiesto",
+      "complexity_off": "Facoltativo",
+
       "current_label": "Password attuale",
       "current_placeholder": "Richiesta per modificare",
       "new_label": "Nuova password",
@@ -244,7 +247,13 @@
       "title": "Amministrazione",
       "debug_description": "Attiva la modalità debug per registrare tutte le operazioni dettagliate in logs/app.log.",
       "debug_mode": "Modalità debug",
+      "debug_on": "Attivato",
+      "debug_off": "Disattivato",
+
       "rotation_title": "Rotazione dei log",
+      "rotation_on": "Attivata",
+      "rotation_off": "Disattivata",
+
       "rotation_description": "Ruota automaticamente i log quando raggiungono la dimensione massima (0 = disattivato). I file precedenti vengono conservati come .1.log, .2.log, ecc.",
       "rotate_size": "Dimensione max (KB)",
       "rotate_backups": "Backup conservati",

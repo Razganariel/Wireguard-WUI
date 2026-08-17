@@ -218,6 +218,9 @@
     "password": {
       "title": "Password",
       "complexity_label": "Require strong password",
+      "complexity_on": "Required",
+      "complexity_off": "Optional",
+
       "current_label": "Current password",
       "current_placeholder": "Required to change",
       "new_label": "New password",
@@ -244,7 +247,13 @@
       "title": "Administration",
       "debug_description": "Enable debug mode to log all detailed operations in logs/app.log.",
       "debug_mode": "Debug mode",
+      "debug_on": "Enabled",
+      "debug_off": "Disabled",
+
       "rotation_title": "Log rotation",
+      "rotation_on": "Enabled",
+      "rotation_off": "Disabled",
+
       "rotation_description": "Automatically rotate logs when they reach their maximum size (0 = disabled). Older files are kept as .1.log, .2.log, etc.",
       "rotate_size": "Max size (KB)",
       "rotate_backups": "Backups kept",

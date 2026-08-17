@@ -218,6 +218,9 @@
     "password": {
       "title": "Pasfhocal",
       "complexity_label": "Éiligh pasfhocal láidir",
+      "complexity_on": "Riachtanach",
+      "complexity_off": "Roghnach",
+
       "current_label": "Pasfhocal reatha",
       "current_placeholder": "Riachtanach chun athrú",
       "new_label": "Pasfhocal nua",
@@ -244,7 +247,13 @@
       "title": "Riarachán",
       "debug_description": "Cumasaigh an mód dífhabhtaithe chun gach oibríocht mhionsonraithe a thaifeadadh i logs/app.log.",
       "debug_mode": "Mód dífhabhtaithe",
+      "debug_on": "Cumasaithe",
+      "debug_off": "Díchumasaithe",
+
       "rotation_title": "Rothlú logaí",
+      "rotation_on": "Cumasaithe",
+      "rotation_off": "Díchumasaithe",
+
       "rotation_description": "Rothlaigh logaí go huathoibríoch nuair a shroicheann siad an t-uasmhéid (0 = díchumasaithe). Coinnítear seanchomhaid mar .1.log, .2.log, srl.",
       "rotate_size": "Uasmhéid (KB)",
       "rotate_backups": "Cúltacaí coinneáilte",

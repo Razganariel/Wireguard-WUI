@@ -218,6 +218,9 @@
     "password": {
       "title": "Senha",
       "complexity_label": "Exigir senha forte",
+      "complexity_on": "Obrigatório",
+      "complexity_off": "Opcional",
+
       "current_label": "Senha atual",
       "current_placeholder": "Necessária para alterar",
       "new_label": "Nova senha",
@@ -244,7 +247,13 @@
       "title": "Administração",
       "debug_description": "Ative o modo de depuração para registrar todas as operações detalhadas em logs/app.log.",
       "debug_mode": "Modo de depuração",
+      "debug_on": "Ativado",
+      "debug_off": "Desativado",
+
       "rotation_title": "Rotação de registos",
+      "rotation_on": "Ativada",
+      "rotation_off": "Desativada",
+
       "rotation_description": "Rotacionar automaticamente os registos ao atingirem o tamanho máximo (0 = desativado). Os ficheiros antigos são guardados como .1.log, .2.log, etc.",
       "rotate_size": "Tamanho máximo (KB)",
       "rotate_backups": "Cópias guardadas",

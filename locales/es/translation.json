@@ -218,6 +218,9 @@
     "password": {
       "title": "Contraseña",
       "complexity_label": "Requerir contraseña segura",
+      "complexity_on": "Requerido",
+      "complexity_off": "Opcional",
+
       "current_label": "Contraseña actual",
       "current_placeholder": "Requerida para cambiar",
       "new_label": "Nueva contraseña",
@@ -244,7 +247,13 @@
       "title": "Administración",
       "debug_description": "Activa el modo depuración para registrar todas las operaciones detalladas en logs/app.log.",
       "debug_mode": "Modo depuración",
+      "debug_on": "Activado",
+      "debug_off": "Desactivado",
+
       "rotation_title": "Rotación de registros",
+      "rotation_on": "Activada",
+      "rotation_off": "Desactivada",
+
       "rotation_description": "Rotar registros automáticamente al alcanzar el tamaño máximo (0 = desactivado). Los archivos antiguos se guardan como .1.log, .2.log, etc.",
       "rotate_size": "Tamaño máximo (KB)",
       "rotate_backups": "Copias guardadas",

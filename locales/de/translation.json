@@ -218,6 +218,9 @@
     "password": {
       "title": "Passwort",
       "complexity_label": "Starkes Passwort erforderlich",
+      "complexity_on": "Erforderlich",
+      "complexity_off": "Optional",
+
       "current_label": "Aktuelles Passwort",
       "current_placeholder": "Erforderlich zum Ändern",
       "new_label": "Neues Passwort",
@@ -244,7 +247,13 @@
       "title": "Verwaltung",
       "debug_description": "Aktivieren Sie den Debug-Modus, um alle detaillierten Vorgänge in logs/app.log zu protokollieren.",
       "debug_mode": "Debug-Modus",
+      "debug_on": "Aktiviert",
+      "debug_off": "Deaktiviert",
+
       "rotation_title": "Protokollrotation",
+      "rotation_on": "Aktiviert",
+      "rotation_off": "Deaktiviert",
+
       "rotation_description": "Logs automatisch rotieren, wenn sie ihre Maximalgröße erreichen (0 = deaktiviert). Ältere Dateien werden als .1.log, .2.log usw. gespeichert.",
       "rotate_size": "Maximale Größe (KB)",
       "rotate_backups": "Aufbewahrte Dateien",

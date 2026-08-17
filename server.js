@@ -186,13 +186,15 @@ app.get('/profile', (req, res) => {
   const logLevel = logger.getLevel()
   const passwordComplexity = settingsModel.getUserSetting(user.id, 'password_complexity') === '1'
   const totpEnabled = settingsModel.getUserSetting(user.id, '2fa_enabled') === '1'
+  const rotationConfig = logger.getRotationConfig()
   res.render('profile/index', {
     title: req.t('profile.title'),
     user,
     passwordComplexity,
     totpEnabled,
     debugMode: logLevel === 'DEBUG',
-    rotation: logger.getRotationConfig()
+    rotationEnabled: rotationConfig.maxSizeKb > 0,
+    rotation: rotationConfig
   })
 })
 

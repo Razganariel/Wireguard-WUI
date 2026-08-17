@@ -211,6 +211,9 @@
     "password": {
       "title": "Mot de passe",
       "complexity_label": "Exiger un mot de passe fort",
+      "complexity_on": "Requis",
+      "complexity_off": "Optionnel",
+
       "current_label": "Mot de passe actuel",
       "current_placeholder": "Requis pour changer",
       "new_label": "Nouveau mot de passe",
@@ -237,7 +240,13 @@
       "title": "Administration",
       "debug_description": "Activez le mode debug pour journaliser toutes les opérations détaillées dans logs/app.log.",
       "debug_mode": "Mode debug",
+      "debug_on": "Activé",
+      "debug_off": "Désactivé",
+
       "rotation_title": "Rotation des journaux",
+      "rotation_on": "Activée",
+      "rotation_off": "Désactivée",
+
       "rotation_description": "Faire pivoter automatiquement les journaux lorsqu'ils atteignent leur taille maximale (0 = désactivé). Les anciens fichiers sont conservés en .1.log, .2.log, etc.",
       "rotate_size": "Taille maximale (Ko)",
       "rotate_backups": "Fichiers conservés",
