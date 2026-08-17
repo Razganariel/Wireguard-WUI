@@ -158,6 +158,7 @@
     "new_password_min_length": "La nueva contraseña debe tener al menos 8 caracteres.",
     "password_confirmation_mismatch": "La confirmación de contraseña no coincide.",
     "password_too_weak": "La contraseña es demasiado débil. Usa mayúsculas, minúsculas, números y caracteres especiales para una contraseña más larga (entropía ≥ 60 bits).",
+    "password_max_bytes": "La contraseña debe tener como máximo 72 bytes.",
     "current_password_incorrect": "La contraseña actual es incorrecta.",
     "no_pending_key": "No hay clave pendiente. Por favor, comienza de nuevo.",
     "enter_current_password": "Por favor, ingresa tu contraseña actual.",
@@ -209,6 +210,7 @@
     "back_to_dashboard": "← Volver al panel",
     "personal_info": {
       "title": "Información personal",
+      "subtitle": "Sus datos de contacto",
       "first_name": "Nombre",
       "last_name": "Apellido",
       "email": "Correo electrónico",
@@ -216,11 +218,17 @@
     },
     "password": {
       "title": "Contraseña",
+      "subtitle": "Política de seguridad de la cuenta",
       "complexity_label": "Requerir contraseña segura",
+      "complexity_on": "Requerido",
+      "complexity_off": "Opcional",
+
       "current_label": "Contraseña actual",
       "current_placeholder": "Requerida para cambiar",
       "new_label": "Nueva contraseña",
       "new_placeholder": "Mínimo 8 caracteres",
+      "max_bytes_help": "Máximo 72 bytes.",
+      "max_bytes_reached": " — límite de 72 bytes alcanzado",
       "confirm_label": "Confirmar contraseña",
       "confirm_placeholder": "Vuelve a ingresar la nueva contraseña",
       "btn_change": "Cambiar contraseña",
@@ -229,6 +237,7 @@
     },
     "twofactor": {
       "title": "Autenticación de dos factores",
+      "subtitle": "Protección adicional de su cuenta",
       "enabled": "Activada",
       "disabled": "Desactivada",
       "disable_description": "La autenticación de dos factores aumenta la seguridad de tu cuenta. Ingresa tu contraseña para desactivarla.",
@@ -239,9 +248,17 @@
     },
     "admin": {
       "title": "Administración",
+      "subtitle": "Registro detallado de operaciones",
       "debug_description": "Activa el modo depuración para registrar todas las operaciones detalladas en logs/app.log.",
       "debug_mode": "Modo depuración",
+      "debug_on": "Activado",
+      "debug_off": "Desactivado",
+
       "rotation_title": "Rotación de registros",
+      "rotation_subtitle": "Tamaño y número de copias de seguridad de los registros",
+      "rotation_on": "Activada",
+      "rotation_off": "Desactivada",
+
       "rotation_description": "Rotar registros automáticamente al alcanzar el tamaño máximo (0 = desactivado). Los archivos antiguos se guardan como .1.log, .2.log, etc.",
       "rotate_size": "Tamaño máximo (KB)",
       "rotate_backups": "Copias guardadas",
@@ -375,7 +392,10 @@
   "strength": {
     "strong": "Fuerte",
     "medium": "Media",
-    "weak": "Débil"
+    "weak": "Débil",
+    "hint_weak": "Use al menos 8 caracteres con mayúsculas, números y símbolos",
+    "hint_medium": "Buen comienzo — añade más longitud o variedad",
+    "hint_strong": "Contraseña excelente"
   },
   "btn": {
     "back": "Volver",

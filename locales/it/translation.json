@@ -158,6 +158,7 @@
     "new_password_min_length": "La nuova password deve contenere almeno 8 caratteri.",
     "password_confirmation_mismatch": "La conferma della password non corrisponde.",
     "password_too_weak": "La password è troppo debole. Usa maiuscole, minuscole, numeri e caratteri speciali per una password più lunga (entropia ≥ 60 bit).",
+    "password_max_bytes": "La password deve essere al massimo di 72 byte.",
     "current_password_incorrect": "La password attuale non è corretta.",
     "no_pending_key": "Nessuna chiave in sospeso. Ricomincia.",
     "enter_current_password": "Inserisci la tua password attuale.",
@@ -209,6 +210,7 @@
     "back_to_dashboard": "← Torna alla dashboard",
     "personal_info": {
       "title": "Informazioni personali",
+      "subtitle": "I tuoi dati di contatto",
       "first_name": "Nome",
       "last_name": "Cognome",
       "email": "Email",
@@ -216,11 +218,17 @@
     },
     "password": {
       "title": "Password",
+      "subtitle": "Politica di sicurezza dell'account",
       "complexity_label": "Richiedi password sicura",
+      "complexity_on": "Richiesto",
+      "complexity_off": "Facoltativo",
+
       "current_label": "Password attuale",
       "current_placeholder": "Richiesta per modificare",
       "new_label": "Nuova password",
       "new_placeholder": "Minimo 8 caratteri",
+      "max_bytes_help": "Massimo 72 byte.",
+      "max_bytes_reached": " — limite di 72 byte raggiunto",
       "confirm_label": "Conferma password",
       "confirm_placeholder": "Reinserisci la nuova password",
       "btn_change": "Cambia password",
@@ -229,6 +237,7 @@
     },
     "twofactor": {
       "title": "Autenticazione a due fattori",
+      "subtitle": "Protezione aggiuntiva per il tuo account",
       "enabled": "Attivata",
       "disabled": "Disattivata",
       "disable_description": "L'autenticazione a due fattori aumenta la sicurezza del tuo account. Inserisci la tua password per disattivarla.",
@@ -239,9 +248,17 @@
     },
     "admin": {
       "title": "Amministrazione",
+      "subtitle": "Registrazione dettagliata delle operazioni",
       "debug_description": "Attiva la modalità debug per registrare tutte le operazioni dettagliate in logs/app.log.",
       "debug_mode": "Modalità debug",
+      "debug_on": "Attivato",
+      "debug_off": "Disattivato",
+
       "rotation_title": "Rotazione dei log",
+      "rotation_subtitle": "Dimensione dei log e numero di backup",
+      "rotation_on": "Attivata",
+      "rotation_off": "Disattivata",
+
       "rotation_description": "Ruota automaticamente i log quando raggiungono la dimensione massima (0 = disattivato). I file precedenti vengono conservati come .1.log, .2.log, ecc.",
       "rotate_size": "Dimensione max (KB)",
       "rotate_backups": "Backup conservati",
@@ -375,7 +392,10 @@
   "strength": {
     "strong": "Forte",
     "medium": "Media",
-    "weak": "Debole"
+    "weak": "Debole",
+    "hint_weak": "Usa almeno 8 caratteri con maiuscole, numeri e simboli",
+    "hint_medium": "Buon inizio — aggiungi più lunghezza o varietà",
+    "hint_strong": "Password eccellente"
   },
   "btn": {
     "back": "Indietro",

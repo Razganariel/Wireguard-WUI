@@ -186,13 +186,15 @@ app.get('/profile', (req, res) => {
   const logLevel = logger.getLevel()
   const passwordComplexity = settingsModel.getUserSetting(user.id, 'password_complexity') === '1'
   const totpEnabled = settingsModel.getUserSetting(user.id, '2fa_enabled') === '1'
+  const rotationConfig = logger.getRotationConfig()
   res.render('profile/index', {
     title: req.t('profile.title'),
     user,
     passwordComplexity,
     totpEnabled,
     debugMode: logLevel === 'DEBUG',
-    rotation: logger.getRotationConfig()
+    rotationEnabled: rotationConfig.maxSizeKb > 0,
+    rotation: rotationConfig
   })
 })
 
@@ -229,6 +231,10 @@ app.post('/profile', asyncHandler(async (req, res) => {
   if (req.body.current_password && req.body.new_password) {
     if (req.body.new_password.length < 8) {
       req.session.flash = { error: req.t('error.new_password_min_length') }
+      return res.redirect('/profile')
+    }
+    if (Buffer.byteLength(req.body.new_password, 'utf8') > 72) {
+      req.session.flash = { error: req.t('error.password_max_bytes') }
       return res.redirect('/profile')
     }
     if (req.body.new_password !== req.body.new_password_confirm) {

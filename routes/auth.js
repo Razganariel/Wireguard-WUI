@@ -49,6 +49,10 @@ router.post('/setup', asyncHandler(async (req, res) => {
     req.session.flash = { error: req.t('error.all_fields_required') }
     return res.redirect('/auth/setup')
   }
+  if (Buffer.byteLength(password, 'utf8') > 72) {
+    req.session.flash = { error: req.t('error.password_max_bytes') }
+    return res.redirect('/auth/setup')
+  }
   try {
     const bcrypt = require('bcrypt')
     const hashedPassword = await bcrypt.hash(password, 10)

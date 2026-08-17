@@ -158,6 +158,7 @@
     "new_password_min_length": "A nova senha deve ter pelo menos 8 caracteres.",
     "password_confirmation_mismatch": "A confirmação de senha não corresponde.",
     "password_too_weak": "A senha é muito fraca. Use maiúsculas, minúsculas, números e caracteres especiais para uma senha mais longa (entropia ≥ 60 bits).",
+    "password_max_bytes": "A senha deve ter no máximo 72 bytes.",
     "current_password_incorrect": "A senha atual está incorreta.",
     "no_pending_key": "Nenhuma chave pendente. Por favor, comece novamente.",
     "enter_current_password": "Por favor, insira sua senha atual.",
@@ -209,6 +210,7 @@
     "back_to_dashboard": "← Voltar ao painel",
     "personal_info": {
       "title": "Informações pessoais",
+      "subtitle": "Seus dados de contato",
       "first_name": "Nome",
       "last_name": "Sobrenome",
       "email": "E-mail",
@@ -216,11 +218,17 @@
     },
     "password": {
       "title": "Senha",
+      "subtitle": "Política de segurança da conta",
       "complexity_label": "Exigir senha forte",
+      "complexity_on": "Obrigatório",
+      "complexity_off": "Opcional",
+
       "current_label": "Senha atual",
       "current_placeholder": "Necessária para alterar",
       "new_label": "Nova senha",
       "new_placeholder": "Mínimo 8 caracteres",
+      "max_bytes_help": "Máximo 72 bytes.",
+      "max_bytes_reached": " — limite de 72 bytes atingido",
       "confirm_label": "Confirmar senha",
       "confirm_placeholder": "Digite novamente a nova senha",
       "btn_change": "Alterar senha",
@@ -229,6 +237,7 @@
     },
     "twofactor": {
       "title": "Autenticação de dois fatores",
+      "subtitle": "Proteção adicional para sua conta",
       "enabled": "Ativada",
       "disabled": "Desativada",
       "disable_description": "A autenticação de dois fatores aumenta a segurança da sua conta. Digite sua senha para desativá-la.",
@@ -239,9 +248,17 @@
     },
     "admin": {
       "title": "Administração",
+      "subtitle": "Registro detalhado das operações",
       "debug_description": "Ative o modo de depuração para registrar todas as operações detalhadas em logs/app.log.",
       "debug_mode": "Modo de depuração",
+      "debug_on": "Ativado",
+      "debug_off": "Desativado",
+
       "rotation_title": "Rotação de registos",
+      "rotation_subtitle": "Tamanho e número de backups dos logs",
+      "rotation_on": "Ativada",
+      "rotation_off": "Desativada",
+
       "rotation_description": "Rotacionar automaticamente os registos ao atingirem o tamanho máximo (0 = desativado). Os ficheiros antigos são guardados como .1.log, .2.log, etc.",
       "rotate_size": "Tamanho máximo (KB)",
       "rotate_backups": "Cópias guardadas",
@@ -375,7 +392,10 @@
   "strength": {
     "strong": "Forte",
     "medium": "Média",
-    "weak": "Fraca"
+    "weak": "Fraca",
+    "hint_weak": "Use pelo menos 8 caracteres com maiúsculas, números e símbolos",
+    "hint_medium": "Bom começo — adicione mais comprimento ou variedade",
+    "hint_strong": "Senha excelente"
   },
   "btn": {
     "back": "Voltar",
