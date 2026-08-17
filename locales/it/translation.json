@@ -158,6 +158,7 @@
     "new_password_min_length": "La nuova password deve contenere almeno 8 caratteri.",
     "password_confirmation_mismatch": "La conferma della password non corrisponde.",
     "password_too_weak": "La password è troppo debole. Usa maiuscole, minuscole, numeri e caratteri speciali per una password più lunga (entropia ≥ 60 bit).",
+    "password_max_bytes": "La password deve essere al massimo di 72 byte.",
     "current_password_incorrect": "La password attuale non è corretta.",
     "no_pending_key": "Nessuna chiave in sospeso. Ricomincia.",
     "enter_current_password": "Inserisci la tua password attuale.",
@@ -221,6 +222,8 @@
       "current_placeholder": "Richiesta per modificare",
       "new_label": "Nuova password",
       "new_placeholder": "Minimo 8 caratteri",
+      "max_bytes_help": "Massimo 72 byte.",
+      "max_bytes_reached": " — limite di 72 byte raggiunto",
       "confirm_label": "Conferma password",
       "confirm_placeholder": "Reinserisci la nuova password",
       "btn_change": "Cambia password",
@@ -375,7 +378,10 @@
   "strength": {
     "strong": "Forte",
     "medium": "Media",
-    "weak": "Debole"
+    "weak": "Debole",
+    "hint_weak": "Usa almeno 8 caratteri con maiuscole, numeri e simboli",
+    "hint_medium": "Buon inizio — aggiungi più lunghezza o varietà",
+    "hint_strong": "Password eccellente"
   },
   "btn": {
     "back": "Indietro",

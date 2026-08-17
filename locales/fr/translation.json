@@ -151,6 +151,7 @@
     "new_password_min_length": "Le nouveau mot de passe doit faire au moins 8 caractères.",
     "password_confirmation_mismatch": "La confirmation du mot de passe ne correspond pas.",
     "password_too_weak": "Le mot de passe est trop faible. Utilisez des majuscules, minuscules, chiffres et caractères spéciaux pour un mot de passe plus long (entropie ≥ 60 bits).",
+    "password_max_bytes": "Le mot de passe doit faire maximum 72 octets.",
     "current_password_incorrect": "Le mot de passe actuel est incorrect.",
     "no_pending_key": "Aucune clé en attente. Veuillez recommencer.",
     "enter_current_password": "Veuillez saisir votre mot de passe actuel.",
@@ -214,6 +215,8 @@
       "current_placeholder": "Requis pour changer",
       "new_label": "Nouveau mot de passe",
       "new_placeholder": "8 caractères min",
+      "max_bytes_help": "Maximum 72 octets.",
+      "max_bytes_reached": " — limite de 72 octets atteinte",
       "confirm_label": "Confirmer le mot de passe",
       "confirm_placeholder": "Retaper le nouveau",
       "btn_change": "Modifier le mot de passe",
@@ -380,7 +383,10 @@
   "strength": {
     "strong": "Fort",
     "medium": "Moyen",
-    "weak": "Faible"
+    "weak": "Faible",
+    "hint_weak": "Utilisez au moins 8 caractères avec majuscules, chiffres et symboles",
+    "hint_medium": "Bon début — ajoutez encore de la longueur ou de la variété",
+    "hint_strong": "Excellent mot de passe"
   },
   "btn": {
     "back": "Retour",

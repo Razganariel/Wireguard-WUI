@@ -158,6 +158,7 @@
     "new_password_min_length": "A nova senha deve ter pelo menos 8 caracteres.",
     "password_confirmation_mismatch": "A confirmação de senha não corresponde.",
     "password_too_weak": "A senha é muito fraca. Use maiúsculas, minúsculas, números e caracteres especiais para uma senha mais longa (entropia ≥ 60 bits).",
+    "password_max_bytes": "A senha deve ter no máximo 72 bytes.",
     "current_password_incorrect": "A senha atual está incorreta.",
     "no_pending_key": "Nenhuma chave pendente. Por favor, comece novamente.",
     "enter_current_password": "Por favor, insira sua senha atual.",
@@ -221,6 +222,8 @@
       "current_placeholder": "Necessária para alterar",
       "new_label": "Nova senha",
       "new_placeholder": "Mínimo 8 caracteres",
+      "max_bytes_help": "Máximo 72 bytes.",
+      "max_bytes_reached": " — limite de 72 bytes atingido",
       "confirm_label": "Confirmar senha",
       "confirm_placeholder": "Digite novamente a nova senha",
       "btn_change": "Alterar senha",
@@ -375,7 +378,10 @@
   "strength": {
     "strong": "Forte",
     "medium": "Média",
-    "weak": "Fraca"
+    "weak": "Fraca",
+    "hint_weak": "Use pelo menos 8 caracteres com maiúsculas, números e símbolos",
+    "hint_medium": "Bom começo — adicione mais comprimento ou variedade",
+    "hint_strong": "Senha excelente"
   },
   "btn": {
     "back": "Voltar",

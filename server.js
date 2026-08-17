@@ -231,6 +231,10 @@ app.post('/profile', asyncHandler(async (req, res) => {
       req.session.flash = { error: req.t('error.new_password_min_length') }
       return res.redirect('/profile')
     }
+    if (Buffer.byteLength(req.body.new_password, 'utf8') > 72) {
+      req.session.flash = { error: req.t('error.password_max_bytes') }
+      return res.redirect('/profile')
+    }
     if (req.body.new_password !== req.body.new_password_confirm) {
       req.session.flash = { error: req.t('error.password_confirmation_mismatch') }
       return res.redirect('/profile')
