@@ -25,8 +25,9 @@
             </div>
             <div class="col-12">
               <label for="password" class="form-label">{{__ 'auth.setup.password_label'}}</label>
-              <input type="password" class="form-control" id="password" name="password" minlength="8" required>
+              <input type="password" class="form-control" id="password" name="password" minlength="8" data-max-bytes="72" required>
               <div class="form-text">{{__ 'auth.setup.password_help'}}</div>
+              <div class="invalid-feedback">{{__ 'error.password_max_bytes'}}</div>
             </div>
             <div class="col-12">
               <button type="submit" class="btn btn-primary w-100">{{__ 'auth.setup.submit'}}</button>

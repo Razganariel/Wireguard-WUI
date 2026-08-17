@@ -3,7 +3,7 @@
 const bcrypt = require('bcrypt')
 const userModel = require('../models/user')
 const settingsModel = require('../models/settings')
-const { sanitizeRaw, sanitizeEmail } = require('../helpers/sanitize')
+const { sanitize, sanitizeRaw, sanitizeEmail } = require('../helpers/sanitize')
 const { verifyToken } = require('../helpers/totp')
 const log = require('../helpers/logger')
 

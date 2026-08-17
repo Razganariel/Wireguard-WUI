@@ -10,7 +10,8 @@
     "sudo_inactive": "Sudo",
     "logout": "Déconnexion",
     "login": "Connexion",
-    "logs": "Journaux"
+    "logs": "Journaux",
+    "profile": "Profil et paramètres"
   },
   "alert": {
     "sudo_password": {
@@ -150,6 +151,7 @@
     "new_password_min_length": "Le nouveau mot de passe doit faire au moins 8 caractères.",
     "password_confirmation_mismatch": "La confirmation du mot de passe ne correspond pas.",
     "password_too_weak": "Le mot de passe est trop faible. Utilisez des majuscules, minuscules, chiffres et caractères spéciaux pour un mot de passe plus long (entropie ≥ 60 bits).",
+    "password_max_bytes": "Le mot de passe doit faire maximum 72 octets.",
     "current_password_incorrect": "Le mot de passe actuel est incorrect.",
     "no_pending_key": "Aucune clé en attente. Veuillez recommencer.",
     "enter_current_password": "Veuillez saisir votre mot de passe actuel.",
@@ -201,6 +203,7 @@
     "back_to_dashboard": "← Retour au tableau de bord",
     "personal_info": {
       "title": "Informations personnelles",
+      "subtitle": "Vos coordonnées",
       "first_name": "Prénom",
       "last_name": "Nom",
       "email": "Email",
@@ -208,11 +211,17 @@
     },
     "password": {
       "title": "Mot de passe",
+      "subtitle": "Politique de sécurité du compte",
       "complexity_label": "Exiger un mot de passe fort",
+      "complexity_on": "Requis",
+      "complexity_off": "Optionnel",
+
       "current_label": "Mot de passe actuel",
       "current_placeholder": "Requis pour changer",
       "new_label": "Nouveau mot de passe",
       "new_placeholder": "8 caractères min",
+      "max_bytes_help": "Maximum 72 octets.",
+      "max_bytes_reached": " — limite de 72 octets atteinte",
       "confirm_label": "Confirmer le mot de passe",
       "confirm_placeholder": "Retaper le nouveau",
       "btn_change": "Modifier le mot de passe",
@@ -221,6 +230,7 @@
     },
     "twofactor": {
       "title": "Authentification à deux facteurs",
+      "subtitle": "Protection supplémentaire de votre compte",
       "enabled": "Activé",
       "disabled": "Désactivé",
       "disable_description": "L'authentification à deux facteurs renforce la sécurité de votre compte. Entrez votre mot de passe pour la désactiver.",
@@ -231,9 +241,17 @@
     },
     "admin": {
       "title": "Administration",
+      "subtitle": "Journalisation détaillée des opérations",
       "debug_description": "Activez le mode debug pour journaliser toutes les opérations détaillées dans logs/app.log.",
       "debug_mode": "Mode debug",
+      "debug_on": "Activé",
+      "debug_off": "Désactivé",
+
       "rotation_title": "Rotation des journaux",
+      "rotation_subtitle": "Taille et nombre de sauvegardes des journaux",
+      "rotation_on": "Activée",
+      "rotation_off": "Désactivée",
+
       "rotation_description": "Faire pivoter automatiquement les journaux lorsqu'ils atteignent leur taille maximale (0 = désactivé). Les anciens fichiers sont conservés en .1.log, .2.log, etc.",
       "rotate_size": "Taille maximale (Ko)",
       "rotate_backups": "Fichiers conservés",
@@ -379,7 +397,10 @@
   "strength": {
     "strong": "Fort",
     "medium": "Moyen",
-    "weak": "Faible"
+    "weak": "Faible",
+    "hint_weak": "Utilisez au moins 8 caractères avec majuscules, chiffres et symboles",
+    "hint_medium": "Bon début — ajoutez encore de la longueur ou de la variété",
+    "hint_strong": "Excellent mot de passe"
   },
   "btn": {
     "back": "Retour",

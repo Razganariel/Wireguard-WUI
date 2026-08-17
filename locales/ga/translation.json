@@ -10,7 +10,8 @@
     "sudo_inactive": "Sudo",
     "logout": "Logáil amach",
     "login": "Logáil isteach",
-    "logs": "Logaí"
+    "logs": "Logaí",
+    "profile": "Próifíl agus socruithe"
   },
   "alert": {
     "sudo_password": {
@@ -157,6 +158,7 @@
     "new_password_min_length": "Caithfidh an pasfhocal nua a bheith 8 gcarachtar ar a laghad.",
     "password_confirmation_mismatch": "Ní réitíonn deimhniú an phasfhocail.",
     "password_too_weak": "Tá an pasfhocal ró-lag. Úsáid ceannlitreacha, litreacha beaga, uimhreacha agus carachtair speisialta le haghaidh pasfhocal níos faide (eantrópacht ≥ 60 giotán).",
+    "password_max_bytes": "Caithfidh an pasfhocal a bheith 72 beart ar a mhéad.",
     "current_password_incorrect": "Tá an pasfhocal reatha mícheart.",
     "no_pending_key": "Níl aon eochair ar feitheamh. Tosaigh arís le do thoil.",
     "enter_current_password": "Cuir isteach do phasfhocal reatha le do thoil.",
@@ -208,6 +210,7 @@
     "back_to_dashboard": "← Ar ais go dtí an painéal",
     "personal_info": {
       "title": "Faisnéis phearsanta",
+      "subtitle": "Do shonraí teagmhála",
       "first_name": "Ainm",
       "last_name": "Sloinne",
       "email": "Ríomhphost",
@@ -215,11 +218,17 @@
     },
     "password": {
       "title": "Pasfhocal",
+      "subtitle": "Beartas slándála an chuntais",
       "complexity_label": "Éiligh pasfhocal láidir",
+      "complexity_on": "Riachtanach",
+      "complexity_off": "Roghnach",
+
       "current_label": "Pasfhocal reatha",
       "current_placeholder": "Riachtanach chun athrú",
       "new_label": "Pasfhocal nua",
       "new_placeholder": "8 gcarachtar ar a laghad",
+      "max_bytes_help": "Uasmhéid 72 beart.",
+      "max_bytes_reached": " — teorainn 72 beart bainte amach",
       "confirm_label": "Deimhnigh pasfhocal",
       "confirm_placeholder": "Cuir isteach an pasfhocal nua arís",
       "btn_change": "Athraigh pasfhocal",
@@ -228,6 +237,7 @@
     },
     "twofactor": {
       "title": "Fíordheimhniú dhá fhachtóir",
+      "subtitle": "Cosaint bhreise do do chuntas",
       "enabled": "Cumasaithe",
       "disabled": "Díchumasaithe",
       "disable_description": "Cuireann fíordheimhniú dhá fhachtóir le slándáil do chuntais. Cuir isteach do phasfhocal chun é a dhíchumasú.",
@@ -238,9 +248,17 @@
     },
     "admin": {
       "title": "Riarachán",
+      "subtitle": "Logáil mhionsonraithe oibríochtaí",
       "debug_description": "Cumasaigh an mód dífhabhtaithe chun gach oibríocht mhionsonraithe a thaifeadadh i logs/app.log.",
       "debug_mode": "Mód dífhabhtaithe",
+      "debug_on": "Cumasaithe",
+      "debug_off": "Díchumasaithe",
+
       "rotation_title": "Rothlú logaí",
+      "rotation_subtitle": "Méid na logaí agus líon na gcúltacaí",
+      "rotation_on": "Cumasaithe",
+      "rotation_off": "Díchumasaithe",
+
       "rotation_description": "Rothlaigh logaí go huathoibríoch nuair a shroicheann siad an t-uasmhéid (0 = díchumasaithe). Coinnítear seanchomhaid mar .1.log, .2.log, srl.",
       "rotate_size": "Uasmhéid (KB)",
       "rotate_backups": "Cúltacaí coinneáilte",
@@ -374,7 +392,10 @@
   "strength": {
     "strong": "Láidir",
     "medium": "Meánach",
-    "weak": "Lag"
+    "weak": "Lag",
+    "hint_weak": "Úsáid 8 gcarachtar ar a laghad le ceannlitreacha, uimhreacha agus siombailí",
+    "hint_medium": "Tús maith — cuir níos mó fad nó éagsúlacht leis",
+    "hint_strong": "Pasfhocal den scoth"
   },
   "btn": {
     "back": "Ar ais",

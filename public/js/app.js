@@ -23,7 +23,40 @@ function togglePassword(inputId, btn) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  const byteLength = (s) => new TextEncoder().encode(s).length
+
+  const findFeedback = (input) => {
+    return input.parentElement.querySelector('.invalid-feedback') ||
+      input.parentElement.parentElement.querySelector('.invalid-feedback')
+  }
+
+  const setInvalid = (input, show) => {
+    input.classList.toggle('is-invalid', show)
+    const fb = findFeedback(input)
+    if (fb) fb.classList.toggle('d-block', show)
+  }
+
+  const enforceMaxBytes = (input) => {
+    const maxBytes = parseInt(input.getAttribute('data-max-bytes'), 10)
+    if (!maxBytes) return
+    const value = input.value
+    if (byteLength(value) <= maxBytes) { setInvalid(input, false); return }
+    let bytes = 0
+    let kept = ''
+    for (const ch of value) {
+      const len = byteLength(ch)
+      if (bytes + len > maxBytes) break
+      bytes += len
+      kept += ch
+    }
+    input.value = kept
+    setInvalid(input, true)
+  }
+
   document.querySelectorAll('form[data-validate]').forEach((form) => {
+    form.querySelectorAll('[data-max-bytes]').forEach((input) => {
+      input.addEventListener('input', () => enforceMaxBytes(input))
+    })
     form.addEventListener('submit', (e) => {
       const inputs = form.querySelectorAll('input[required], select[required]')
       let valid = true
@@ -33,6 +66,14 @@ document.addEventListener('DOMContentLoaded', () => {
           input.classList.add('is-invalid')
         } else {
           input.classList.remove('is-invalid')
+        }
+      })
+      form.querySelectorAll('[data-max-bytes]').forEach((input) => {
+        const maxBytes = parseInt(input.getAttribute('data-max-bytes'), 10)
+        const overLimit = maxBytes && input.value && byteLength(input.value) > maxBytes
+        if (overLimit) {
+          valid = false
+          setInvalid(input, true)
         }
       })
       if (!valid) e.preventDefault()
@@ -78,21 +119,45 @@ document.addEventListener('DOMContentLoaded', () => {
   const meter = document.getElementById('entropy-meter')
   const bar = document.getElementById('entropy-bar')
   const label = document.getElementById('entropy-label')
+  const feedback = document.getElementById('entropy-feedback')
   const val = document.getElementById('entropy-value')
+  const capped = document.getElementById('entropy-capped')
   if (newPwd && meter) {
+    const updateCapped = () => {
+      if (!capped) return
+      const maxBytes = parseInt(newPwd.getAttribute('data-max-bytes'), 10)
+      capped.textContent = (maxBytes && byteLength(newPwd.value) >= maxBytes && newPwd.value) ? (label.getAttribute('data-capped') || '') : ''
+    }
     newPwd.addEventListener('input', () => {
       const entropy = calcEntropy(newPwd.value)
-      if (newPwd.value.length === 0) { meter.style.display = 'none'; return }
-      meter.style.display = 'block'
+      if (newPwd.value.length === 0) { meter.classList.add('d-none'); return }
+      meter.classList.remove('d-none')
       const pct = Math.min(100, Math.round(entropy / 80 * 100))
       bar.style.width = pct + '%'
       val.textContent = entropy
+      updateCapped()
       const strong = label.getAttribute('data-strong') || 'Strong'
       const medium = label.getAttribute('data-medium') || 'Medium'
       const weak = label.getAttribute('data-weak') || 'Weak'
-      if (entropy >= 60) { bar.className = 'progress-bar bg-success'; label.textContent = strong }
-      else if (entropy >= 40) { bar.className = 'progress-bar bg-warning'; label.textContent = medium }
-      else { bar.className = 'progress-bar bg-danger'; label.textContent = weak }
+      const hintStrong = label.getAttribute('data-hint-strong') || ''
+      const hintMedium = label.getAttribute('data-hint-medium') || ''
+      const hintWeak = label.getAttribute('data-hint-weak') || ''
+      if (entropy >= 60) {
+        bar.className = 'progress-bar bg-success progress-bar-striped progress-bar-animated'
+        label.textContent = strong
+        label.className = 'fw-semibold text-success'
+        feedback.textContent = hintStrong
+      } else if (entropy >= 40) {
+        bar.className = 'progress-bar bg-warning progress-bar-striped progress-bar-animated'
+        label.textContent = medium
+        label.className = 'fw-semibold text-warning-emphasis'
+        feedback.textContent = hintMedium
+      } else {
+        bar.className = 'progress-bar bg-danger progress-bar-striped progress-bar-animated'
+        label.textContent = weak
+        label.className = 'fw-semibold text-danger'
+        feedback.textContent = hintWeak
+      }
     })
   }
 

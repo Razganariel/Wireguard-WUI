@@ -10,7 +10,8 @@
     "sudo_inactive": "Sudo",
     "logout": "Log out",
     "login": "Log in",
-    "logs": "Logs"
+    "logs": "Logs",
+    "profile": "Profile & settings"
   },
   "alert": {
     "sudo_password": {
@@ -157,6 +158,7 @@
     "new_password_min_length": "New password must be at least 8 characters.",
     "password_confirmation_mismatch": "Password confirmation does not match.",
     "password_too_weak": "Password is too weak. Use uppercase, lowercase, numbers and special characters for a longer password (entropy ≥ 60 bits).",
+    "password_max_bytes": "Password must be at most 72 bytes.",
     "current_password_incorrect": "Current password is incorrect.",
     "no_pending_key": "No pending key. Please start over.",
     "enter_current_password": "Please enter your current password.",
@@ -208,6 +210,7 @@
     "back_to_dashboard": "← Back to dashboard",
     "personal_info": {
       "title": "Personal information",
+      "subtitle": "Your contact details",
       "first_name": "First name",
       "last_name": "Last name",
       "email": "Email",
@@ -215,11 +218,17 @@
     },
     "password": {
       "title": "Password",
+      "subtitle": "Account security policy",
       "complexity_label": "Require strong password",
+      "complexity_on": "Required",
+      "complexity_off": "Optional",
+
       "current_label": "Current password",
       "current_placeholder": "Required to change",
       "new_label": "New password",
       "new_placeholder": "8 characters min",
+      "max_bytes_help": "Maximum 72 bytes.",
+      "max_bytes_reached": " — 72-byte limit reached",
       "confirm_label": "Confirm password",
       "confirm_placeholder": "Re-enter new password",
       "btn_change": "Change password",
@@ -228,6 +237,7 @@
     },
     "twofactor": {
       "title": "Two-factor authentication",
+      "subtitle": "Extra protection for your account",
       "enabled": "Enabled",
       "disabled": "Disabled",
       "disable_description": "Two-factor authentication increases your account security. Enter your password to disable it.",
@@ -238,9 +248,17 @@
     },
     "admin": {
       "title": "Administration",
+      "subtitle": "Detailed operation logging",
       "debug_description": "Enable debug mode to log all detailed operations in logs/app.log.",
       "debug_mode": "Debug mode",
+      "debug_on": "Enabled",
+      "debug_off": "Disabled",
+
       "rotation_title": "Log rotation",
+      "rotation_subtitle": "Log size and number of backups",
+      "rotation_on": "Enabled",
+      "rotation_off": "Disabled",
+
       "rotation_description": "Automatically rotate logs when they reach their maximum size (0 = disabled). Older files are kept as .1.log, .2.log, etc.",
       "rotate_size": "Max size (KB)",
       "rotate_backups": "Backups kept",
@@ -386,7 +404,10 @@
   "strength": {
     "strong": "Strong",
     "medium": "Medium",
-    "weak": "Weak"
+    "weak": "Weak",
+    "hint_weak": "Use at least 8 characters with uppercase letters, numbers and symbols",
+    "hint_medium": "Good start — add more length or variety",
+    "hint_strong": "Excellent password"
   },
   "btn": {
     "back": "Back",
