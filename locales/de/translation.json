@@ -210,6 +210,7 @@
     "back_to_dashboard": "← Zurück zum Dashboard",
     "personal_info": {
       "title": "Persönliche Informationen",
+      "subtitle": "Ihre Kontaktdaten",
       "first_name": "Vorname",
       "last_name": "Nachname",
       "email": "E-Mail",
@@ -217,6 +218,7 @@
     },
     "password": {
       "title": "Passwort",
+      "subtitle": "Sicherheitsrichtlinie des Kontos",
       "complexity_label": "Starkes Passwort erforderlich",
       "complexity_on": "Erforderlich",
       "complexity_off": "Optional",
@@ -235,6 +237,7 @@
     },
     "twofactor": {
       "title": "Zwei-Faktor-Authentifizierung",
+      "subtitle": "Zusätzlicher Schutz Ihres Kontos",
       "enabled": "Aktiviert",
       "disabled": "Deaktiviert",
       "disable_description": "Die Zwei-Faktor-Authentifizierung erhöht die Sicherheit Ihres Kontos. Geben Sie Ihr Passwort ein, um sie zu deaktivieren.",
@@ -245,12 +248,14 @@
     },
     "admin": {
       "title": "Verwaltung",
+      "subtitle": "Detaillierte Protokollierung der Vorgänge",
       "debug_description": "Aktivieren Sie den Debug-Modus, um alle detaillierten Vorgänge in logs/app.log zu protokollieren.",
       "debug_mode": "Debug-Modus",
       "debug_on": "Aktiviert",
       "debug_off": "Deaktiviert",
 
       "rotation_title": "Protokollrotation",
+      "rotation_subtitle": "Protokollgröße und Anzahl der Sicherungskopien",
       "rotation_on": "Aktiviert",
       "rotation_off": "Deaktiviert",
 

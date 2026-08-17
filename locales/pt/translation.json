@@ -210,6 +210,7 @@
     "back_to_dashboard": "← Voltar ao painel",
     "personal_info": {
       "title": "Informações pessoais",
+      "subtitle": "Seus dados de contato",
       "first_name": "Nome",
       "last_name": "Sobrenome",
       "email": "E-mail",
@@ -217,6 +218,7 @@
     },
     "password": {
       "title": "Senha",
+      "subtitle": "Política de segurança da conta",
       "complexity_label": "Exigir senha forte",
       "complexity_on": "Obrigatório",
       "complexity_off": "Opcional",
@@ -235,6 +237,7 @@
     },
     "twofactor": {
       "title": "Autenticação de dois fatores",
+      "subtitle": "Proteção adicional para sua conta",
       "enabled": "Ativada",
       "disabled": "Desativada",
       "disable_description": "A autenticação de dois fatores aumenta a segurança da sua conta. Digite sua senha para desativá-la.",
@@ -245,12 +248,14 @@
     },
     "admin": {
       "title": "Administração",
+      "subtitle": "Registro detalhado das operações",
       "debug_description": "Ative o modo de depuração para registrar todas as operações detalhadas em logs/app.log.",
       "debug_mode": "Modo de depuração",
       "debug_on": "Ativado",
       "debug_off": "Desativado",
 
       "rotation_title": "Rotação de registos",
+      "rotation_subtitle": "Tamanho e número de backups dos logs",
       "rotation_on": "Ativada",
       "rotation_off": "Desativada",
 

@@ -210,6 +210,7 @@
     "back_to_dashboard": "← Ar ais go dtí an painéal",
     "personal_info": {
       "title": "Faisnéis phearsanta",
+      "subtitle": "Do shonraí teagmhála",
       "first_name": "Ainm",
       "last_name": "Sloinne",
       "email": "Ríomhphost",
@@ -217,6 +218,7 @@
     },
     "password": {
       "title": "Pasfhocal",
+      "subtitle": "Beartas slándála an chuntais",
       "complexity_label": "Éiligh pasfhocal láidir",
       "complexity_on": "Riachtanach",
       "complexity_off": "Roghnach",
@@ -235,6 +237,7 @@
     },
     "twofactor": {
       "title": "Fíordheimhniú dhá fhachtóir",
+      "subtitle": "Cosaint bhreise do do chuntas",
       "enabled": "Cumasaithe",
       "disabled": "Díchumasaithe",
       "disable_description": "Cuireann fíordheimhniú dhá fhachtóir le slándáil do chuntais. Cuir isteach do phasfhocal chun é a dhíchumasú.",
@@ -245,12 +248,14 @@
     },
     "admin": {
       "title": "Riarachán",
+      "subtitle": "Logáil mhionsonraithe oibríochtaí",
       "debug_description": "Cumasaigh an mód dífhabhtaithe chun gach oibríocht mhionsonraithe a thaifeadadh i logs/app.log.",
       "debug_mode": "Mód dífhabhtaithe",
       "debug_on": "Cumasaithe",
       "debug_off": "Díchumasaithe",
 
       "rotation_title": "Rothlú logaí",
+      "rotation_subtitle": "Méid na logaí agus líon na gcúltacaí",
       "rotation_on": "Cumasaithe",
       "rotation_off": "Díchumasaithe",
 

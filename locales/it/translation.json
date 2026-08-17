@@ -210,6 +210,7 @@
     "back_to_dashboard": "← Torna alla dashboard",
     "personal_info": {
       "title": "Informazioni personali",
+      "subtitle": "I tuoi dati di contatto",
       "first_name": "Nome",
       "last_name": "Cognome",
       "email": "Email",
@@ -217,6 +218,7 @@
     },
     "password": {
       "title": "Password",
+      "subtitle": "Politica di sicurezza dell'account",
       "complexity_label": "Richiedi password sicura",
       "complexity_on": "Richiesto",
       "complexity_off": "Facoltativo",
@@ -235,6 +237,7 @@
     },
     "twofactor": {
       "title": "Autenticazione a due fattori",
+      "subtitle": "Protezione aggiuntiva per il tuo account",
       "enabled": "Attivata",
       "disabled": "Disattivata",
       "disable_description": "L'autenticazione a due fattori aumenta la sicurezza del tuo account. Inserisci la tua password per disattivarla.",
@@ -245,12 +248,14 @@
     },
     "admin": {
       "title": "Amministrazione",
+      "subtitle": "Registrazione dettagliata delle operazioni",
       "debug_description": "Attiva la modalità debug per registrare tutte le operazioni dettagliate in logs/app.log.",
       "debug_mode": "Modalità debug",
       "debug_on": "Attivato",
       "debug_off": "Disattivato",
 
       "rotation_title": "Rotazione dei log",
+      "rotation_subtitle": "Dimensione dei log e numero di backup",
       "rotation_on": "Attivata",
       "rotation_off": "Disattivata",
 

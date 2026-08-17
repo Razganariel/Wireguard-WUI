@@ -210,6 +210,7 @@
     "back_to_dashboard": "← Back to dashboard",
     "personal_info": {
       "title": "Personal information",
+      "subtitle": "Your contact details",
       "first_name": "First name",
       "last_name": "Last name",
       "email": "Email",
@@ -217,6 +218,7 @@
     },
     "password": {
       "title": "Password",
+      "subtitle": "Account security policy",
       "complexity_label": "Require strong password",
       "complexity_on": "Required",
       "complexity_off": "Optional",
@@ -235,6 +237,7 @@
     },
     "twofactor": {
       "title": "Two-factor authentication",
+      "subtitle": "Extra protection for your account",
       "enabled": "Enabled",
       "disabled": "Disabled",
       "disable_description": "Two-factor authentication increases your account security. Enter your password to disable it.",
@@ -245,12 +248,14 @@
     },
     "admin": {
       "title": "Administration",
+      "subtitle": "Detailed operation logging",
       "debug_description": "Enable debug mode to log all detailed operations in logs/app.log.",
       "debug_mode": "Debug mode",
       "debug_on": "Enabled",
       "debug_off": "Disabled",
 
       "rotation_title": "Log rotation",
+      "rotation_subtitle": "Log size and number of backups",
       "rotation_on": "Enabled",
       "rotation_off": "Disabled",
 
